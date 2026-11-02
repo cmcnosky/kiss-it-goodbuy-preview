@@ -1,13 +1,16 @@
 KISS IT GOOD BUY — WEBSITE DESIGN PREVIEW
 
-Preview: https://cmcnosky.github.io/kiss-it-goodbuy-preview/
+https://cmcnosky.github.io/kiss-it-goodbuy-preview/
 
-Independent website design concept for review. This is not the business's official website. Current inventory and purchasing are at https://kissitgoodbuy.net/.
+Independent website design concept for review.
+Six pages and 20 selected product records checked November 2, 2026.
+The featured catalog is a dated snapshot; current inventory and purchasing
+remain at https://kissitgoodbuy.net/.
 
-This repository contains the static public preview files only.
-Business artwork and photographs remain the property of their respective
-rights holders. Font licenses are included in licenses/.
+Search, category and budget filters, shortlist comparison and sharing,
+product detail links, and email-draft preparation demonstrate the design.
+Saved finds stay in the browser and do not reserve pieces. No email is sent
+and no photos are uploaded by this preview.
 
-Featured prices were recorded November 2, 2026. Check the linked live store
-for current price and availability. Saved finds stay in the visitor's browser.
-The consignment helper prepares an email draft; it does not send one.
+This repository contains only static public website files and font licenses.
+Business artwork and photography remain with their respective rights holders.

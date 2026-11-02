@@ -10,6 +10,9 @@ window.PRODUCTS = [
     "compareAtPrice": 1199.0,
     "available": true,
     "dimensionsRaw": "65 x 28 x 33 in — confirm width, depth and height with the gallery",
+    "dimensionsShort": "65 x 28 x 33 in (axes not labeled)",
+    "materialNote": "Cut velvet leopard upholstery",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/leopard-loveseat.jpg",
     "altImage": "assets/products/leopard-loveseat-alt.jpg",
     "sourceImageUrls": [
@@ -29,6 +32,9 @@ window.PRODUCTS = [
     "compareAtPrice": 999.0,
     "available": true,
     "dimensionsRaw": "44 x 22 x 62.5 in — confirm width, depth and height with the gallery",
+    "dimensionsShort": "44 x 22 x 62.5 in (axes not labeled)",
+    "materialNote": "Rattan",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/peacock-chair.jpg",
     "altImage": "assets/products/peacock-chair-alt.jpg",
     "sourceImageUrls": [
@@ -48,6 +54,8 @@ window.PRODUCTS = [
     "compareAtPrice": 3490.0,
     "available": true,
     "dimensionsRaw": "31 x 32 x 30 in — confirm width, depth and height with the gallery",
+    "dimensionsShort": "31 x 32 x 30 in (axes not labeled)",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/copper-swivel-chair.jpg",
     "altImage": "assets/products/copper-swivel-chair-alt.jpg",
     "sourceImageUrls": [
@@ -67,6 +75,9 @@ window.PRODUCTS = [
     "compareAtPrice": 3280.0,
     "available": true,
     "dimensionsRaw": "54 in diameter x 29.5 in high",
+    "dimensionsShort": "54 in dia x 29.5 in H",
+    "materialNote": "Hammered zinc top; oak trestle base",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/hammered-zinc-table.jpg",
     "altImage": "assets/products/hammered-zinc-table-alt.jpg",
     "sourceImageUrls": [
@@ -86,6 +97,9 @@ window.PRODUCTS = [
     "compareAtPrice": 1999.0,
     "available": true,
     "dimensionsRaw": "74 x 18 x 48 in — confirm width, depth and height with the gallery",
+    "dimensionsShort": "74 x 18 x 48 in (axes not labeled)",
+    "materialNote": "Teak",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/g-plan-sideboard.jpg",
     "altImage": "assets/products/g-plan-sideboard-alt.jpg",
     "sourceImageUrls": [
@@ -105,6 +119,8 @@ window.PRODUCTS = [
     "compareAtPrice": 3000.0,
     "available": true,
     "dimensionsRaw": "68 x 21 x 38 in — confirm width, depth and height with the gallery",
+    "dimensionsShort": "68 x 21 x 38 in (axes not labeled)",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/madeline-sideboard.jpg",
     "altImage": "assets/products/madeline-sideboard-alt.jpg",
     "sourceImageUrls": [
@@ -124,6 +140,8 @@ window.PRODUCTS = [
     "compareAtPrice": 389.0,
     "available": true,
     "dimensionsRaw": "32 in wide x 35 in high",
+    "dimensionsShort": "32 in W x 35 in H",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/art-deco-fan-mirror.jpg",
     "altImage": "assets/products/art-deco-fan-mirror-alt.jpg",
     "sourceImageUrls": [
@@ -143,6 +161,9 @@ window.PRODUCTS = [
     "compareAtPrice": 2500.0,
     "available": true,
     "dimensionsRaw": "48 x 48 in",
+    "dimensionsShort": "48 x 48 in",
+    "materialNote": "Oil painting",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/birdhouse-painting.jpg",
     "altImage": "assets/products/birdhouse-painting-alt.jpg",
     "sourceImageUrls": [
@@ -162,6 +183,9 @@ window.PRODUCTS = [
     "compareAtPrice": 10000.0,
     "available": true,
     "dimensionsRaw": "72 in long x 19 in wide x 24 in high",
+    "dimensionsShort": "72 in L x 19 in W x 24 in H",
+    "materialNote": "Bronze",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/bronze-leopard.jpg",
     "altImage": "assets/products/bronze-leopard-alt.jpg",
     "sourceImageUrls": [
@@ -181,6 +205,8 @@ window.PRODUCTS = [
     "compareAtPrice": 699.0,
     "available": true,
     "dimensionsRaw": "25 in high",
+    "dimensionsShort": "25 in H",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/dragonfly-lamp.jpg",
     "altImage": "assets/products/dragonfly-lamp-alt.jpg",
     "sourceImageUrls": [
@@ -200,6 +226,9 @@ window.PRODUCTS = [
     "compareAtPrice": 9999.0,
     "available": true,
     "dimensionsRaw": "54.5 in wide x 32 in high; overall 55.5 in per listing title",
+    "dimensionsShort": "54.5 in W x 32 in H; overall 55.5 in",
+    "materialNote": "Brass",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/brenta-chandelier.jpg",
     "altImage": "assets/products/brenta-chandelier-alt.jpg",
     "sourceImageUrls": [
@@ -219,11 +248,187 @@ window.PRODUCTS = [
     "compareAtPrice": 2299.0,
     "available": true,
     "dimensionsRaw": "31.38 x 31.38 in diameter x 29.88 in high (height from the live product description)",
+    "dimensionsShort": "31.38 x 31.38 in dia x 29.88 in H",
+    "materialNote": "Brass and lucite",
+    "recordedAt": "2026-11-02T20:12:56Z",
     "image": "assets/products/prima-vista-chandelier.jpg",
     "altImage": null,
     "sourceImageUrls": [
       "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/c70ea2a20e36fe098ff1758a650b5f28.jpg?v=1788122673"
     ],
     "itemNumber": "8352-23"
+  },
+  {
+    "category": "Art & Objects",
+    "exactTitle": "PAIR Vintage Blonde Elongated Hexagonal Mirrors 23x46",
+    "displayTitle": "Pair of Vintage Blonde Hexagonal Mirrors",
+    "sourceProductType": "Wall Mirrors",
+    "handle": "pair-vintage-blonde-elongated-hexagonal-mirrors",
+    "productUrl": "https://kissitgoodbuy.net/products/pair-vintage-blonde-elongated-hexagonal-mirrors",
+    "price": 299.0,
+    "compareAtPrice": null,
+    "available": true,
+    "dimensionsRaw": "23 x 46 in (dimension order is not labeled in the source)",
+    "dimensionsShort": "23 x 46 in (axes not labeled)",
+    "recordedAt": "2026-11-02T20:12:56Z",
+    "image": "assets/products/vintage-hex-mirrors.jpg",
+    "altImage": "assets/products/vintage-hex-mirrors-alt.jpg",
+    "sourceImageUrls": [
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/8edaba24c302b713f3447c71dbbe6229.jpg?v=1792788701",
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/509e835d475b88702913b2152e7209d0.jpg?v=1792788701"
+    ],
+    "itemNumber": "8435-111"
+  },
+  {
+    "category": "Art & Objects",
+    "exactTitle": "Clear Quartz Crystal Skull 5.5\"H",
+    "displayTitle": "Clear Quartz Crystal Skull",
+    "sourceProductType": "Quartz",
+    "handle": "clear-quartz-crystal-skull",
+    "productUrl": "https://kissitgoodbuy.net/products/clear-quartz-crystal-skull",
+    "price": 225.0,
+    "compareAtPrice": null,
+    "available": true,
+    "dimensionsRaw": "5.5 in high",
+    "dimensionsShort": "5.5 in H",
+    "materialNote": "Clear quartz",
+    "recordedAt": "2026-11-02T20:12:56Z",
+    "image": "assets/products/clear-quartz-skull.jpg",
+    "altImage": "assets/products/clear-quartz-skull-alt.jpg",
+    "sourceImageUrls": [
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/a65d4ca59b470bcfff45e728b45e266a.jpg?v=1793127110",
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/2bc88e8a05712520a55470d87a78ddda.jpg?v=1793127110"
+    ],
+    "itemNumber": "5987-164"
+  },
+  {
+    "category": "Art & Objects",
+    "exactTitle": "Hand Carved Pyrite Skull 3\"H",
+    "displayTitle": "Hand-Carved Pyrite Skull",
+    "sourceProductType": "Mineral Speciman",
+    "handle": "mineral-speciman-hand-carved-pyrite-skull",
+    "productUrl": "https://kissitgoodbuy.net/products/mineral-speciman-hand-carved-pyrite-skull",
+    "price": 139.0,
+    "compareAtPrice": null,
+    "available": true,
+    "dimensionsRaw": "3 in high",
+    "dimensionsShort": "3 in H",
+    "materialNote": "Hand-carved pyrite",
+    "recordedAt": "2026-11-02T20:12:56Z",
+    "image": "assets/products/pyrite-skull.jpg",
+    "altImage": "assets/products/pyrite-skull-alt.jpg",
+    "sourceImageUrls": [
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/e10f93480086bb882a9a6c5d20fad62c.jpg?v=1793127035",
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/813b99d3b814fd47b155bf20bb0ffbba.jpg?v=1793127035"
+    ],
+    "itemNumber": "5987-163"
+  },
+  {
+    "category": "Tables & Storage",
+    "exactTitle": "Joss & Main Signa Natural Oak Dining Table 76x36x30",
+    "displayTitle": "Signa Natural Oak Dining Table",
+    "sourceProductType": "Table",
+    "handle": "joss-main-signa-natural-oak-dining-table",
+    "productUrl": "https://kissitgoodbuy.net/products/joss-main-signa-natural-oak-dining-table",
+    "price": 899.0,
+    "compareAtPrice": 1935.0,
+    "available": true,
+    "dimensionsRaw": "76 x 36 x 30 in (dimension order is not labeled in the source)",
+    "dimensionsShort": "76 x 36 x 30 in (axes not labeled)",
+    "materialNote": "Natural oak",
+    "recordedAt": "2026-11-02T20:12:56Z",
+    "image": "assets/products/signa-oak-table.jpg",
+    "altImage": "assets/products/signa-oak-table-alt.jpg",
+    "sourceImageUrls": [
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/18b67423959f2c9b697ff54c57fda8ac.jpg?v=1792787993",
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/0233a6a5ca6b33503d210458652a2b6b.jpg?v=1792787993"
+    ],
+    "itemNumber": "3413-15"
+  },
+  {
+    "category": "Tables & Storage",
+    "exactTitle": "Henredon Ming-Style Walnut Side Table 26x26x25",
+    "displayTitle": "Henredon Ming-Style Walnut Side Table",
+    "sourceProductType": "Console Table",
+    "handle": "henredon-ming-style-walnut-side-table-26x26x25-1",
+    "productUrl": "https://kissitgoodbuy.net/products/henredon-ming-style-walnut-side-table-26x26x25-1",
+    "price": 319.2,
+    "compareAtPrice": 399.0,
+    "available": true,
+    "dimensionsRaw": "26 x 26 x 25 in (dimension order is not labeled in the source)",
+    "dimensionsShort": "26 x 26 x 25 in (axes not labeled)",
+    "materialNote": "Walnut",
+    "recordedAt": "2026-11-02T20:12:56Z",
+    "image": "assets/products/henredon-ming-side-table.jpg",
+    "altImage": "assets/products/henredon-ming-side-table-alt.jpg",
+    "sourceImageUrls": [
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/8c0317e7a6f757ed8076fef121c498be.jpg?v=1790459954",
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/bec38d3b60b2b264d7010e48b2b6861d.jpg?v=1790459954"
+    ],
+    "itemNumber": "6764-261"
+  },
+  {
+    "category": "Seating",
+    "exactTitle": "Classic Home Element 3Pc Charcoal Lounge Chair W/Boucle Weave Fabric 46x46x14",
+    "displayTitle": "Element Charcoal Boucle Lounge Chair",
+    "sourceProductType": "Chair",
+    "handle": "classic-home-element-3pc-charcoal-lounge-chair-w-boucle-weave-fabric-46x46x14",
+    "productUrl": "https://kissitgoodbuy.net/products/classic-home-element-3pc-charcoal-lounge-chair-w-boucle-weave-fabric-46x46x14",
+    "price": 327.6,
+    "compareAtPrice": 1123.0,
+    "available": true,
+    "dimensionsRaw": "46 x 46 x 14 in (dimension order is not labeled in the source)",
+    "dimensionsShort": "46 x 46 x 14 in (axes not labeled)",
+    "materialNote": "Boucle weave fabric",
+    "recordedAt": "2026-11-02T20:12:56Z",
+    "image": "assets/products/charcoal-lounge-chair.jpg",
+    "altImage": "assets/products/charcoal-lounge-chair-alt.jpg",
+    "sourceImageUrls": [
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/a525071428138d2fc6d6434f1e945dcc.jpg?v=1788293728",
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/7aaa9da227e3ffa6f1d15cebeb41dbbc.jpg?v=1788293728"
+    ],
+    "itemNumber": "8467-8"
+  },
+  {
+    "category": "Lighting",
+    "exactTitle": "Capital Lighting Axis 4 Lt 23\"W Cage Pendant NEW",
+    "displayTitle": "Capital Lighting Axis Cage Pendant",
+    "sourceProductType": "Pendant",
+    "handle": "capital-lighting-axis-4-lt-23w-cage-pendant-new",
+    "productUrl": "https://kissitgoodbuy.net/products/capital-lighting-axis-4-lt-23w-cage-pendant-new",
+    "price": 245.0,
+    "compareAtPrice": 590.0,
+    "available": true,
+    "dimensionsRaw": "23 in wide",
+    "dimensionsShort": "23 in W",
+    "recordedAt": "2026-11-02T20:12:56Z",
+    "image": "assets/products/axis-pendant.jpg",
+    "altImage": null,
+    "sourceImageUrls": [
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/994cc823764351fb4863a72a96dd0bcd.jpg?v=1786829102"
+    ],
+    "itemNumber": "8352-18"
+  },
+  {
+    "category": "Art & Objects",
+    "exactTitle": "Contemporary Silver-tone Medallion Sculpture On Marble 24\"D x 30\"H",
+    "displayTitle": "Silver-Tone Medallion Sculpture on Marble",
+    "sourceProductType": "Sculpture",
+    "handle": "contemporary-silver-tone-medallion-sculpture-on-marble-24d-x-30h",
+    "productUrl": "https://kissitgoodbuy.net/products/contemporary-silver-tone-medallion-sculpture-on-marble-24d-x-30h",
+    "price": 87.5,
+    "compareAtPrice": 125.0,
+    "available": true,
+    "dimensionsRaw": "24\"D x 30\"H (source notation; D is not expanded)",
+    "dimensionsShort": "24\"D x 30\"H (source notation)",
+    "materialNote": "Silver-tone medallion on marble",
+    "recordedAt": "2026-11-02T20:12:56Z",
+    "image": "assets/products/medallion-sculpture.jpg",
+    "altImage": "assets/products/medallion-sculpture-alt.jpg",
+    "sourceImageUrls": [
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/2a49f1cf566af9c351119f1500929f10.jpg?v=1786469605",
+      "https://cdn.shopify.com/s/files/1/0289/5239/5911/files/aadbbbbde87eb00e0b79e92a3306d55d.jpg?v=1786469605"
+    ],
+    "itemNumber": "8253-2"
   }
 ];
