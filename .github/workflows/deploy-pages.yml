@@ -1,0 +1,77 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      refresh:
+        description: Refresh the public Shopify catalog before deployment
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    - cron: '17 11 * * *'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the public repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Stage the public allowlist
+        run: node _build-tools/stage-public-build.mjs
+
+      - name: Refresh Shopify catalog
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.refresh == true) }}
+        run: node .build/scripts/sync-catalog.mjs
+
+      - name: Render static entry points and product pages
+        run: node .build/scripts/render-pages.mjs --dist .build/dist
+
+      - name: Validate the staged storefront
+        run: |
+          node --check .build/dist/app.js
+          node --check .build/dist/commerce.js
+          node --check .build/dist/storefront-data.js
+          node .build/scripts/test-commerce.mjs
+          node .build/scripts/test-storefront-data.mjs
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the verified Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .build/dist
+          include-hidden-files: true
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
