@@ -2,12 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
+function writeRenderedFile(file,content){const temporary=file+'.render-tmp';fs.writeFileSync(temporary,content);fs.renameSync(temporary,file);}
 const flag=process.argv.indexOf('--dist');
 const dist=flag>=0?path.resolve(process.argv[flag+1]):path.resolve(import.meta.dirname,'../dist');
 const inventory=JSON.parse(fs.readFileSync(path.join(dist,'inventory.json'),'utf8'));
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const encode=x=>JSON.stringify(x).replaceAll('<','\\u003c').replaceAll('>','\\u003e').replaceAll('&','\\u0026');
-fs.writeFileSync(path.join(dist,'inventory.js'),'window.KIGB_INVENTORY='+encode(inventory)+';\n');
+writeRenderedFile(path.join(dist,'inventory.js'),'window.KIGB_INVENTORY='+encode(inventory)+';\n');
 const app=fs.readFileSync(path.join(dist,'app.js'),'utf8');
 assert.ok(app.includes('// BROWSER START'));
 const prefix=app.slice(0,app.indexOf('// BROWSER START'));
@@ -16,19 +17,19 @@ function render(url,product){const context={location:new URL(url,'https://cmcnos
 const siteUrl='https://cmcnosky.github.io/kiss-it-goodbuy-preview/';
 function html(body,{base='./',title,description,product,pagePath=''}={}){
 const photo=product?.images[0];
-const image=photo?.src||siteUrl+'assets/social-preview-kiss-it-good-buy-v3.png';
-const imageAlt=photo?.src?(photo.alt||product.title):'Kiss It Good Buy in large lettering with the original kiss logo, Love at first find, and the gallery’s leopard loveseat, peacock chair, and stained-glass lamp.';
+const image=photo?.src||siteUrl+'assets/social-preview-kiss-it-good-buy-v4.png';
+const imageAlt=photo?.src?(photo.alt||product.title):'Kiss It Good Buy in large teal lettering with the exact original kiss logo, cream and gold Love at first find lettering, coral and gold framing, and the gallery’s leopard loveseat, peacock chair, and stained-glass lamp.';
 const width=photo?.src?photo.width:1200;
 const height=photo?.src?photo.height:630;
 const imageType=photo?.src?({jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'}[new URL(image).pathname.split('.').pop().toLowerCase()]):'image/png';
 const imageDetails=(imageType?`<meta property="og:image:type" content="${imageType}">`:'')+(width>0&&height>0?`<meta property="og:image:width" content="${width}"><meta property="og:image:height" content="${height}">`:'');
 return `<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="${base}"><title>${escape(title)} | Kiss It Good Buy</title><meta name="description" content="${escape(description)}"><meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#a62c36"><meta property="og:type" content="website"><meta property="og:site_name" content="Kiss It Good Buy"><meta property="og:url" content="${escape(siteUrl+pagePath)}"><meta property="og:title" content="${escape(title)} | Kiss It Good Buy"><meta property="og:description" content="${escape(description)}"><meta property="og:image" content="${escape(image)}">${imageDetails}<meta property="og:image:alt" content="${escape(imageAlt)}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${escape(title)} | Kiss It Good Buy"><meta name="twitter:description" content="${escape(description)}"><meta name="twitter:image" content="${escape(image)}"><meta name="twitter:image:alt" content="${escape(imageAlt)}"><link rel="icon" href="assets/brand-original.png"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="storefront.css"><link rel="stylesheet" href="integration.css">${product?'<script>window.KIGB_PRODUCT_HANDLE='+encode(product.handle)+'</script>':''}<script src="catalog-normalize.js" defer></script><script src="inventory.js" defer></script><script src="catalog.js" defer></script><script src="commerce.js" defer></script><script src="storefront-data.js" defer></script><script src="app.js" defer></script></head><body><a href="#main" class="skip-link">Skip to content</a><div id="app">${body}</div><noscript><div class="no-js"><p>Interactive filters, the bag, and live updates need JavaScript. <a href="https://kissitgoodbuy.net/collections/all">Shop directly at Kiss It Good Buy</a>.</p></div></noscript><div id="toast" class="toast" role="status" hidden></div></body></html>\n`;}
 const pages={index:['Love at first find','Explore distinctive furniture, art, and decor from Kiss It Good Buy in Grapevine. Shop the full inventory, compare your favorites, or consign a piece.'],collection:['Shop every good find','Browse the complete Kiss It Good Buy online inventory. Search by piece, brand, price, or item number, compare favorites, and buy through the store.'],story:['A Grapevine original since 2002','Discover the gallery, its history, and the eclectic furniture, art, and decor that give Kiss It Good Buy its character.'],consign:['Give a good piece its next chapter','Clear consignment terms, photo requirements, and an email helper for offering your furniture to Kiss It Good Buy.'],visit:['Visit the gallery','Visit Kiss It Good Buy at 201 East Franklin Street, Grapevine. Hours, directions, pickup, and contact details.'],shortlist:['Your shortlist','Compare your favorite pieces side by side, share your selection, and ask about exact item numbers.'],product:['A closer look','Explore a gallery piece, its photographs and details, and add it to your shopping bag.'],cart:['Your shopping bag','Review your pieces and continue to Kiss It Good Buy’s secure Shopify checkout.']};
-for(const [name,[title,description]] of Object.entries(pages))fs.writeFileSync(path.join(dist,name+'.html'),html(render('/'+name+'.html'),{title,description,pagePath:name==='index'?'':name+'.html'}));
+for(const [name,[title,description]] of Object.entries(pages))writeRenderedFile(path.join(dist,name+'.html'),html(render('/'+name+'.html'),{title,description,pagePath:name==='index'?'':name+'.html'}));
 fs.mkdirSync(path.join(dist,'products'),{recursive:true});
 const handles=new Set(inventory.products.map(p=>p.handle));
 for(const name of fs.readdirSync(path.join(dist,'products')))if(!handles.has(name))fs.rmSync(path.join(dist,'products',name),{recursive:true,force:true});
-for(const product of inventory.products){assert.match(product.handle,/^[a-z0-9][a-z0-9-]*$/);const dir=path.join(dist,'products',product.handle);fs.mkdirSync(dir,{recursive:true});fs.writeFileSync(path.join(dir,'index.html'),html(render('/products/'+product.handle+'/',product),{base:'../../',title:product.title,description:product.description.replace(/\s+/g,' ').slice(0,200),product,pagePath:'products/'+product.handle+'/'}));}
+for(const product of inventory.products){assert.match(product.handle,/^[a-z0-9][a-z0-9-]*$/);const dir=path.join(dist,'products',product.handle);fs.mkdirSync(dir,{recursive:true});writeRenderedFile(path.join(dir,'index.html'),html(render('/products/'+product.handle+'/',product),{base:'../../',title:product.title,description:product.description.replace(/\s+/g,' ').slice(0,200),product,pagePath:'products/'+product.handle+'/'}));}
 for(const url of ['/','/index','/index/','/collection','/collection/','/kiss-it-goodbuy-preview/','/cart','/shortlist'])render(url);
 const allFiles=[...Object.keys(pages).map(x=>path.join(dist,x+'.html')),...inventory.products.map(p=>path.join(dist,'products',p.handle,'index.html'))];
 let refs=0;
