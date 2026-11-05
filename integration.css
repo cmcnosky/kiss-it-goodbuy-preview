@@ -102,7 +102,7 @@
 .compare-scroll,.compare-table th,.compare-table td,.dialog,.filter-dialog{border-width:2px}
 
 /* The gallery itself is the identity: rooms, objects, and factual labels. */
-:root{--paper:#faf5e9;--ink:#2d2927;--red:#a34232;--muted:#665e59;--line:#c6b6a0;--soft:#ece4d5;--coral:#e49580;--celadon:#d6e0cc;--ochre:#d7ad54;--cream:#faf5e9}
+:root{--paper:#fff9ed;--ink:#2d2927;--red:#a34232;--muted:#665e59;--line:#c6b6a0;--soft:#ece4d5;--coral:#e58a78;--celadon:#bfd9b7;--ochre:#edc56b;--cream:#fff9ed;--frame:#8f2f28}
 body{background:var(--paper)}
 ::selection{background:var(--ochre);color:var(--ink)}
 :focus-visible{outline:3px solid var(--cream);outline-offset:2px;box-shadow:0 0 0 6px var(--ink)}
@@ -112,7 +112,7 @@ body{background:var(--paper)}
 .site-header .wordmark>img{width:76px}
 .brand-name{font:700 25px/1.1 Georgia,'Times New Roman',serif;letter-spacing:-.045em;color:var(--ink)}
 .brand-name>small{font-family:Mono,monospace;color:var(--muted);font-size:9px;letter-spacing:.06em;margin-top:7px}
-.site-header .nav a[aria-current=page]{color:var(--red)}
+.site-header .nav a[aria-current]{color:var(--red)}
 .store-navigation{background:var(--celadon);color:var(--ink);border-bottom-color:var(--coral);gap:8px}
 .home-store-navigation{display:none}
 .store-navigation a:hover{background:var(--cream);color:var(--red)}
@@ -337,3 +337,40 @@ body{background:var(--paper)}
 
 .newsletter-form small,.newsletter-form label{color:var(--ink)}
 .header-actions .saved-count,.header-actions .cart-count{border-color:var(--red)}
+
+/* Richer pastels, separated by warm red edges that remain distinct on each field. */
+.site-header,.store-navigation,.room-photograph,.room-welcome,.gallery-directory,
+.gallery-proof,.gallery-chapter,.chapter-shop,.form-chapter,.color-chapter .chapter-shop,
+.gallery-doors,.consign-door,.catalog-intro,.story-opener,.gallery-values,
+.gift-recipient-panel,.form-box,.consignment-at-a-glance,.photo-checklist,
+.location-placard,.archive-grid figure,.story-opener>img,.gallery-note>img,
+.shop-sidebar,.main-product-image,.product-photo,.footer-logo{border-color:var(--frame)}
+.room-entrance{border-bottom:5px solid var(--frame)}
+.room-welcome{box-shadow:10px 10px 0 var(--ochre),12px 12px 0 var(--frame)}
+.gallery-note{border-bottom:0}
+.gallery-doors{border-bottom:5px solid var(--frame)}
+.story-end,.social-band{border-block:5px solid var(--frame)}
+.newsletter-block{border:2px solid var(--frame)}
+.button,.button.red,.button.outline,.button.white,.card-add,
+.visit-door .button,.newsletter-form .button,.newsletter-form input,
+.discovery-heading .home-search,.collection-chips a,.active-filters a,
+.filter-toggle,.filter-group input,.filter-group select,.search-wrap,
+.variant-options select,.purchase-controls input,.field input,.field select,.field textarea,
+.email-ready textarea,.save,.cart-quantity,.cart-quantity input{border-color:var(--frame)}
+.button:hover,.button.red:hover,.button.outline:hover,.button.white:hover,
+.visit-door .button:hover,.newsletter-form .button:hover,.card-add:hover{
+ background:var(--frame);border-color:var(--frame);color:var(--cream)
+}
+.save[aria-pressed=true],.pagination [aria-current=page]{background:var(--frame);border-color:var(--frame);color:var(--cream)}
+.gallery-directory>a+a{border-left-color:var(--frame)}
+.browse-mirrors,.consign-door li,.visit-door .hours>div,.consignment-at-a-glance>div{border-color:var(--frame)}
+.gallery-proof,.catalog-intro,.visit-door,.newsletter-block,.chapter-photograph figcaption{color:var(--ink)}
+.gallery-proof .eyebrow,.visit-door .eyebrow,.newsletter-form small,.newsletter-form label{color:var(--ink)}
+@media(max-width:640px){
+ .room-welcome{box-shadow:5px 5px 0 var(--ochre),7px 7px 0 var(--frame)}
+ .consign-door,.gallery-values>div+div,.consignment-at-a-glance>div:last-child{border-color:var(--frame)}
+}
+
+.form-chapter .object-tag,.form-chapter .object-tag span,.form-chapter .card-dimensions,.form-chapter .previous-price,.photo-checklist small{color:var(--ink)}
+
+.shop-sidebar .filter-group label{color:var(--ink)}

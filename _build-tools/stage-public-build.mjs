@@ -39,7 +39,9 @@ const REQUIRED_TOOLS = [
   'test-commerce.mjs',
   'test-storefront-data.mjs',
   'test-storefront.mjs',
-  'test-interactions.mjs'
+  'test-interactions.mjs',
+  'test-cross-tab.mjs',
+  'test-palette.mjs'
 ];
 
 function assertSafeBuildPath() {

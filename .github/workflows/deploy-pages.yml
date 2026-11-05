@@ -59,6 +59,8 @@ jobs:
           node .build/scripts/test-storefront-data.mjs
           node .build/scripts/test-storefront.mjs
           node .build/scripts/test-interactions.mjs
+          node .build/scripts/test-cross-tab.mjs
+          node .build/scripts/test-palette.mjs
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

@@ -436,6 +436,19 @@
       });
     }
     if (!result.cart) throw new CommerceError('CART_CREATE_FAILED', 'Shopify did not create a cart.');
+    const unavailableLines = (result.cart.lines?.nodes || [])
+      .filter((line) => line?.merchandise?.availableForSale === false)
+      .map((line) => ({
+        variantId: line.merchandise.id,
+        quantity: Number(line.quantity || 0)
+      }));
+    if (unavailableLines.length) {
+      throw new CommerceError('CART_LINE_UNAVAILABLE', 'A piece became unavailable while checkout was being prepared.', {
+        unavailableLines,
+        currentLines: checked.lines,
+        cart: result.cart
+      });
+    }
     const mismatches = compareCreatedLines(checked.lines, result.cart.lines?.nodes);
     if (mismatches.length) {
       throw new CommerceError('CART_LINE_MISMATCH', 'Shopify could not add every requested item and quantity.', {

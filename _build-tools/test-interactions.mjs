@@ -94,6 +94,53 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
   assert.doesNotMatch(markup, /You might also love/, 'gift card does not show an empty recommendations heading');
 }
 
+{
+  const run = bootStorage({});
+  assert.match(run(`page='collection.html';navItem('collection.html','Shop the finds')`), /aria-current="page"/);
+  for (const sectionPage of ['product.html', 'cart.html', 'shortlist.html']) {
+    assert.match(run(`page=${JSON.stringify(sectionPage)};navItem('collection.html','Shop the finds')`), /aria-current="location"/,
+      `${sectionPage} must identify the Shop section as the current location`);
+  }
+  assert.doesNotMatch(run(`page='story.html';navItem('collection.html','Shop the finds')`), /aria-current/);
+  assert.match(run(`page='collection.html';collection()`), /data-open-filters aria-haspopup="dialog" aria-controls="filter-dialog"/,
+    'the filter disclosure identifies the dialog that it opens');
+  const filtered = run(`catalogResults(filterState(new URLSearchParams('q=oak&min=100&budget=500')))`);
+  assert.match(filtered, /aria-label="Remove search filter oak"/);
+  assert.match(filtered, /aria-label="Remove minimum price filter 100"/);
+  assert.match(filtered, /aria-label="Remove maximum price filter 500"/);
+  const footer = run('footer()');
+  assert.match(footer, /action="https:\/\/kissitgoodbuy\.net\/contact#newsletter-form-sections--20243435815149__footer"/,
+    'the newsletter posts to the current official form anchor');
+  assert.match(footer, /href="https:\/\/kissitgoodbuy\.net\/apps\/consignor"/,
+    'the consignor portal uses the verified canonical URL without an avoidable redirect');
+}
+
+{
+  const gift = inventory.products.find((entry) => /gift.?card/i.test(`${entry.sourceProductType || ''} ${entry.title}`));
+  const run = bootStorage({ 'kigb-favorites': JSON.stringify([gift.handle]) });
+  const markup = run('shortlistContent()');
+  assert.match(markup, /Digital gift card · choose denomination/);
+  assert.match(markup, /See gift-card terms in the original listing\./);
+  assert.match(markup, /aria-label="Remove [^"]+ from my shortlist"/,
+    'shortlist removal names the affected piece');
+  const quoted = inventory.products.find((entry) => /["&]/.test(entry.title));
+  assert.ok(quoted, 'catalog fixture includes a title that requires attribute escaping');
+  const quotedRun = bootStorage({ 'kigb-favorites': JSON.stringify([quoted.handle]) });
+  const escapedTitle = quotedRun(`esc(PRODUCTS.find(p=>p.handle===${JSON.stringify(quoted.handle)}).displayTitle)`);
+  assert.ok(quotedRun('shortlistContent()').includes(`aria-label="Remove ${escapedTitle} from my shortlist"`),
+    'piece-specific shortlist action remains safely escaped');
+}
+
+{
+  const run = bootStorage({}, new Set(), product.handle);
+  const markup = run('productPage()');
+  assert.match(markup, /data-zoom[^>]+aria-haspopup="dialog" aria-controls="photo-dialog"/,
+    'the photograph disclosure identifies the enlargement dialog');
+  const escapedTitle = run(`esc(PRODUCTS.find(p=>p.handle===${JSON.stringify(product.handle)}).displayTitle)`);
+  assert.ok(markup.includes(`data-save="${product.handle}" aria-pressed="false" aria-label="Save ${escapedTitle}"`),
+    'the product-page shortlist control keeps its item-specific accessible name after a rerender');
+}
+
 const interactionStart = app.indexOf('// INTERACTION STATE START');
 const interactionEnd = app.indexOf('// INTERACTION STATE END');
 assert.ok(interactionStart > 0 && interactionEnd > interactionStart);
@@ -182,6 +229,62 @@ function rootWith(nodes) {
   assert.match(rerenderedBagLink.className, /card-add-confirmation/);
 }
 
+{
+  const copyStart = app.indexOf('let copyFallbackReturnFocus=');
+  const copyEnd = app.indexOf('function updateStatus', copyStart);
+  assert.ok(copyStart > 0 && copyEnd > copyStart);
+  const textarea = {
+    value: '',
+    focus() { document.activeElement = this; },
+    select() { this.selected = true; }
+  };
+  const title = { textContent: '' };
+  let fallback = null;
+  const document = {
+    body: {
+      append(node) {
+        fallback = node;
+        node.isConnected = true;
+      }
+    },
+    activeElement: null,
+    createElement() {
+      return {
+        attributes: {},
+        setAttribute(name, value) { this.attributes[name] = value; },
+        querySelector(selector) {
+          if (selector === 'textarea') return textarea;
+          if (selector === '#copy-fallback-title') return title;
+          return null;
+        },
+        remove() { this.isConnected = false; fallback = null; }
+      };
+    }
+  };
+  const trigger = { isConnected: true, focus() { document.activeElement = this; } };
+  const context = {
+    document,
+    navigator: { clipboard: { async writeText() { throw new Error('clipboard blocked'); } } },
+    $: (selector) => selector === '#copy-link-fallback' ? fallback : null,
+    focusElement(node) { node.focus(); return true; },
+    toast() {}
+  };
+  vm.createContext(context);
+  vm.runInContext(app.slice(copyStart, copyEnd), context);
+  context.value = 'https://example.test/a-share-link';
+  context.trigger = trigger;
+  vm.runInContext('showCopyFallback(value,trigger)', context);
+  assert.equal(fallback.attributes.role, 'region');
+  assert.equal(fallback.attributes['aria-labelledby'], 'copy-fallback-title');
+  assert.equal(title.textContent, 'Copy this text');
+  assert.equal(textarea.value, context.value);
+  assert.equal(textarea.selected, true);
+  assert.equal(document.activeElement, textarea);
+  vm.runInContext('dismissCopyFallback()', context);
+  assert.equal(fallback, null);
+  assert.equal(document.activeElement, trigger, 'dismissing the fallback restores the originating control');
+}
+
 const mergeStart = app.indexOf('function mergeCartCatalog');
 const mergeEnd = app.indexOf('async function refreshInventory', mergeStart);
 assert.ok(mergeStart > 0 && mergeEnd > mergeStart);
@@ -236,7 +339,7 @@ function mergeContext(page) {
 
 assert.match(app, /function refreshHomeMain\(\).*home-search.*restoreFocusState/s);
 assert.match(app, /function refreshProductMain\(\).*dialog\?\.open.*variant:.*quantity:.*photo:.*confirmation:.*restoreFocusState/s);
-assert.match(app, /function renderCart\(\).*captureFocusState.*restoreFocusState/s);
+assert.match(app, /function renderCart\([^)]*\).*captureFocusState.*restoreFocusState/s);
 assert.match(app, /function updateFavorites\(\).*captureFocusState.*restoreFocusState/s);
 const quickAddPath = app.slice(app.indexOf("if(t.hasAttribute('data-quick-add'))"), app.indexOf("if(t.hasAttribute('data-checkout'))"));
 assert.ok(quickAddPath.indexOf('addLine(') < quickAddPath.indexOf('persistCart()'));
@@ -244,5 +347,13 @@ assert.ok(quickAddPath.indexOf('persistCart()') < quickAddPath.indexOf('showQuic
   'the successful quick-add path converts the clicked control synchronously after persisting the cart');
 assert.doesNotMatch(app, /queueMicrotask\(.*showQuickAddConfirmation/s,
   'quick-add confirmation must not depend on a capture-phase microtask race');
+assert.match(app, /emailReady\.setAttribute\('role','region'\).*aria-labelledby.*addEventListener\('submit',\(\)=>focusElement\(emailReady\)\)/s,
+  'the prepared consignment draft is announced and focused after a valid submit');
+assert.match(app, /function syncConditionNote\(\).*pageshow.*syncConditionNote/s,
+  'restored consignment condition values must restore the matching warning');
+assert.match(app, /data-dismiss-copy.*stopImmediatePropagation\(\).*dismissCopyFallback/s,
+  'the clipboard recovery Done action must restore focus through the shared dismissal path');
+assert.match(app, /Escape.*copy-link-fallback.*dismissCopyFallback/s,
+  'the clipboard recovery panel must close with Escape');
 
-console.log('interaction resilience: storage, focus, quick add, live refresh, and cart price-baseline tests passed');
+console.log('interaction resilience: storage, focus, navigation, dialogs, share recovery, consignment, quick add, live refresh, and cart price-baseline tests passed');

@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "fetchedAt": "2026-11-05T02:07:56.468Z",
+  "fetchedAt": "2026-11-05T15:44:56.557Z",
   "source": {
     "baseUrl": "https://kissitgoodbuy.net",
     "productsEndpoint": "https://kissitgoodbuy.net/products.json",
     "collectionsEndpoint": "https://kissitgoodbuy.net/collections.json",
-    "fetchedAt": "2026-11-05T02:07:56.468Z",
+    "fetchedAt": "2026-11-05T15:44:56.557Z",
     "productCount": 249,
     "variantCount": 253,
     "availableProductCount": 249,
@@ -47,25 +47,20 @@
         "handle": "outdoor-furniture",
         "declared": 7,
         "returned": 6
-      },
-      {
-        "handle": "tables",
-        "declared": 23,
-        "returned": 22
       }
     ],
     "productPageHashes": [
       {
         "url": "https://kissitgoodbuy.net/products.json?limit=250&page=1",
-        "sha256": "8425508e219db13d2843a5f9a0264bb0d80a0c2b03d7910a1a777491eecccf4e",
-        "etag": "\"sfr:computation:v2:fb59b5db830a3da5ac336568c9a4375183dd066e0a277364fb27487086912238\""
+        "sha256": "5556fa44f8a019d03d39d084678d2ae1ca65b6ca21dabfdd54e534019ada3d38",
+        "etag": "\"sfr:computation:v2:76c9a46249d6dae6dc90a7a1a55481f37ed888cc91fb239f0e96dff5a8568d13\""
       }
     ],
     "collectionPageHashes": [
       {
         "url": "https://kissitgoodbuy.net/collections.json?limit=250&page=1",
-        "sha256": "13e75a6cd3d2b25658e34d3ee89b001d29a15cab28086805ce7f9b78bb0b44f8",
-        "etag": "\"page_cache:28952395911:CollectionListController:53887a24d5a9893938a6420f1355d233\""
+        "sha256": "a64e3472b7d45f37ac6fdaac0d8065691ff90ddac748e8e757f74465bf53630b",
+        "etag": "\"page_cache:28952395911:CollectionListController:5d325f40fe7023e194739dea5600f02c\""
       }
     ]
   },
@@ -177,7 +172,7 @@
       "title": "Bedroom",
       "description": "",
       "publishedAt": "2020-02-06T16:50:09-05:00",
-      "updatedAt": "2026-11-04T13:57:47-05:00",
+      "updatedAt": "2026-11-05T04:42:38-05:00",
       "image": {
         "src": "https://cdn.shopify.com/s/files/1/0289/5239/5911/collections/bedroom-300x300.png?v=1593726016",
         "alt": "Bedroom - Kiss It Good Buy",
@@ -244,7 +239,7 @@
       "title": "Ceiling & Wall",
       "description": "",
       "publishedAt": "2020-03-19T14:24:47-04:00",
-      "updatedAt": "2026-10-29T04:42:06-04:00",
+      "updatedAt": "2026-11-05T04:42:36-05:00",
       "image": {
         "src": "https://cdn.shopify.com/s/files/1/0289/5239/5911/collections/25ed15dd9dfa402619cb38162b3c276d_350x350_c06ec1db-b83b-48eb-864d-9c69d498244d.jpg?v=1594506502",
         "alt": null,
@@ -428,7 +423,7 @@
       "title": "JUST ADDED",
       "description": "",
       "publishedAt": "2020-01-27T10:37:15-05:00",
-      "updatedAt": "2026-11-04T16:15:48-05:00",
+      "updatedAt": "2026-11-05T04:42:38-05:00",
       "image": null,
       "declaredProductCount": 251,
       "productIds": [
@@ -736,7 +731,7 @@
       "title": "Living Room",
       "description": "",
       "publishedAt": "2020-02-03T15:58:38-05:00",
-      "updatedAt": "2026-11-04T16:14:36-05:00",
+      "updatedAt": "2026-11-05T04:42:36-05:00",
       "image": {
         "src": "https://cdn.shopify.com/s/files/1/0289/5239/5911/collections/LivingRoom-02.jpg?v=1593726051",
         "alt": "Living Room - Kiss It Good Buy",
@@ -894,7 +889,7 @@
       "title": "Seating",
       "description": "",
       "publishedAt": "2020-03-14T16:39:02-04:00",
-      "updatedAt": "2026-11-04T16:15:48-05:00",
+      "updatedAt": "2026-11-05T04:42:37-05:00",
       "image": {
         "src": "https://cdn.shopify.com/s/files/1/0289/5239/5911/collections/FullSizeRender-compressed_20.jpg?v=1594506103",
         "alt": null,
@@ -931,14 +926,14 @@
       "title": "Tables",
       "description": "",
       "publishedAt": "2020-02-01T19:20:14-05:00",
-      "updatedAt": "2026-11-04T14:08:33-05:00",
+      "updatedAt": "2026-11-05T05:26:28-05:00",
       "image": {
         "src": "https://cdn.shopify.com/s/files/1/0289/5239/5911/collections/dining-table-1348717_1920.jpg?v=1593726059",
         "alt": "Tables - Kiss It Good Buy",
         "width": null,
         "height": null
       },
-      "declaredProductCount": 23,
+      "declaredProductCount": 22,
       "productIds": [
         "15506520932589",
         "15424557908205",
@@ -1000,7 +995,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-04T14:08:32-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-04T14:03:28-05:00",
       "available": true,
       "price": 249,
@@ -1082,7 +1077,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-04T12:46:38-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-04T12:41:34-05:00",
       "available": true,
       "price": 849,
@@ -1172,7 +1167,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-04T12:44:24-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-04T12:39:21-05:00",
       "available": true,
       "price": 479,
@@ -1246,7 +1241,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T16:43:38-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T16:38:33-05:00",
       "available": true,
       "price": 617,
@@ -1336,7 +1331,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T16:12:16-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T16:07:10-05:00",
       "available": true,
       "price": 841.4,
@@ -1434,7 +1429,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T16:08:47-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T16:03:42-05:00",
       "available": true,
       "price": 425,
@@ -1523,7 +1518,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T16:05:05-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T16:00:00-05:00",
       "available": true,
       "price": 499,
@@ -1620,7 +1615,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T16:02:20-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T15:57:14-05:00",
       "available": true,
       "price": 299,
@@ -1725,7 +1720,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T15:56:58-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T15:51:54-05:00",
       "available": true,
       "price": 499,
@@ -1815,7 +1810,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T15:43:21-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T15:38:17-05:00",
       "available": true,
       "price": 799,
@@ -1905,7 +1900,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T15:31:16-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T15:26:12-05:00",
       "available": true,
       "price": 1499,
@@ -1995,7 +1990,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T15:28:58-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T15:23:53-05:00",
       "available": true,
       "price": 1699,
@@ -2084,7 +2079,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T15:27:29-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T15:22:24-05:00",
       "available": true,
       "price": 299,
@@ -2174,7 +2169,7 @@
         "source": "title"
       },
       "createdAt": "2026-11-03T12:50:56-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-11-03T12:45:46-05:00",
       "available": true,
       "price": 99,
@@ -2256,7 +2251,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-27T14:54:13-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-27T14:49:10-04:00",
       "available": true,
       "price": 272.3,
@@ -2337,7 +2332,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-27T14:51:50-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-27T14:46:45-04:00",
       "available": true,
       "price": 225,
@@ -2434,7 +2429,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-27T14:50:34-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-27T14:45:30-04:00",
       "available": true,
       "price": 139,
@@ -2524,7 +2519,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-23T17:00:21-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-23T16:55:16-04:00",
       "available": true,
       "price": 1599,
@@ -2614,7 +2609,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-23T16:54:30-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-23T16:49:25-04:00",
       "available": true,
       "price": 2400,
@@ -2703,7 +2698,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-23T16:51:41-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-23T16:46:38-04:00",
       "available": true,
       "price": 299,
@@ -2785,7 +2780,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-23T16:39:53-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-23T16:34:49-04:00",
       "available": true,
       "price": 899,
@@ -2874,7 +2869,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-23T16:26:35-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-23T16:21:26-04:00",
       "available": true,
       "price": 1399,
@@ -2964,7 +2959,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-22T18:40:25-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-22T18:35:18-04:00",
       "available": true,
       "price": 1299,
@@ -3070,7 +3065,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-22T14:22:36-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-22T14:17:31-04:00",
       "available": true,
       "price": 1245,
@@ -3168,7 +3163,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-21T14:35:28-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-21T14:30:23-04:00",
       "available": true,
       "price": 1499,
@@ -3257,7 +3252,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-21T14:33:14-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-21T14:28:08-04:00",
       "available": true,
       "price": 1749.3,
@@ -3346,7 +3341,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-13T18:09:55-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-13T18:04:43-04:00",
       "available": true,
       "price": 629.1,
@@ -3452,7 +3447,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-13T18:05:00-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-13T17:59:55-04:00",
       "available": true,
       "price": 2199,
@@ -3541,7 +3536,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-13T18:01:35-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-13T17:56:29-04:00",
       "available": true,
       "price": 539.4,
@@ -3631,7 +3626,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-09T16:49:28-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-09T16:44:18-04:00",
       "available": true,
       "price": 2249.1,
@@ -3745,22 +3740,22 @@
         "source": "title"
       },
       "createdAt": "2026-10-09T15:19:36-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-09T15:14:26-04:00",
       "available": true,
-      "price": 1499,
-      "minPrice": 1499,
-      "maxPrice": 1499,
-      "compareAtPrice": null,
+      "price": 1349.1,
+      "minPrice": 1349.1,
+      "maxPrice": 1349.1,
+      "compareAtPrice": 1499,
       "variants": [
         {
           "id": "67698807996653",
           "title": "Default Title",
           "available": true,
-          "price": 1499,
-          "priceCents": 149900,
-          "compareAtPrice": null,
-          "compareAtPriceCents": null,
+          "price": 1349.1,
+          "priceCents": 134910,
+          "compareAtPrice": 1499,
+          "compareAtPriceCents": 149900,
           "sku": "169464",
           "position": 1,
           "options": [
@@ -3831,7 +3826,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-10-09T15:18:27-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-09T15:13:23-04:00",
       "available": true,
       "price": 1399.3,
@@ -3913,7 +3908,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-09T15:16:50-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-09T15:11:45-04:00",
       "available": true,
       "price": 1699,
@@ -4002,7 +3997,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-06T16:40:20-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-06T16:35:11-04:00",
       "available": true,
       "price": 199.2,
@@ -4072,7 +4067,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-10-06T16:37:57-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-06T16:32:47-04:00",
       "available": true,
       "price": 940.8,
@@ -4157,7 +4152,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-10-06T16:35:08-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-06T16:30:05-04:00",
       "available": true,
       "price": 244.3,
@@ -4231,7 +4226,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-06T16:33:26-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-06T16:28:21-04:00",
       "available": true,
       "price": 1359.2,
@@ -4321,7 +4316,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-06T16:31:30-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-06T16:26:24-04:00",
       "available": true,
       "price": 1209.6,
@@ -4419,7 +4414,7 @@
         "source": "title"
       },
       "createdAt": "2026-10-06T16:28:16-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-10-06T16:23:03-04:00",
       "available": true,
       "price": 489.3,
@@ -4525,7 +4520,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-29T14:47:43-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-29T14:42:37-04:00",
       "available": true,
       "price": 2880,
@@ -4623,7 +4618,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-29T14:10:12-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-29T14:04:58-04:00",
       "available": true,
       "price": 421.2,
@@ -4745,7 +4740,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-29T13:12:51-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-29T13:07:46-04:00",
       "available": true,
       "price": 737.1,
@@ -4835,7 +4830,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-29T13:10:59-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-29T13:05:49-04:00",
       "available": true,
       "price": 495,
@@ -4925,7 +4920,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-29T12:31:58-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-29T12:26:53-04:00",
       "available": true,
       "price": 787.5,
@@ -4999,7 +4994,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-27T17:55:54-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-27T17:50:49-04:00",
       "available": true,
       "price": 1169.1,
@@ -5089,7 +5084,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-27T17:54:29-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-27T17:49:24-04:00",
       "available": true,
       "price": 697.5,
@@ -5179,7 +5174,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-27T16:24:22-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-27T16:19:10-04:00",
       "available": true,
       "price": 224.1,
@@ -5277,7 +5272,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-27T16:20:30-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-27T16:15:24-04:00",
       "available": true,
       "price": 224.1,
@@ -5375,7 +5370,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-26T18:37:19-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-26T18:32:08-04:00",
       "available": true,
       "price": 799.2,
@@ -5473,7 +5468,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-26T17:59:14-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-26T17:54:03-04:00",
       "available": true,
       "price": 319.2,
@@ -5563,7 +5558,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-26T17:49:58-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-26T17:44:48-04:00",
       "available": true,
       "price": 319.2,
@@ -5645,7 +5640,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-26T16:52:06-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-26T16:47:01-04:00",
       "available": true,
       "price": 479.2,
@@ -5735,7 +5730,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-26T13:26:29-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-26T13:21:25-04:00",
       "available": true,
       "price": 449.1,
@@ -5800,7 +5795,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-26T13:22:49-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-26T13:17:44-04:00",
       "available": true,
       "price": 1259.1,
@@ -5897,7 +5892,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-24T17:49:49-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-24T17:44:43-04:00",
       "available": true,
       "price": 455,
@@ -5995,7 +5990,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-24T17:44:01-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-24T17:38:48-04:00",
       "available": true,
       "price": 1799.1,
@@ -6090,7 +6085,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-09-24T15:42:14-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-24T15:37:04-04:00",
       "available": true,
       "price": 1599.2,
@@ -6164,7 +6159,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-24T14:31:09-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-24T14:26:03-04:00",
       "available": true,
       "price": 4899.3,
@@ -6253,7 +6248,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-23T18:33:37-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-23T18:28:29-04:00",
       "available": true,
       "price": 1169.1,
@@ -6367,7 +6362,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-23T17:48:54-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-23T17:43:50-04:00",
       "available": true,
       "price": 959.2,
@@ -6441,7 +6436,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-23T12:24:27-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-23T12:19:13-04:00",
       "available": true,
       "price": 1890,
@@ -6563,7 +6558,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-22T17:02:53-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-22T16:57:46-04:00",
       "available": true,
       "price": 959.2,
@@ -6669,7 +6664,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-22T17:01:17-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-22T16:56:09-04:00",
       "available": true,
       "price": 979.3,
@@ -6743,7 +6738,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-22T16:36:11-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-22T16:31:07-04:00",
       "available": true,
       "price": 1599.2,
@@ -6833,7 +6828,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-22T16:34:04-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-22T16:28:54-04:00",
       "available": true,
       "price": 799.2,
@@ -6939,7 +6934,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-16T15:11:10-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-16T15:06:00-04:00",
       "available": true,
       "price": 263.2,
@@ -7021,7 +7016,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-12T17:54:48-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-12T17:49:44-04:00",
       "available": true,
       "price": 1199.2,
@@ -7110,7 +7105,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-12T15:10:00-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-12T15:04:52-04:00",
       "available": true,
       "price": 172.8,
@@ -7208,7 +7203,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-12T12:06:45-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-12T12:01:41-04:00",
       "available": true,
       "price": 719.2,
@@ -7298,7 +7293,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-10T16:05:10-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-10T16:00:06-04:00",
       "available": true,
       "price": 2560,
@@ -7379,20 +7374,20 @@
         "source": "title"
       },
       "createdAt": "2026-09-10T13:10:48-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-10T13:05:34-04:00",
       "available": true,
-      "price": 799.2,
-      "minPrice": 799.2,
-      "maxPrice": 799.2,
+      "price": 699.3,
+      "minPrice": 699.3,
+      "maxPrice": 699.3,
       "compareAtPrice": 999,
       "variants": [
         {
           "id": "50661877678317",
           "title": "Default Title",
           "available": true,
-          "price": 799.2,
-          "priceCents": 79920,
+          "price": 699.3,
+          "priceCents": 69930,
           "compareAtPrice": 999,
           "compareAtPriceCents": 99900,
           "sku": "169092",
@@ -7493,7 +7488,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-09T15:54:48-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-09T15:49:33-04:00",
       "available": true,
       "price": 1039.2,
@@ -7614,7 +7609,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-09T15:42:38-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-09T15:37:30-04:00",
       "available": true,
       "price": 349.3,
@@ -7720,7 +7715,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-09T15:04:33-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-09T14:59:28-04:00",
       "available": true,
       "price": 2700,
@@ -7810,7 +7805,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-09T15:00:42-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-09T14:55:33-04:00",
       "available": true,
       "price": 1299,
@@ -7916,7 +7911,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-02T18:26:04-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-02T18:20:55-04:00",
       "available": true,
       "price": 699.3,
@@ -8014,7 +8009,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-02T14:06:39-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-02T14:01:26-04:00",
       "available": true,
       "price": 1399.3,
@@ -8120,7 +8115,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-02T14:02:56-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-02T13:57:50-04:00",
       "available": true,
       "price": 559.3,
@@ -8218,7 +8213,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-01T16:15:27-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-01T16:10:21-04:00",
       "available": true,
       "price": 327.6,
@@ -8315,7 +8310,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-01T16:12:30-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-01T16:07:25-04:00",
       "available": true,
       "price": 909.3,
@@ -8405,7 +8400,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-01T16:09:23-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-01T16:04:13-04:00",
       "available": true,
       "price": 650.3,
@@ -8514,7 +8509,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-09-01T15:17:01-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-01T15:11:46-04:00",
       "available": true,
       "price": 1499.4,
@@ -8627,7 +8622,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-01T15:14:02-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-01T15:08:55-04:00",
       "available": true,
       "price": 875,
@@ -8709,7 +8704,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-01T13:18:11-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-01T13:12:36-04:00",
       "available": true,
       "price": 279.3,
@@ -8799,7 +8794,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-01T13:12:07-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-09-01T13:06:57-04:00",
       "available": true,
       "price": 700,
@@ -8904,20 +8899,20 @@
         "source": "title"
       },
       "createdAt": "2026-08-30T16:44:33-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-30T16:39:30-04:00",
       "available": true,
-      "price": 699.3,
-      "minPrice": 699.3,
-      "maxPrice": 699.3,
+      "price": 599.4,
+      "minPrice": 599.4,
+      "maxPrice": 599.4,
       "compareAtPrice": 2299,
       "variants": [
         {
           "id": "50591309070573",
           "title": "Default Title",
           "available": true,
-          "price": 699.3,
-          "priceCents": 69930,
+          "price": 599.4,
+          "priceCents": 59940,
           "compareAtPrice": 2299,
           "compareAtPriceCents": 229900,
           "sku": "168853",
@@ -8978,20 +8973,20 @@
         "source": "title"
       },
       "createdAt": "2026-08-27T17:15:58-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-27T17:10:46-04:00",
       "available": true,
-      "price": 1080.8,
-      "minPrice": 1080.8,
-      "maxPrice": 1080.8,
+      "price": 926.4,
+      "minPrice": 926.4,
+      "maxPrice": 926.4,
       "compareAtPrice": 1544,
       "variants": [
         {
           "id": "50549408760045",
           "title": "Default Title",
           "available": true,
-          "price": 1080.8,
-          "priceCents": 108080,
+          "price": 926.4,
+          "priceCents": 92640,
           "compareAtPrice": 1544,
           "compareAtPriceCents": 154400,
           "sku": "168905",
@@ -9076,7 +9071,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-27T15:25:34-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-27T15:20:25-04:00",
       "available": true,
       "price": 979.3,
@@ -9158,7 +9153,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-27T15:24:01-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-27T15:18:56-04:00",
       "available": true,
       "price": 979.3,
@@ -9240,7 +9235,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-27T14:10:36-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-27T14:05:24-04:00",
       "available": true,
       "price": 1081.5,
@@ -9321,7 +9316,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-26T14:34:53-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-26T14:29:45-04:00",
       "available": true,
       "price": 3604.3,
@@ -9424,7 +9419,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-08-25T16:43:54-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-25T16:38:42-04:00",
       "available": true,
       "price": 1749.3,
@@ -9506,7 +9501,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-25T15:42:04-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-25T15:37:00-04:00",
       "available": true,
       "price": 4549.3,
@@ -9596,7 +9591,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-25T15:31:59-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-25T15:26:45-04:00",
       "available": true,
       "price": 239.2,
@@ -9702,7 +9697,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-25T14:53:15-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-25T14:48:03-04:00",
       "available": true,
       "price": 999,
@@ -9800,7 +9795,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-25T13:17:16-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-25T13:12:07-04:00",
       "available": true,
       "price": 559.3,
@@ -9898,7 +9893,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-22T15:18:36-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-22T15:13:29-04:00",
       "available": true,
       "price": 183.4,
@@ -9988,7 +9983,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-16T17:57:59-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-16T17:52:49-04:00",
       "available": true,
       "price": 3599.2,
@@ -10070,7 +10065,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-15T17:43:49-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-15T17:38:35-04:00",
       "available": true,
       "price": 1350.3,
@@ -10199,7 +10194,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-15T17:36:24-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-15T17:31:16-04:00",
       "available": true,
       "price": 299.4,
@@ -10313,7 +10308,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-15T17:25:02-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-15T17:19:59-04:00",
       "available": true,
       "price": 245,
@@ -10387,7 +10382,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-15T15:00:03-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-15T14:54:54-04:00",
       "available": true,
       "price": 319.2,
@@ -10469,7 +10464,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-15T14:08:57-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-15T14:03:54-04:00",
       "available": true,
       "price": 599.4,
@@ -10543,7 +10538,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-15T13:46:54-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-15T13:41:49-04:00",
       "available": true,
       "price": 489.3,
@@ -10640,7 +10635,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-14T18:15:41-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-14T18:10:36-04:00",
       "available": true,
       "price": 479.4,
@@ -10730,7 +10725,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-14T17:48:25-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-14T17:43:18-04:00",
       "available": true,
       "price": 629.3,
@@ -10843,7 +10838,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-13T19:18:31-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-13T19:13:15-04:00",
       "available": true,
       "price": 2099.3,
@@ -10948,7 +10943,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-12T12:48:35-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-12T12:43:31-04:00",
       "available": true,
       "price": 179.4,
@@ -11026,7 +11021,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-08-11T15:30:44-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-11T15:25:29-04:00",
       "available": true,
       "price": 1999,
@@ -11148,7 +11143,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-11T14:32:57-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-11T14:27:49-04:00",
       "available": true,
       "price": 4400,
@@ -11245,7 +11240,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-11T13:33:25-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-11T13:28:13-04:00",
       "available": true,
       "price": 87.5,
@@ -11339,7 +11334,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-08-08T13:39:01-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-08T13:33:54-04:00",
       "available": true,
       "price": 1799.4,
@@ -11445,7 +11440,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-06T14:39:38-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-06T14:34:28-04:00",
       "available": true,
       "price": 506.1,
@@ -11566,7 +11561,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-05T12:25:26-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-05T12:20:17-04:00",
       "available": true,
       "price": 5299,
@@ -11672,7 +11667,7 @@
         "source": "title"
       },
       "createdAt": "2026-08-01T15:57:06-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-08-01T15:51:56-04:00",
       "available": true,
       "price": 479.4,
@@ -11762,7 +11757,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-30T15:27:40-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-30T15:22:34-04:00",
       "available": true,
       "price": 2040,
@@ -11860,7 +11855,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-29T18:32:27-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-29T18:27:17-04:00",
       "available": true,
       "price": 2099.3,
@@ -11949,7 +11944,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-29T15:23:53-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-29T15:18:38-04:00",
       "available": true,
       "price": 599.5,
@@ -12047,7 +12042,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-25T19:14:59-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-25T19:09:46-04:00",
       "available": true,
       "price": 3077.9,
@@ -12161,7 +12156,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-25T13:34:21-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-25T13:29:09-04:00",
       "available": true,
       "price": 1199.4,
@@ -12275,7 +12270,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-18T15:24:54-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-18T15:19:43-04:00",
       "available": true,
       "price": 405,
@@ -12373,7 +12368,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-15T17:41:26-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-15T17:36:11-04:00",
       "available": true,
       "price": 539.4,
@@ -12490,7 +12485,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-07-14T18:43:33-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-14T18:38:15-04:00",
       "available": true,
       "price": 7199.2,
@@ -12636,7 +12631,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-14T14:48:25-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-14T14:43:16-04:00",
       "available": true,
       "price": 225,
@@ -12710,7 +12705,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-11T14:15:07-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-11T14:10:00-04:00",
       "available": true,
       "price": 89.6,
@@ -12824,7 +12819,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-02T17:19:40-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-02T17:14:31-04:00",
       "available": true,
       "price": 2099.3,
@@ -12897,7 +12892,7 @@
         "source": "title"
       },
       "createdAt": "2026-07-02T16:24:05-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-07-02T16:18:53-04:00",
       "available": true,
       "price": 419.4,
@@ -12995,7 +12990,7 @@
         "source": "title"
       },
       "createdAt": "2026-06-30T17:42:49-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-06-30T17:37:27-04:00",
       "available": true,
       "price": 839.3,
@@ -13093,7 +13088,7 @@
         "source": "title"
       },
       "createdAt": "2026-06-27T14:14:51-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-06-27T14:09:35-04:00",
       "available": true,
       "price": 1279.2,
@@ -13191,7 +13186,7 @@
         "source": "title"
       },
       "createdAt": "2026-06-27T14:13:12-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-06-27T14:08:06-04:00",
       "available": true,
       "price": 1279.2,
@@ -13289,7 +13284,7 @@
         "source": "title"
       },
       "createdAt": "2026-06-26T18:55:56-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-06-26T18:50:47-04:00",
       "available": true,
       "price": 1756,
@@ -13386,7 +13381,7 @@
         "source": "title"
       },
       "createdAt": "2026-06-16T15:16:52-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-06-16T15:11:50-04:00",
       "available": true,
       "price": 594.3,
@@ -13460,7 +13455,7 @@
         "source": "title"
       },
       "createdAt": "2026-06-05T14:36:55-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-06-05T14:31:49-04:00",
       "available": true,
       "price": 2799.3,
@@ -13558,7 +13553,7 @@
         "source": "title"
       },
       "createdAt": "2026-06-04T16:42:17-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-06-04T16:37:11-04:00",
       "available": true,
       "price": 449.4,
@@ -13664,7 +13659,7 @@
         "source": "title"
       },
       "createdAt": "2026-06-02T15:13:15-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-06-02T15:08:07-04:00",
       "available": true,
       "price": 931.5,
@@ -13770,7 +13765,7 @@
         "source": "title"
       },
       "createdAt": "2026-05-30T18:30:43-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-05-30T18:25:38-04:00",
       "available": true,
       "price": 649.5,
@@ -13868,7 +13863,7 @@
         "source": "title"
       },
       "createdAt": "2026-05-28T12:55:11-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-05-28T12:50:05-04:00",
       "available": true,
       "price": 1599,
@@ -13959,7 +13954,7 @@
         "source": "title"
       },
       "createdAt": "2026-05-13T18:02:19-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-05-13T17:57:15-04:00",
       "available": true,
       "price": 1189.3,
@@ -14040,7 +14035,7 @@
         "source": "title"
       },
       "createdAt": "2026-05-12T16:53:51-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-05-12T16:48:43-04:00",
       "available": true,
       "price": 1049.3,
@@ -14113,7 +14108,7 @@
         "source": "title"
       },
       "createdAt": "2026-05-05T19:14:40-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-05-05T19:09:33-04:00",
       "available": true,
       "price": 1575,
@@ -14186,7 +14181,7 @@
         "source": "title"
       },
       "createdAt": "2026-05-05T16:11:23-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-05-05T16:06:10-04:00",
       "available": true,
       "price": 2275,
@@ -14260,7 +14255,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-30T17:13:03-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-30T17:07:55-04:00",
       "available": true,
       "price": 959.4,
@@ -14373,7 +14368,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-25T17:21:57-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-25T17:16:48-04:00",
       "available": true,
       "price": 209.4,
@@ -14447,7 +14442,7 @@
         "source": "title"
       },
       "createdAt": "2024-05-25T12:59:45-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-24T18:47:32-04:00",
       "available": true,
       "price": 500,
@@ -14529,7 +14524,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-22T17:53:30-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-22T17:48:21-04:00",
       "available": true,
       "price": 499.5,
@@ -14602,7 +14597,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-18T16:06:21-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-18T16:01:08-04:00",
       "available": true,
       "price": 249.5,
@@ -14691,7 +14686,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-18T15:58:07-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-18T15:52:58-04:00",
       "available": true,
       "price": 249.5,
@@ -14796,7 +14791,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-18T15:52:07-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-18T15:46:52-04:00",
       "available": true,
       "price": 299.5,
@@ -14910,7 +14905,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-18T11:44:35-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-18T11:39:25-04:00",
       "available": true,
       "price": 1499.5,
@@ -15008,7 +15003,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-16T13:04:16-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-16T12:59:01-04:00",
       "available": true,
       "price": 999.5,
@@ -15107,7 +15102,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-16T12:55:32-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-16T12:50:25-04:00",
       "available": true,
       "price": 279.3,
@@ -15205,7 +15200,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-12T14:47:43-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-12T14:42:25-04:00",
       "available": true,
       "price": 1049.3,
@@ -15327,7 +15322,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-12T14:06:15-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-12T14:01:08-04:00",
       "available": true,
       "price": 209.3,
@@ -15409,7 +15404,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-11T16:08:56-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-11T16:03:39-04:00",
       "available": true,
       "price": 1199,
@@ -15522,7 +15517,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-08T19:36:52-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-08T19:31:48-04:00",
       "available": true,
       "price": 3150,
@@ -15596,7 +15591,7 @@
         "source": "title"
       },
       "createdAt": "2026-04-07T19:27:30-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-04-07T19:22:18-04:00",
       "available": true,
       "price": 1441.3,
@@ -15710,7 +15705,7 @@
         "source": "title"
       },
       "createdAt": "2026-03-26T17:33:39-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-03-26T17:28:26-04:00",
       "available": true,
       "price": 1799,
@@ -15832,7 +15827,7 @@
         "source": "title"
       },
       "createdAt": "2026-03-25T14:31:10-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-03-25T14:25:57-04:00",
       "available": true,
       "price": 1161.3,
@@ -15914,7 +15909,7 @@
         "source": "title"
       },
       "createdAt": "2026-03-17T13:48:01-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-03-17T13:42:52-04:00",
       "available": true,
       "price": 239.2,
@@ -16012,7 +16007,7 @@
         "source": "title"
       },
       "createdAt": "2026-02-28T16:53:00-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-02-28T16:47:47-05:00",
       "available": true,
       "price": 719.4,
@@ -16118,7 +16113,7 @@
         "source": "title"
       },
       "createdAt": "2026-02-28T14:28:21-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-02-28T14:23:11-05:00",
       "available": true,
       "price": 249.5,
@@ -16191,7 +16186,7 @@
         "source": "title"
       },
       "createdAt": "2026-02-18T17:07:41-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-02-18T17:02:32-05:00",
       "available": true,
       "price": 239.4,
@@ -16265,7 +16260,7 @@
         "source": "title"
       },
       "createdAt": "2026-02-11T16:57:24-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-02-11T16:52:21-05:00",
       "available": true,
       "price": 749.5,
@@ -16339,7 +16334,7 @@
         "source": "title"
       },
       "createdAt": "2026-02-11T16:57:21-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-02-11T16:52:09-05:00",
       "available": true,
       "price": 749.5,
@@ -16413,7 +16408,7 @@
         "source": "title"
       },
       "createdAt": "2026-02-03T15:31:43-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-02-03T15:26:37-05:00",
       "available": true,
       "price": 526.75,
@@ -16502,7 +16497,7 @@
         "source": "title"
       },
       "createdAt": "2026-01-31T14:06:34-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-01-31T14:01:27-05:00",
       "available": true,
       "price": 539.4,
@@ -16607,7 +16602,7 @@
         "source": "title"
       },
       "createdAt": "2026-01-18T18:06:13-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-01-18T18:01:01-05:00",
       "available": true,
       "price": 225,
@@ -16708,7 +16703,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2026-01-17T14:23:36-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-01-17T14:18:25-05:00",
       "available": true,
       "price": 349.3,
@@ -16822,7 +16817,7 @@
         "source": "title"
       },
       "createdAt": "2026-01-14T12:03:42-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-01-14T11:58:32-05:00",
       "available": true,
       "price": 139.3,
@@ -16904,7 +16899,7 @@
         "source": "title"
       },
       "createdAt": "2026-01-13T17:20:23-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-01-13T17:15:13-05:00",
       "available": true,
       "price": 1759.2,
@@ -16986,7 +16981,7 @@
         "source": "title"
       },
       "createdAt": "2026-01-13T17:19:47-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2026-01-13T17:14:36-05:00",
       "available": true,
       "price": 1759.2,
@@ -17067,7 +17062,7 @@
         "source": "title"
       },
       "createdAt": "2025-12-27T15:54:10-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-12-27T15:48:56-05:00",
       "available": true,
       "price": 1799.4,
@@ -17196,7 +17191,7 @@
         "source": "title"
       },
       "createdAt": "2025-12-04T14:37:02-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-12-04T14:31:55-05:00",
       "available": true,
       "price": 599.4,
@@ -17270,7 +17265,7 @@
         "source": "title"
       },
       "createdAt": "2025-11-29T15:41:36-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-11-29T15:36:29-05:00",
       "available": true,
       "price": 481.75,
@@ -17344,7 +17339,7 @@
         "source": "title"
       },
       "createdAt": "2025-11-22T14:37:49-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-11-22T14:32:46-05:00",
       "available": true,
       "price": 1756,
@@ -17441,7 +17436,7 @@
         "source": "title"
       },
       "createdAt": "2025-11-18T15:33:21-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-11-18T15:28:16-05:00",
       "available": true,
       "price": 449.5,
@@ -17531,7 +17526,7 @@
         "source": "title"
       },
       "createdAt": "2025-09-27T11:57:27-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-11-08T13:06:39-05:00",
       "available": true,
       "price": 399,
@@ -17612,7 +17607,7 @@
         "source": "title"
       },
       "createdAt": "2025-10-25T16:05:31-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-10-25T16:00:18-04:00",
       "available": true,
       "price": 1199,
@@ -17734,7 +17729,7 @@
         "source": "title"
       },
       "createdAt": "2025-10-21T17:13:28-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-10-21T17:08:16-04:00",
       "available": true,
       "price": 599.4,
@@ -17856,7 +17851,7 @@
         "source": "title"
       },
       "createdAt": "2025-10-15T11:35:35-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-10-15T11:30:25-04:00",
       "available": true,
       "price": 909.3,
@@ -17962,7 +17957,7 @@
         "source": "title"
       },
       "createdAt": "2025-10-11T13:31:54-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-10-11T13:26:44-04:00",
       "available": true,
       "price": 629.3,
@@ -18032,7 +18027,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2025-10-10T17:28:10-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-10-10T17:22:55-04:00",
       "available": true,
       "price": 319.2,
@@ -18114,7 +18109,7 @@
         "source": "title"
       },
       "createdAt": "2025-10-04T14:36:39-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-10-04T14:31:29-04:00",
       "available": true,
       "price": 140,
@@ -18212,7 +18207,7 @@
         "source": "title"
       },
       "createdAt": "2025-09-28T13:28:52-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-09-28T13:23:48-04:00",
       "available": true,
       "price": 799.2,
@@ -18286,7 +18281,7 @@
         "source": "title"
       },
       "createdAt": "2025-09-03T18:37:19-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-09-03T18:32:07-04:00",
       "available": true,
       "price": 279.3,
@@ -18391,7 +18386,7 @@
         "source": "title"
       },
       "createdAt": "2025-08-27T15:14:52-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-08-27T15:09:41-04:00",
       "available": true,
       "price": 87,
@@ -18489,7 +18484,7 @@
         "source": "title"
       },
       "createdAt": "2025-08-07T14:58:15-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-08-07T14:53:12-04:00",
       "available": true,
       "price": 225,
@@ -18562,7 +18557,7 @@
         "source": "title"
       },
       "createdAt": "2025-07-24T18:11:56-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-07-24T18:06:45-04:00",
       "available": true,
       "price": 779.4,
@@ -18643,7 +18638,7 @@
         "source": "title"
       },
       "createdAt": "2025-07-24T17:49:37-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-07-24T17:44:27-04:00",
       "available": true,
       "price": 719.4,
@@ -18732,7 +18727,7 @@
         "source": "title"
       },
       "createdAt": "2025-07-13T16:52:47-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-07-13T16:47:37-04:00",
       "available": true,
       "price": 3552,
@@ -18829,7 +18824,7 @@
         "source": "title"
       },
       "createdAt": "2025-07-05T16:58:22-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-07-05T16:53:12-04:00",
       "available": true,
       "price": 1560,
@@ -18943,7 +18938,7 @@
         "source": "title"
       },
       "createdAt": "2025-06-29T17:37:58-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-06-29T17:32:37-04:00",
       "available": true,
       "price": 1499.5,
@@ -19096,7 +19091,7 @@
         "source": "title"
       },
       "createdAt": "2025-06-29T15:35:21-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-06-29T15:30:16-04:00",
       "available": true,
       "price": 192.5,
@@ -19194,7 +19189,7 @@
         "source": "title"
       },
       "createdAt": "2025-06-28T18:17:43-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-06-28T18:12:34-04:00",
       "available": true,
       "price": 782.1,
@@ -19300,7 +19295,7 @@
         "source": "title"
       },
       "createdAt": "2023-12-15T17:12:25-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-06-28T17:03:34-04:00",
       "available": true,
       "price": 999,
@@ -19386,7 +19381,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2025-06-12T17:11:04-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-06-12T14:45:17-04:00",
       "available": true,
       "price": 184.8,
@@ -19483,7 +19478,7 @@
         "source": "title"
       },
       "createdAt": "2025-06-11T14:11:30-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-06-11T14:06:19-04:00",
       "available": true,
       "price": 150,
@@ -19580,7 +19575,7 @@
         "source": "title"
       },
       "createdAt": "2025-05-24T15:34:46-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-05-24T15:29:40-04:00",
       "available": true,
       "price": 399,
@@ -19677,7 +19672,7 @@
         "source": "title"
       },
       "createdAt": "2025-05-07T18:20:19-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-05-07T18:15:07-04:00",
       "available": true,
       "price": 361,
@@ -19774,7 +19769,7 @@
         "source": "title"
       },
       "createdAt": "2025-04-23T13:10:46-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-04-23T13:05:28-04:00",
       "available": true,
       "price": 599,
@@ -19872,7 +19867,7 @@
         "source": "title"
       },
       "createdAt": "2025-02-19T13:14:11-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-02-19T13:09:01-05:00",
       "available": true,
       "price": 3299,
@@ -20010,7 +20005,7 @@
         "source": "title"
       },
       "createdAt": "2025-02-01T16:08:28-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-02-01T16:03:25-05:00",
       "available": true,
       "price": 425,
@@ -20080,7 +20075,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2025-02-01T16:06:53-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-02-01T16:01:41-05:00",
       "available": true,
       "price": 299,
@@ -20153,7 +20148,7 @@
         "source": "title"
       },
       "createdAt": "2025-02-01T14:31:26-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-02-01T14:26:18-05:00",
       "available": true,
       "price": 299.4,
@@ -20258,7 +20253,7 @@
         "source": "title"
       },
       "createdAt": "2025-01-11T18:34:15-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-01-11T18:29:03-05:00",
       "available": true,
       "price": 140,
@@ -20340,7 +20335,7 @@
         "source": "title"
       },
       "createdAt": "2025-01-08T16:44:14-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-01-08T16:39:04-05:00",
       "available": true,
       "price": 198,
@@ -20430,7 +20425,7 @@
         "source": "title"
       },
       "createdAt": "2025-01-08T11:30:02-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-01-08T11:24:52-05:00",
       "available": true,
       "price": 239.4,
@@ -20503,7 +20498,7 @@
         "source": "title"
       },
       "createdAt": "2025-01-04T14:46:53-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2025-01-04T14:41:49-05:00",
       "available": true,
       "price": 209.3,
@@ -20584,7 +20579,7 @@
         "source": "title"
       },
       "createdAt": "2024-12-28T12:55:45-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-12-28T12:50:31-05:00",
       "available": true,
       "price": 419.3,
@@ -20681,7 +20676,7 @@
         "source": "title"
       },
       "createdAt": "2024-12-07T17:18:55-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-12-07T17:13:32-05:00",
       "available": true,
       "price": 150,
@@ -20795,7 +20790,7 @@
         "source": "title"
       },
       "createdAt": "2024-12-07T14:03:51-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-12-07T13:58:43-05:00",
       "available": true,
       "price": 384,
@@ -20885,7 +20880,7 @@
         "source": "title"
       },
       "createdAt": "2024-11-26T15:26:46-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-11-26T15:21:33-05:00",
       "available": true,
       "price": 949.5,
@@ -20991,7 +20986,7 @@
         "source": "title"
       },
       "createdAt": "2024-11-19T17:49:28-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-11-19T17:44:24-05:00",
       "available": true,
       "price": 1499.4,
@@ -21058,7 +21053,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2024-11-14T18:37:59-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-11-14T18:37:59-05:00",
       "available": true,
       "price": 25,
@@ -21207,7 +21202,7 @@
         "source": "title"
       },
       "createdAt": "2022-05-08T14:26:46-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-10-16T17:30:31-04:00",
       "available": true,
       "price": 475,
@@ -21281,7 +21276,7 @@
         "source": "title"
       },
       "createdAt": "2024-09-21T18:56:47-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-09-21T18:51:41-04:00",
       "available": true,
       "price": 186.6,
@@ -21363,7 +21358,7 @@
         "source": "title"
       },
       "createdAt": "2024-08-18T13:34:37-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-08-18T13:29:25-04:00",
       "available": true,
       "price": 649.5,
@@ -21461,7 +21456,7 @@
         "source": "title"
       },
       "createdAt": "2024-07-03T14:10:05-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-07-03T14:05:01-04:00",
       "available": true,
       "price": 289,
@@ -21542,7 +21537,7 @@
         "source": "title"
       },
       "createdAt": "2024-06-05T13:45:19-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-06-05T13:40:12-04:00",
       "available": true,
       "price": 499,
@@ -21616,7 +21611,7 @@
         "source": "title"
       },
       "createdAt": "2024-06-05T11:50:45-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-06-05T11:45:33-04:00",
       "available": true,
       "price": 525,
@@ -21698,7 +21693,7 @@
         "source": "title"
       },
       "createdAt": "2024-05-14T14:56:29-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-05-14T14:51:11-04:00",
       "available": true,
       "price": 20200,
@@ -21827,7 +21822,7 @@
         "source": "title"
       },
       "createdAt": "2024-01-31T16:19:46-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-01-31T16:14:33-05:00",
       "available": true,
       "price": 175,
@@ -21908,7 +21903,7 @@
         "source": "title"
       },
       "createdAt": "2024-01-31T12:27:15-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-01-31T12:22:06-05:00",
       "available": true,
       "price": 250,
@@ -21998,7 +21993,7 @@
         "source": "title"
       },
       "createdAt": "2024-01-24T16:09:49-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2024-01-24T16:04:44-05:00",
       "available": true,
       "price": 599,
@@ -22079,7 +22074,7 @@
         "source": "title"
       },
       "createdAt": "2023-12-20T14:55:59-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2023-12-20T14:50:52-05:00",
       "available": true,
       "price": 159,
@@ -22169,7 +22164,7 @@
         "source": "title"
       },
       "createdAt": "2023-12-12T16:46:43-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2023-12-12T16:41:35-05:00",
       "available": true,
       "price": 799,
@@ -22250,7 +22245,7 @@
         "source": "title"
       },
       "createdAt": "2025-04-11T16:47:04-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2023-11-05T14:56:28-05:00",
       "available": true,
       "price": 159.2,
@@ -22332,7 +22327,7 @@
         "source": "title"
       },
       "createdAt": "2023-11-04T12:48:05-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2023-11-04T12:42:52-04:00",
       "available": true,
       "price": 178,
@@ -22414,7 +22409,7 @@
         "source": "title"
       },
       "createdAt": "2023-03-02T10:37:34-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2023-03-02T10:32:28-05:00",
       "available": true,
       "price": 199,
@@ -22496,7 +22491,7 @@
         "source": "title"
       },
       "createdAt": "2023-01-27T15:01:27-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2023-01-27T14:56:17-05:00",
       "available": true,
       "price": 399,
@@ -22581,7 +22576,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2022-12-14T17:43:43-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-12-14T17:38:32-05:00",
       "available": true,
       "price": 40,
@@ -22695,7 +22690,7 @@
         "source": "title"
       },
       "createdAt": "2022-10-14T18:44:04-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-10-14T18:38:59-04:00",
       "available": true,
       "price": 199,
@@ -22769,7 +22764,7 @@
         "source": "title"
       },
       "createdAt": "2022-08-24T12:55:02-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-08-24T12:49:57-04:00",
       "available": true,
       "price": 265,
@@ -22851,7 +22846,7 @@
         "source": "title"
       },
       "createdAt": "2022-08-06T18:38:16-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-08-06T18:33:08-04:00",
       "available": true,
       "price": 525,
@@ -22933,7 +22928,7 @@
         "source": "title"
       },
       "createdAt": "2022-06-05T15:33:28-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-06-05T15:28:19-04:00",
       "available": true,
       "price": 239.2,
@@ -23023,7 +23018,7 @@
         "source": "title"
       },
       "createdAt": "2022-05-29T15:45:00-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-05-29T15:39:47-04:00",
       "available": true,
       "price": 175,
@@ -23113,7 +23108,7 @@
         "source": "title"
       },
       "createdAt": "2022-03-08T17:09:44-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-03-08T17:04:32-05:00",
       "available": true,
       "price": 199,
@@ -23186,7 +23181,7 @@
         "source": "title"
       },
       "createdAt": "2022-02-22T16:14:24-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-02-22T16:09:17-05:00",
       "available": true,
       "price": 75,
@@ -23259,7 +23254,7 @@
         "source": "title"
       },
       "createdAt": "2022-02-22T16:13:30-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-02-22T16:08:23-05:00",
       "available": true,
       "price": 75,
@@ -23332,7 +23327,7 @@
         "source": "title"
       },
       "createdAt": "2022-02-20T16:33:47-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-02-20T16:28:39-05:00",
       "available": true,
       "price": 1200,
@@ -23406,7 +23401,7 @@
         "source": "title"
       },
       "createdAt": "2022-01-08T15:39:59-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-01-08T15:34:54-05:00",
       "available": true,
       "price": 145,
@@ -23495,7 +23490,7 @@
         "source": "title"
       },
       "createdAt": "2022-01-08T13:52:00-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-01-08T13:46:46-05:00",
       "available": true,
       "price": 394,
@@ -23593,7 +23588,7 @@
         "source": "title"
       },
       "createdAt": "2022-01-08T13:43:56-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-01-08T13:38:46-05:00",
       "available": true,
       "price": 799,
@@ -23674,7 +23669,7 @@
         "source": "title"
       },
       "createdAt": "2022-01-05T15:56:30-05:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2022-01-05T15:51:15-05:00",
       "available": true,
       "price": 399,
@@ -23761,7 +23756,7 @@
         "source": "title"
       },
       "createdAt": "2021-09-05T14:07:13-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2021-09-05T14:02:01-04:00",
       "available": true,
       "price": 380,
@@ -23842,7 +23837,7 @@
         "source": "title"
       },
       "createdAt": "2021-04-14T17:38:59-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2021-04-14T17:33:48-04:00",
       "available": true,
       "price": 479,
@@ -23924,7 +23919,7 @@
         "source": "title"
       },
       "createdAt": "2021-03-26T12:37:02-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2021-03-26T12:31:56-04:00",
       "available": true,
       "price": 599,
@@ -24002,7 +23997,7 @@
       "dimensionsRaw": null,
       "dimensions": null,
       "createdAt": "2020-07-03T17:46:01-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2020-07-03T17:40:32-04:00",
       "available": true,
       "price": 15.99,
@@ -24116,7 +24111,7 @@
         "source": "title"
       },
       "createdAt": "2026-09-16T15:33:15-04:00",
-      "updatedAt": "2026-11-04T21:07:56-05:00",
+      "updatedAt": "2026-11-05T10:44:56-05:00",
       "publishedAt": "2020-02-29T18:24:07-05:00",
       "available": true,
       "price": 399,

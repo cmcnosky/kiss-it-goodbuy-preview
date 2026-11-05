@@ -176,6 +176,42 @@ const checkout = await C.createCheckout([lamp], { fetchImpl: checkoutFetch });
 assert.equal(checkoutCalls, 2);
 assert.equal(checkout.checkoutUrl, 'https://kissitgoodbuy.net/cart/c/test');
 
+let unavailableAfterValidationCalls = 0;
+await assert.rejects(
+  C.createCheckout([lamp], {
+    fetchImpl: async () => {
+      unavailableAfterValidationCalls += 1;
+      if (unavailableAfterValidationCalls === 1) return response({ data: { nodes: [remoteVariant()] } });
+      return response({
+        data: {
+          cartCreate: {
+            cart: {
+              checkoutUrl: 'https://kissitgoodbuy.net/cart/c/test',
+              lines: {
+                nodes: [{
+                  id: 'line-1',
+                  quantity: 1,
+                  merchandise: {
+                    id: 'gid://shopify/ProductVariant/68162102526189',
+                    availableForSale: false
+                  }
+                }]
+              },
+              cost: null
+            },
+            userErrors: [],
+            warnings: []
+          }
+        }
+      });
+    }
+  }),
+  (error) => error.code === 'CART_LINE_UNAVAILABLE'
+    && error.details.unavailableLines[0].variantId === 'gid://shopify/ProductVariant/68162102526189'
+    && error.details.currentLines.length === 1
+);
+assert.equal(unavailableAfterValidationCalls, 2, 'availability must be checked again on the created cart');
+
 let mismatchCalls = 0;
 await assert.rejects(
   C.createCheckout([lamp], {
