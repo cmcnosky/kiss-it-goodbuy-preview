@@ -37,8 +37,26 @@ const fallback=run("displaySelection(['leopard-loveseat.jpg','peacock-chair.jpg'
 assert.equal(new Set(fallback.map(p=>p.id)).size,3,'replacement hero slots must be distinct');
 assert.ok(fallback.every(p=>p.available&&p.images.length&&!/gift.?card/i.test(p.title)),'replacement hero items must have a current photograph and availability');
 run('PRODUCTS=[]');
-assert.doesNotThrow(()=>run('home()'),'an empty catalog must not crash the homepage');
+let emptyHome;
+assert.doesNotThrow(()=>{emptyHome=run('home()');},'an empty catalog must not crash the homepage');
+assert.equal((emptyHome.match(/class="empty chapter-empty"/g)||[]).length,3,'each editorial chapter must provide a useful no-match state');
+assert.ok(emptyHome.includes('No available lighting is shown online right now.'));
+assert.ok(emptyHome.includes('No available furniture or mirrors are shown online right now.'));
+assert.ok(emptyHome.includes('No available art or objects are shown online right now.'));
+assert.ok(emptyHome.includes('02 / FORM · From the online inventory'),'inventory wording must remain truthful when only the saved catalog is available');
 context.testProducts=initialProducts;run('PRODUCTS=testProducts');
+assert.equal(run("chapterMatches.form(productByImage('dragonfly-lamp.jpg'))"),false,'a table lamp must never leak into the FORM chapter');
+assert.equal(run("chapterMatches.color(productByImage('art-deco-fan-mirror.jpg'))"),false,'Art Deco in a mirror title must never make it COLOR artwork');
+const selectedChapterHandles=run(`(()=>{const used=new Set(),groups=[];for(const [images,match] of [[['brenta-chandelier.jpg','dragonfly-lamp.jpg'],chapterMatches.light],[['g-plan-sideboard.jpg','art-deco-fan-mirror.jpg'],chapterMatches.form],[['birdhouse-painting.jpg','medallion-sculpture.jpg'],chapterMatches.color]]){const group=chapterFinds(images,match,2,used);group.forEach(p=>used.add(p.id));groups.push(...group);}return groups.map(p=>p.handle).join('|');})()`);
+const intendedChapterHandles=run("['brenta-chandelier.jpg','dragonfly-lamp.jpg','g-plan-sideboard.jpg','art-deco-fan-mirror.jpg','birdhouse-painting.jpg','medallion-sculpture.jpg'].map(name=>productByImage(name).handle).join('|')");
+assert.equal(selectedChapterHandles,intendedChapterHandles,'the current six curated chapter selections must remain unchanged');
+assert.equal(new Set(selectedChapterHandles.split('|')).size,6,'a product must not repeat across editorial chapters');
+assert.equal(run(`(()=>{const first=chapterFinds([],chapterMatches.color,1),used=new Set(first.map(p=>p.id)),next=chapterFinds([],chapterMatches.color,1,used);return Boolean(first[0]&&next[0]&&first[0].id!==next[0].id);})()`),true,'chapter exclusions must force a distinct fallback when another qualifying item exists');
+for(const key of ['light','form','color']){
+ const candidates=run(`chapterFinds([],chapterMatches.${key},8)`);
+ const dated=p=>Date.parse(p.publishedAt||p.createdAt)||0;
+ assert.ok(candidates.every((p,i)=>!i||dated(candidates[i-1])>=dated(p)),`${key} fallback products must be newest first`);
+}
 const fixtureSource=inventory.products.find(p=>p.available&&p.variants.some(v=>v.available));
 assert.ok(fixtureSource,'a purchasable source product is required for the synthetic no-photo fixture');
 context.noPhotoFixture={
@@ -59,4 +77,4 @@ const newest=run('latestFinds([])');
 assert.equal(new Set(newest.map(p=>p.id)).size,newest.length);
 assert.ok(newest.every(p=>p.available&&p.images.length));
 assert.ok(newest.every((p,i)=>!i||Date.parse(newest[i-1].publishedAt||newest[i-1].createdAt)>=Date.parse(p.publishedAt||p.createdAt)),'arrivals must be ordered by merchant publication time');
-console.log('Merchandising regressions passed: sold/deleted hero fallback, empty catalog, no-photo cards/bag, newest listing order.');
+console.log('Merchandising regressions passed: sold/deleted fallback, strict distinct chapters, useful empty states, no-photo cards/bag, newest listing order.');
