@@ -17,8 +17,8 @@ function render(url,product){const context={location:new URL(url,'https://cmcnos
 const siteUrl='https://cmcnosky.github.io/kiss-it-goodbuy-preview/';
 function html(body,{base='./',title,description,product,pagePath=''}={}){
 const photo=product?.images[0];
-const image=photo?.src||siteUrl+'assets/social-preview-kiss-it-good-buy-v4.png';
-const imageAlt=photo?.src?(photo.alt||product.title):'Kiss It Good Buy in large teal lettering with the exact original kiss logo, cream and gold Love at first find lettering, coral and gold framing, and the gallery’s leopard loveseat, peacock chair, and stained-glass lamp.';
+const image=photo?.src||siteUrl+'assets/social-preview-kiss-it-good-buy-v5.png';
+const imageAlt=photo?.src?(photo.alt||product.title):'Kiss It Good Buy in oversized cherry-red lettering on butter yellow, with a pink checkerboard accent, the exact original kiss logo, and framed photographs of the gallery’s leopard loveseat, peacock chair, and stained-glass lamp.';
 const width=photo?.src?photo.width:1200;
 const height=photo?.src?photo.height:630;
 const imageType=photo?.src?({jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'}[new URL(image).pathname.split('.').pop().toLowerCase()]):'image/png';
