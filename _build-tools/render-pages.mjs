@@ -20,7 +20,7 @@ const setup=['catalog.js','commerce.js'].map(f=>fs.readFileSync(path.join(dist,f
 function render(url,product){const context={location:new URL(url,'https://cmcnosky.github.io'),URL,URLSearchParams,Intl,Date,localStorage:{getItem:()=>null},KIGB_INVENTORY:inventory,KIGB_PRODUCT_HANDLE:product?.handle};context.window=context;const result=vm.runInNewContext(setup+'\n'+prefix+'\npageHtml()',context);assert.equal((result.match(/<h1[\s>]/g)||[]).length,1,'Exactly one H1 on '+url);return result;}
 const siteUrl='https://cmcnosky.github.io/kiss-it-goodbuy-preview/';
 // Give preview artwork an immutable content-based URL without changing the shared page URL.
-const previewBytes=fs.readFileSync(path.join(dist,'assets/social-preview-kiss-it-good-buy-v11.png'));
+const previewBytes=fs.readFileSync(path.join(dist,'assets/social-preview-kiss-it-good-buy-v12.png'));
 const previewHash=createHash('sha256').update(previewBytes).digest('hex').slice(0,16);
 const previewPath='assets/kiss-it-good-buy-gallery-'+previewHash+'.png';
 writeRenderedFile(path.join(dist,previewPath),previewBytes);
@@ -30,7 +30,7 @@ function html(body,{base='./',title,description,product,pagePath=''}={}){
 const pageUrl=siteUrl+pagePath;
 const photo=product?.images[0];
 const image=photo?.src||siteUrl+previewPath;
-const imageAlt=photo?.src?(photo.alt||product.title):'A photograph inside the Kiss It Good Buy showroom, the complete original lipstick-kiss logo, and a prominent dark business name on a pastel coral-red gallery label.';
+const imageAlt=photo?.src?(photo.alt||product.title):'The original red lipstick kiss above the large Kiss It Good Buy name and Furniture Consignment wording, beside a photograph of the showroom in a coral, cream, sage, and ochre composition.';
 const width=photo?.src?photo.width:1200;
 const height=photo?.src?photo.height:630;
 const imageType=photo?.src?({jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'}[new URL(image).pathname.split('.').pop().toLowerCase()]):'image/png';
