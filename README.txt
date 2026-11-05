@@ -27,4 +27,6 @@ Original first-party logo and store imagery are preserved. Font licenses are in 
 November 4, 2026 owner review: 249 products, 253 variants, 31 collections at the recorded source fetch. More readable business identity, newest arrivals, verified Readers Choice recognition, gallery values, clearer item/transport details, resilient live refresh, and stricter price review. Counts and availability remain time-specific.
 
 November 5, 2026 gallery-layout redesign: the actual showroom opens the page, followed by a search/category directory, a mobile arrivals shelf, and differently arranged lighting, furniture, and art displays. Archive imagery is clearly labeled; available product selections have category-specific fallbacks. The matching photographic link image keeps the original logo unchanged and the business name prominent.
-Share this revision: https://cmcnosky.github.io/kiss-it-goodbuy-preview/?v=6
+Share this revision: https://cmcnosky.github.io/kiss-it-goodbuy-preview/
+
+The shared URL remains unchanged between releases. Internal stylesheet and JavaScript references include content hashes to prevent updated pages from reusing older cached assets.
