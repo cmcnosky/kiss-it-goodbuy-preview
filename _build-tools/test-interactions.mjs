@@ -8,6 +8,7 @@ const dist = path.join(root, 'dist');
 const app = fs.readFileSync(path.join(dist, 'app.js'), 'utf8');
 const inventory = JSON.parse(fs.readFileSync(path.join(dist, 'inventory.json'), 'utf8'));
 const commerce = fs.readFileSync(path.join(dist, 'commerce.js'), 'utf8');
+const renderer = fs.readFileSync(path.join(root, 'scripts', 'render-pages.mjs'), 'utf8');
 const prefix = app.slice(0, app.indexOf('// BROWSER START'));
 const product = inventory.products.find((entry) => entry.available && entry.variants.some((variant) => variant.available));
 const variant = product.variants.find((entry) => entry.available);
@@ -113,6 +114,62 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
     'the newsletter posts to the current official form anchor');
   assert.match(footer, /href="https:\/\/kissitgoodbuy\.net\/apps\/consignor"/,
     'the consignor portal uses the verified canonical URL without an avoidable redirect');
+  const consignMarkup = run('consign()');
+  assert.match(consignMarkup, /href="consign\.html#inquiry-form"/,
+    'the consignment shortcut remains on consign.html despite the document base');
+  assert.doesNotMatch(consignMarkup, /href=["']#/,
+    'app templates do not use fragment-only hrefs that resolve against the document base');
+}
+
+{
+  const htmlStart = renderer.indexOf('function html(');
+  const htmlEnd = renderer.indexOf('const pages=', htmlStart);
+  assert.ok(htmlStart > 0 && htmlEnd > htmlStart, 'renderer HTML helper is available for skip-link regression tests');
+  const assetNames = ['style.css', 'storefront.css', 'integration.css', 'catalog-normalize.js', 'inventory.js', 'catalog.js', 'commerce.js', 'storefront-data.js', 'app.js'];
+  const context = {
+    URL,
+    siteUrl: 'https://cmcnosky.github.io/kiss-it-goodbuy-preview/',
+    previewPath: 'assets/preview.png',
+    assetUrls: Object.fromEntries(assetNames.map((name) => [name, name])),
+    escape(value) { return String(value); },
+    encode: JSON.stringify
+  };
+  vm.createContext(context);
+  vm.runInContext(renderer.slice(htmlStart, htmlEnd), context);
+  const cases = [
+    {
+      options: { base: './', title: 'Home', description: 'Home', pagePath: '' },
+      expectedHref: 'index.html#main',
+      documentUrl: 'http://localhost:8765/index.html',
+      expectedPath: '/index.html'
+    },
+    {
+      options: { base: './', title: 'Collection', description: 'Collection', pagePath: 'collection.html' },
+      expectedHref: 'collection.html#main',
+      documentUrl: 'https://cmcnosky.github.io/kiss-it-goodbuy-preview/collection.html?q=mirror',
+      expectedPath: '/kiss-it-goodbuy-preview/collection.html'
+    },
+    {
+      options: { base: '../../', title: 'Piece', description: 'Piece', pagePath: 'products/a-piece/' },
+      expectedHref: 'products/a-piece/#main',
+      documentUrl: 'https://cmcnosky.github.io/kiss-it-goodbuy-preview/products/a-piece/?variant=123',
+      expectedPath: '/kiss-it-goodbuy-preview/products/a-piece/'
+    }
+  ];
+  for (const testCase of cases) {
+    context.options = testCase.options;
+    const markup = vm.runInContext(`html('',options)`, context);
+    const match = markup.match(/<a href="([^"]+)" class="skip-link">Skip to content<\/a>/);
+    assert.ok(match, 'rendered page includes the native skip-link fallback');
+    assert.equal(match[1], testCase.expectedHref);
+    const baseUrl = new URL(testCase.options.base, testCase.documentUrl);
+    const resolved = new URL(match[1], baseUrl);
+    assert.equal(resolved.origin, new URL(testCase.documentUrl).origin, 'native fallback stays on the current host');
+    assert.equal(resolved.pathname, testCase.expectedPath, 'native fallback stays on the rendered page under its base path');
+    assert.equal(resolved.hash, '#main');
+  }
+  assert.doesNotMatch(renderer, /href="#main" class="skip-link"/,
+    'the renderer never emits a fragment-only skip link');
 }
 
 {
@@ -283,6 +340,54 @@ function rootWith(nodes) {
   vm.runInContext('dismissCopyFallback()', context);
   assert.equal(fallback, null);
   assert.equal(document.activeElement, trigger, 'dismissing the fallback restores the originating control');
+}
+
+{
+  const navigationStart = app.indexOf('// SAME-PAGE NAVIGATION START');
+  const navigationEnd = app.indexOf('// SAME-PAGE NAVIGATION END', navigationStart);
+  assert.ok(navigationStart > 0 && navigationEnd > navigationStart);
+  let clickHandler = null;
+  let pushedUrl = null;
+  const main = {
+    attributes: {},
+    setAttribute(name, value) { this.attributes[name] = value; },
+    focus() { this.focused = true; },
+    scrollIntoView(options) { this.scrollOptions = options; }
+  };
+  const location = new URL('https://cmcnosky.github.io/kiss-it-goodbuy-preview/products/a-piece/?variant=123&view=detail#photos');
+  const context = {
+    URL,
+    location,
+    history: {
+      state: { retained: true },
+      pushState(state, _title, url) {
+        assert.deepEqual(state, { retained: true });
+        pushedUrl = url;
+      }
+    },
+    document: {
+      addEventListener(type, handler) { if (type === 'click') clickHandler = handler; }
+    },
+    $: (selector) => selector === '#main' ? main : null,
+    focusElement(node) { node.focus(); return true; }
+  };
+  vm.createContext(context);
+  vm.runInContext(app.slice(navigationStart, navigationEnd + '// SAME-PAGE NAVIGATION END'.length), context);
+  assert.equal(typeof clickHandler, 'function');
+  let prevented = false;
+  clickHandler({
+    target: { closest: (selector) => selector === '.skip-link' ? { className: 'skip-link' } : null },
+    preventDefault() { prevented = true; }
+  });
+  assert.equal(prevented, true, 'enhanced skip link prevents a base-relative navigation');
+  assert.equal(main.attributes.tabindex, '-1');
+  assert.equal(main.focused, true, 'enhanced skip link moves keyboard focus to main');
+  assert.equal(main.scrollOptions?.block, 'start');
+  const pushed = new URL(pushedUrl);
+  assert.equal(pushed.origin, location.origin, 'enhanced skip link remains on the current host');
+  assert.equal(pushed.pathname, location.pathname, 'enhanced skip link preserves the current page path');
+  assert.equal(pushed.search, '?variant=123&view=detail', 'enhanced skip link preserves product and filter parameters');
+  assert.equal(pushed.hash, '#main');
 }
 
 const mergeStart = app.indexOf('function mergeCartCatalog');
