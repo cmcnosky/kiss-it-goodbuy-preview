@@ -13,6 +13,13 @@ const Catalog = require(path.join(projectRoot, 'dist/catalog-normalize.js'));
 const DEFAULT_BASE_URL = 'https://kissitgoodbuy.net';
 const PAGE_LIMIT = 250;
 const MAX_PAGES = 100;
+const REQUEST_SPACING_MS = 200;
+const MAX_ATTEMPTS = 4;
+const RETRY_BASE_MS = 1000;
+const MAX_RETRY_DELAY_MS = 30000;
+const RETRYABLE_STATUS = new Set([429, 503]);
+
+let lastRequestStartedAt = 0;
 
 function parseArguments(argv) {
   const values = { baseUrl: DEFAULT_BASE_URL, out: path.join(projectRoot, 'dist/inventory.json') };
@@ -49,13 +56,43 @@ async function writeAtomic(target, contents) {
 }
 
 function selectedHeaders(headers) {
-  const names = ['content-type', 'etag', 'last-modified', 'access-control-allow-origin', 'powered-by'];
+  const names = ['content-type', 'etag', 'last-modified', 'access-control-allow-origin', 'powered-by', 'retry-after'];
   return Object.fromEntries(names.map(name => [name, headers.get(name)]).filter(([, value]) => value != null));
 }
 
-async function fetchJson(url, attempts = 3) {
+function sleep(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+function retryAfterMilliseconds(value, now = Date.now()) {
+  if (value == null || String(value).trim() === '') return null;
+  const text = String(value).trim();
+  const seconds = Number(text);
+  if (Number.isFinite(seconds) && seconds >= 0) return Math.min(MAX_RETRY_DELAY_MS, Math.ceil(seconds * 1000));
+  const date = Date.parse(text);
+  if (Number.isNaN(date)) return null;
+  return Math.min(MAX_RETRY_DELAY_MS, Math.max(0, date - now));
+}
+
+async function waitForRequestSlot() {
+  const remaining = REQUEST_SPACING_MS - (Date.now() - lastRequestStartedAt);
+  if (remaining > 0) await sleep(remaining);
+  lastRequestStartedAt = Date.now();
+}
+
+class HttpResponseError extends Error {
+  constructor(response, url) {
+    super(`${response.status} ${response.statusText}: ${url}`);
+    this.name = 'HttpResponseError';
+    this.status = response.status;
+    this.retryAfter = response.headers.get('retry-after');
+  }
+}
+
+async function fetchJson(url, attempts = MAX_ATTEMPTS) {
   let lastError;
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    await waitForRequestSlot();
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
@@ -64,7 +101,7 @@ async function fetchJson(url, attempts = 3) {
         signal: controller.signal
       });
       const rawBody = await response.text();
-      if (!response.ok) throw new Error(`${response.status} ${response.statusText}: ${url}`);
+      if (!response.ok) throw new HttpResponseError(response, url);
       let payload;
       try { payload = JSON.parse(rawBody); } catch { throw new Error(`Invalid JSON from ${url}`); }
       return {
@@ -76,7 +113,12 @@ async function fetchJson(url, attempts = 3) {
       };
     } catch (error) {
       lastError = error;
-      if (attempt < attempts) await new Promise(resolve => setTimeout(resolve, attempt * 750));
+      const retryableHttp = error instanceof HttpResponseError && RETRYABLE_STATUS.has(error.status);
+      const retryableOther = !(error instanceof HttpResponseError);
+      if (attempt >= attempts || (!retryableHttp && !retryableOther)) break;
+      const exponential = Math.min(MAX_RETRY_DELAY_MS, RETRY_BASE_MS * (2 ** (attempt - 1)));
+      const requested = retryAfterMilliseconds(error.retryAfter);
+      await sleep(Math.max(exponential, requested ?? 0));
     } finally {
       clearTimeout(timeout);
     }
@@ -84,17 +126,18 @@ async function fetchJson(url, attempts = 3) {
   throw lastError;
 }
 
-async function fetchPages(baseUrl, pathname, key) {
+async function fetchPages(baseUrl, pathname, key, options = {}) {
+  const fetchPage = options.fetchJson || fetchJson;
   const records = [];
   const pages = [];
   for (let page = 1; page <= MAX_PAGES; page += 1) {
     const joiner = pathname.includes('?') ? '&' : '?';
-    const response = await fetchJson(`${baseUrl}${pathname}${joiner}limit=${PAGE_LIMIT}&page=${page}`);
+    const response = await fetchPage(`${baseUrl}${pathname}${joiner}limit=${PAGE_LIMIT}&page=${page}`);
     const pageRecords = response.payload?.[key];
     if (!Array.isArray(pageRecords)) throw new Error(`${response.url} did not return a ${key} array.`);
     pages.push(response);
-    if (!pageRecords.length) return { records, pages };
     records.push(...pageRecords);
+    if (pageRecords.length < PAGE_LIMIT) return { records, pages };
   }
   throw new Error(`${pathname} exceeded the ${MAX_PAGES}-page safety limit.`);
 }
@@ -121,7 +164,7 @@ function normalizeCollectionImage(image) {
   };
 }
 
-function runSelfTest() {
+async function runSelfTest() {
   const failures = [];
   const check = (condition, message) => { if (!condition) failures.push(message); };
   check(Catalog.moneyToCents('1,299.20') === 129920, 'moneyToCents preserves cents');
@@ -131,6 +174,8 @@ function runSelfTest() {
   check(Catalog.plainHtmlText('<p>A &amp; B</p><p>C</p>') === 'A & B\nC', 'plain HTML conversion');
   check(Catalog.extractDimensions('Table 21"Hx50"Wx30"D')?.labelStatus === 'labeled', 'labeled dimensions');
   check(Catalog.extractDimensions('Chair 35x33x41')?.labelStatus === 'unlabeled', 'unlabeled dimensions stay unlabeled');
+  check(Catalog.extractDimensions("1880's Italian table") === null, 'possessive year apostrophes are not measurements');
+  check(Catalog.extractDimensions("Backdrop 8'W x 10'H")?.raw === "8'W x 10'H", 'legitimate feet measurements are preserved');
   const giftCard = Catalog.normalizeProduct({
     id: 1,
     title: 'Exact Gift Card Title',
@@ -145,13 +190,35 @@ function runSelfTest() {
   });
   check(giftCard.title === 'Exact Gift Card Title', 'exact source title is preserved');
   check(giftCard.minPrice === 25 && giftCard.maxPrice === 100 && giftCard.variants.length === 2, 'multi-variant price range');
+
+  const shortPageCalls = [];
+  const shortPage = await fetchPages('https://example.test', '/products.json', 'products', {
+    fetchJson: async url => {
+      shortPageCalls.push(url);
+      return { url, payload: { products: [{ id: 1 }, { id: 2 }] } };
+    }
+  });
+  check(shortPageCalls.length === 1 && shortPage.records.length === 2 && shortPage.pages.length === 1, 'a short page terminates pagination without an empty follow-up request');
+
+  const fullPageCalls = [];
+  const fullPage = await fetchPages('https://example.test', '/products.json', 'products', {
+    fetchJson: async url => {
+      fullPageCalls.push(url);
+      return {
+        url,
+        payload: { products: fullPageCalls.length === 1 ? Array.from({ length: PAGE_LIMIT }, (_, index) => ({ id: index + 1 })) : [] }
+      };
+    }
+  });
+  check(fullPageCalls.length === 2 && fullPage.records.length === PAGE_LIMIT && fullPage.pages.length === 2, 'a full page continues until a short page confirms completion');
+  check(retryAfterMilliseconds('2') === 2000 && retryAfterMilliseconds('not-a-date') === null, 'Retry-After seconds are parsed and invalid values are ignored');
   if (failures.length) throw new Error(`Self-test failed:\n- ${failures.join('\n- ')}`);
-  process.stdout.write('Catalog self-test passed (7 checks).\n');
+  process.stdout.write('Catalog self-test passed (12 checks).\n');
 }
 
 async function main() {
   const config = parseArguments(process.argv.slice(2));
-  if (config.selfTest) return runSelfTest();
+  if (config.selfTest) return await runSelfTest();
   const fetchedAt = config.recordedAt ? new Date(config.recordedAt).toISOString() : new Date().toISOString();
   const dateStamp = fetchedAt.slice(0, 10);
 

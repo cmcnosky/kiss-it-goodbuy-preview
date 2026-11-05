@@ -51,10 +51,14 @@ jobs:
       - name: Validate the staged storefront
         run: |
           node --check .build/dist/app.js
+          node --check .build/dist/catalog-normalize.js
           node --check .build/dist/commerce.js
           node --check .build/dist/storefront-data.js
+          node .build/scripts/sync-catalog.mjs --self-test
           node .build/scripts/test-commerce.mjs
           node .build/scripts/test-storefront-data.mjs
+          node .build/scripts/test-storefront.mjs
+          node .build/scripts/test-interactions.mjs
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

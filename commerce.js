@@ -314,7 +314,7 @@
       }
       const currentPrice = amountToCents(variant.price.amount);
       const currencyCode = variant.price.currencyCode;
-      if (line.priceCents !== null && (line.priceCents !== currentPrice || line.currencyCode !== currencyCode)) {
+      if (line.priceCents === null || line.priceCents !== currentPrice || line.currencyCode !== currencyCode) {
         priceChanges.push({
           variantId: line.variantId,
           productTitle: variant.product.title,
@@ -411,7 +411,7 @@
   async function createCheckout(lines, options = {}) {
     const checked = await validateCart(lines, options);
     if (checked.priceChanges.length && options.acceptPriceChanges !== true) {
-      throw new CommerceError('CART_PRICE_CHANGED', 'A price changed. Review the updated cart before checkout.', {
+      throw new CommerceError('CART_PRICE_CHANGED', 'A price needs review. Review the live price before checkout.', {
         priceChanges: checked.priceChanges,
         currentLines: checked.lines
       });

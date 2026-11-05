@@ -37,7 +37,9 @@ const REQUIRED_TOOLS = [
   'stage-public-build.mjs',
   'sync-catalog.mjs',
   'test-commerce.mjs',
-  'test-storefront-data.mjs'
+  'test-storefront-data.mjs',
+  'test-storefront.mjs',
+  'test-interactions.mjs'
 ];
 
 function assertSafeBuildPath() {

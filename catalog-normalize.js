@@ -82,6 +82,8 @@
     ]) {
       for (const match of source.matchAll(pattern)) {
         const raw = match[0].trim();
+        const following = source.slice((match.index || 0) + match[0].length);
+        if (raw.endsWith("'") && /^s\b/i.test(following)) continue;
         const dimensionTokens = raw.split(slashDelimited ? /\s*\/\s*/ : /\s*[xX×]\s*/);
         const labeled = dimensionTokens.filter(part => /(?:Dia\.?|W|H|D|L)\s*$/i.test(part)).length;
         const quoted = dimensionTokens.filter(part => /[\"″]|\bin\b/i.test(part)).length;

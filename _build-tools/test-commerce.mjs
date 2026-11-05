@@ -47,7 +47,9 @@ assert.deepEqual(C.cartSummary([lamp, chair]), {
   priceComplete: true,
   hasUnavailable: false
 });
-assert.equal(C.cartSummary([{ ...lamp, priceCents: null }]).subtotalCents, null);
+const unknownPriceSummary = C.cartSummary([{ ...lamp, priceCents: null }]);
+assert.equal(unknownPriceSummary.subtotalCents, null);
+assert.equal(unknownPriceSummary.priceComplete, false);
 
 assert.equal(
   C.buildCartReviewUrl([lamp, { ...chair, quantity: 2 }]),
@@ -126,6 +128,21 @@ await assert.rejects(
   (error) => error.code === 'CART_PRICE_CHANGED' && error.details.currentLines[0].priceCents === 10900
 );
 assert.equal(priceChangeCalls, 1, 'price changes must stop before cartCreate');
+
+let unknownPriceCalls = 0;
+await assert.rejects(
+  C.createCheckout([{ ...lamp, priceCents: null }], {
+    fetchImpl: async () => {
+      unknownPriceCalls += 1;
+      return response({ data: { nodes: [remoteVariant()] } });
+    }
+  }),
+  (error) => error.code === 'CART_PRICE_CHANGED'
+    && error.details.priceChanges[0].fromCents === null
+    && error.details.priceChanges[0].toCents === 9900
+    && error.details.currentLines[0].priceCents === 9900
+);
+assert.equal(unknownPriceCalls, 1, 'an unknown saved price must stop before cartCreate');
 
 let checkoutCalls = 0;
 const checkoutFetch = async (_url, init) => {
