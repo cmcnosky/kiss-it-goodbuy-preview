@@ -375,12 +375,14 @@ body{background:var(--paper)}
 
 .shop-sidebar .filter-group label{color:var(--ink)}
 
-/* Larger curved lettering within the original compact banner footprint. */
-.site-header .header-inner{padding-block:5px}
+/* A little extra height lets the refined lettering arc around the original kiss. */
+html{scroll-padding-top:142px}
+.site-header .header-inner{min-height:104px;padding-block:5px}
 .site-header .wordmark{width:225px;gap:0}
-.site-header .wordmark>img{width:100%;max-height:79px;object-fit:contain}
+.site-header .wordmark>img{width:100%;max-height:94px;object-fit:contain}
 @media(max-width:640px){
- .site-header .header-inner{padding-block:4px}
+ html{scroll-padding-top:128px}
+ .site-header .header-inner{min-height:91px;padding-block:4px}
  .site-header .wordmark{width:200px;gap:0}
- .site-header .wordmark>img{width:100%;max-height:70px}
+ .site-header .wordmark>img{width:100%;max-height:84px}
 }
