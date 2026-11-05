@@ -375,15 +375,12 @@ body{background:var(--paper)}
 
 .shop-sidebar .filter-group label{color:var(--ink)}
 
-/* Use the existing banner space for the original curved logo and a legible descriptor. */
+/* Larger curved lettering within the original compact banner footprint. */
 .site-header .header-inner{padding-block:5px}
-.site-header .wordmark>img{width:124px}
-.site-header .brand-name>small{display:block;font:700 15px/1.15 Grotesk,Arial,sans-serif;letter-spacing:.025em;color:var(--ink);margin-top:4px}
-@media(min-width:1001px) and (max-width:1200px){.site-header .wordmark>img{width:100px}.site-header .brand-name>small{font-size:13px;letter-spacing:0}}
-@media(min-width:641px) and (max-width:1000px){.site-header .wordmark>img{width:116px}.site-header .brand-name>small{font-size:14px}}
+.site-header .wordmark{width:225px;gap:0}
+.site-header .wordmark>img{width:100%;max-height:79px;object-fit:contain}
 @media(max-width:640px){
  .site-header .header-inner{padding-block:4px}
- .site-header .wordmark>img{width:88px}
- .site-header .brand-name>small{font-size:12px;line-height:1.05;letter-spacing:0;margin-top:2px;white-space:normal}
+ .site-header .wordmark{width:200px;gap:0}
+ .site-header .wordmark>img{width:100%;max-height:70px}
 }
-@media(max-width:360px){.site-header .wordmark>img{width:70px}}

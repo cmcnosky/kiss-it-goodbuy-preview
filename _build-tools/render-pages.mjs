@@ -20,7 +20,7 @@ const setup=['catalog.js','commerce.js'].map(f=>fs.readFileSync(path.join(dist,f
 function render(url,product){const context={location:new URL(url,'https://cmcnosky.github.io'),URL,URLSearchParams,Intl,Date,localStorage:{getItem:()=>null},KIGB_INVENTORY:inventory,KIGB_PRODUCT_HANDLE:product?.handle};context.window=context;const result=vm.runInNewContext(setup+'\n'+prefix+'\npageHtml()',context);assert.equal((result.match(/<h1[\s>]/g)||[]).length,1,'Exactly one H1 on '+url);return result;}
 const siteUrl='https://cmcnosky.github.io/kiss-it-goodbuy-preview/';
 // Give preview artwork an immutable content-based URL without changing the shared page URL.
-const previewBytes=fs.readFileSync(path.join(dist,'assets/social-preview-kiss-it-good-buy-v9.png'));
+const previewBytes=fs.readFileSync(path.join(dist,'assets/social-preview-kiss-it-good-buy-v10.png'));
 const previewHash=createHash('sha256').update(previewBytes).digest('hex').slice(0,16);
 const previewPath='assets/kiss-it-good-buy-gallery-'+previewHash+'.png';
 writeRenderedFile(path.join(dist,previewPath),previewBytes);
