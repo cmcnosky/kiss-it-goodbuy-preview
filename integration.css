@@ -102,7 +102,7 @@
 .compare-scroll,.compare-table th,.compare-table td,.dialog,.filter-dialog{border-width:2px}
 
 /* The gallery itself is the identity: rooms, objects, and factual labels. */
-:root{--paper:#faf5e9;--ink:#2d2927;--red:#a34232;--muted:#665e59;--line:#c6b6a0;--soft:#ece4d5;--coral:#e79b88;--celadon:#d6e0cc;--ochre:#d7ad54;--cream:#faf5e9}
+:root{--paper:#faf5e9;--ink:#2d2927;--red:#a34232;--muted:#665e59;--line:#c6b6a0;--soft:#ece4d5;--coral:#e49580;--celadon:#d6e0cc;--ochre:#d7ad54;--cream:#faf5e9}
 body{background:var(--paper)}
 ::selection{background:var(--ochre);color:var(--ink)}
 :focus-visible{outline:3px solid var(--cream);outline-offset:2px;box-shadow:0 0 0 6px var(--ink)}
