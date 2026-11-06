@@ -79,6 +79,16 @@ async function setStudioDesignField(page, name, value) {
   await expect(page.locator(`[name="${name}"][data-design-field]`)).toHaveValue(value);
 }
 
+async function signInToStudio(page) {
+  const form = page.locator('#studio-login-form');
+  await expect(form).toBeVisible();
+  await form.locator('[name="username"]').fill('Chelsea');
+  await form.locator('[name="password"]').fill('Chelsea');
+  await form.getByRole('button', { name: /^Sign in to Owner Studio/ }).click();
+  await expect(page.locator('.studio-tabs')).toBeVisible();
+  await expect(form).toHaveCount(0);
+}
+
 async function captureProof(page, name) {
   if (!proofRoot) return;
   mkdirSync(proofRoot, { recursive: true });
@@ -245,10 +255,68 @@ test('mocked checkout stores a trusted recovery link and a cart change invalidat
   await expect(recoveryLink).toHaveCount(0);
 });
 
+test('Owner Studio convenience sign-in is exact, session-scoped, and signs out without losing the draft', async ({ page }) => {
+  const loginRequests = [];
+  page.on('request', request => {
+    if (['fetch', 'xhr'].includes(request.resourceType())) loginRequests.push(`${request.method()} ${request.url()}`);
+  });
+  await page.goto('/studio.html', { waitUntil: 'load' });
+  const form = page.locator('#studio-login-form');
+  await expect(form).toBeVisible();
+  await expect(page.locator('.studio-tabs')).toHaveCount(0);
+
+  if (proofRoot) {
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await captureProof(page, 'owner-studio-login-desktop.png');
+    await page.setViewportSize({ width: 390, height: 844 });
+    await captureProof(page, 'owner-studio-login-mobile.png');
+    await page.setViewportSize({ width: 1440, height: 1000 });
+  }
+
+  loginRequests.length = 0;
+  await form.locator('[name="username"]').fill('Chelsea');
+  await form.locator('[name="password"]').fill('chelsea');
+  await form.getByRole('button', { name: /^Sign in to Owner Studio/ }).click();
+  await expect(page.locator('#studio-login-error')).toBeVisible();
+  expect((await page.locator('#studio-login-error').innerText()).trim().length).toBeGreaterThan(0);
+  await expect(page.locator('.studio-tabs')).toHaveCount(0);
+  expect(await page.evaluate(() => sessionStorage.getItem('kigb-owner-studio-session-v1'))).toBeNull();
+  expect(loginRequests).toEqual([]);
+
+  await signInToStudio(page);
+  expect(await page.evaluate(() => sessionStorage.getItem('kigb-owner-studio-session-v1'))).toBe('Chelsea');
+  await setStudioDesignField(page, 'coral', '#b15a4a');
+  await page.reload({ waitUntil: 'load' });
+  await expect(page.locator('.studio-tabs')).toBeVisible();
+  await expect(page.locator('[name="coral"][data-design-field]')).toHaveValue('#b15a4a');
+
+  await Promise.all([
+    page.waitForURL('**/index.html'),
+    page.locator('[data-preview-store]').click()
+  ]);
+  await page.getByRole('link', { name: 'Edit in Owner Studio →', exact: true }).click();
+  await expect(page.locator('.studio-tabs')).toBeVisible();
+  await page.locator('[data-studio-signout]').click();
+  await expect(form).toBeVisible();
+  await expect(page.locator('.studio-tabs')).toHaveCount(0);
+  expect(await page.evaluate(() => sessionStorage.getItem('kigb-owner-studio-session-v1'))).toBeNull();
+  expect(await page.evaluate(() => window.KIGBStudioState.read().active)).toBe(false);
+
+  await page.goto('/index.html', { waitUntil: 'load' });
+  await page.goBack({ waitUntil: 'load' });
+  await expect(page).toHaveURL(/\/studio\.html$/);
+  await expect(form).toBeVisible();
+  await expect(page.locator('.studio-tabs')).toHaveCount(0);
+
+  await signInToStudio(page);
+  await expect(page.locator('[name="coral"][data-design-field]')).toHaveValue('#b15a4a');
+});
+
 test('Owner Studio design, words, and inventory edits persist into the private preview without merchant requests', async ({ page }) => {
   expect(studioProduct, 'fixture needs an available non-gift product with an item number').toBeTruthy();
   const merchantRequests = watchMerchantDataRequests(page);
   await page.goto('/studio.html', { waitUntil: 'load' });
+  await signInToStudio(page);
   await page.evaluate(() => localStorage.setItem('kigb-cart-v1', '"real-cart-sentinel"'));
 
   await setStudioDesignField(page, 'coral', '#c95747');
@@ -308,6 +376,7 @@ test('Owner Studio design, words, and inventory edits persist into the private p
 
 test('Owner Studio supports undo, named restore points, and atomic backup import', async ({ page }) => {
   await page.goto('/studio.html', { waitUntil: 'load' });
+  await signInToStudio(page);
   await page.locator('[data-preset="collected"]').click();
   await expect(page.locator('[name="coral"][data-design-field]')).toHaveValue('#de755f');
 
@@ -371,6 +440,7 @@ test('practice checkout creates and updates only a local Studio order', async ({
   expect(studioProduct, 'fixture needs an available non-gift product with an item number').toBeTruthy();
   const merchantRequests = watchMerchantDataRequests(page);
   await page.goto('/studio.html', { waitUntil: 'load' });
+  await signInToStudio(page);
   await page.evaluate(() => localStorage.setItem('kigb-cart-v1', '"real-cart-sentinel"'));
   await Promise.all([
     page.waitForURL('**/index.html'),
@@ -429,6 +499,7 @@ test('a stale normal-store tab cannot submit after Owner Studio is activated els
 
   const ownerTab = await context.newPage();
   await ownerTab.goto('/studio.html', { waitUntil: 'load' });
+  await signInToStudio(ownerTab);
   await Promise.all([
     ownerTab.waitForURL('**/index.html'),
     ownerTab.locator('[data-preview-store]').click()
@@ -452,6 +523,7 @@ test('practice newsletter and consignment activity stay local and support follow
   });
   const merchantRequests = watchMerchantDataRequests(page);
   await page.goto('/studio.html', { waitUntil: 'load' });
+  await signInToStudio(page);
   await Promise.all([
     page.waitForURL('**/index.html'),
     page.locator('[data-preview-store]').click()
@@ -494,6 +566,7 @@ test('practice newsletter and consignment activity stay local and support follow
 
 test('Owner Studio resizes a large phone-style photo into a bounded local sample item', async ({ page }) => {
   await page.goto('/studio.html', { waitUntil: 'load' });
+  await signInToStudio(page);
   await page.locator('[data-studio-tab="inventory"]').click();
   const form = page.locator('#studio-custom-product-form');
   await form.locator('[name="title"]').fill('Browser QA photo sample');
@@ -546,6 +619,7 @@ test('Owner Studio stays in place when browser storage cannot persist preview mo
     };
   });
   await page.goto('/studio.html', { waitUntil: 'load' });
+  await signInToStudio(page);
   await page.locator('[data-preview-store]').click();
   await expect(page).toHaveURL(/\/studio\.html$/);
   await expect(page.locator('.studio-message.error')).toContainText('cross-page preview cannot open reliably');

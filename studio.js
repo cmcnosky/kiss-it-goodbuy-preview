@@ -5,6 +5,25 @@
 })(typeof globalThis!=='undefined'?globalThis:window,function createStudio(root){
   'use strict';
 
+  // Shared preview access only; this static site does not provide server authentication.
+  const SESSION_KEY='kigb-owner-studio-session-v1';
+  let volatileSignIn=false,sessionInMemory=false;
+  function signedIn(){
+    if(sessionInMemory)return volatileSignIn;
+    try{if(!root.sessionStorage)return false;return root.sessionStorage.getItem(SESSION_KEY)==='Chelsea';}catch{return volatileSignIn;}
+  }
+  function setSignedIn(value){
+    volatileSignIn=value;
+    try{
+      if(!root.sessionStorage)throw new Error('Session storage unavailable');
+      if(value)root.sessionStorage.setItem(SESSION_KEY,'Chelsea');else root.sessionStorage.removeItem(SESSION_KEY);
+      sessionInMemory=value?root.sessionStorage.getItem(SESSION_KEY)!=='Chelsea':false;
+    }catch{sessionInMemory=true;}
+  }
+  function loginMarkup(message=''){
+    return `<section class="studio-login"><div class="studio-login-welcome"><p class="eyebrow">Kiss It Good Buy · Owner Studio</p><h1>Welcome,<br><em>Chelsea.</em></h1><p>Your space to try a new look, explore the store, and keep the ideas you love.</p><span>Change a little. Try something bold. Come back to it later.</span></div><div class="studio-login-card"><p class="eyebrow">Make yourself at home</p><h2>Open your workspace.</h2><form id="studio-login-form" method="dialog"><label for="studio-username">Login</label><input id="studio-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required maxlength="100"><label for="studio-password">Password</label><input id="studio-password" name="password" type="password" autocomplete="current-password" required maxlength="100"><label class="studio-show-password"><input type="checkbox" data-show-studio-password> Show password</label><p id="studio-login-error" role="alert" ${message?'':'hidden'}>${escape(message)}</p><button type="submit" class="button red">Sign in to Owner Studio →</button></form><p class="studio-login-note">This shared preview sign-in is a convenience, not a secure business account. Your saved edits stay on this browser.</p><a class="text-link" href="index.html">Back to the storefront →</a></div></section>`;
+  }
+
   const TABS=['design','content','inventory','versions','orders','activity'];
   const PRESETS={
     original:{label:'Gallery original',design:{coral:'#e58a78',celadon:'#bfd9b7',ochre:'#edc56b',cream:'#fff9ed',ink:'#2d2927',frame:'#8f2f28'}},
@@ -16,7 +35,7 @@
   let unsubscribe=null;
   let mounted=false;
   let pendingConfirm=null;
-  const ui={tab:'design',search:'',message:'',messageKind:'status',inventoryPage:1};
+  const ui={tab:'design',search:'',message:'',messageKind:'status',inventoryPage:1,loginMessage:''};
 
   const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const money=cents=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format((Number(cents)||0)/100);
@@ -26,7 +45,7 @@
   const current=()=>stateApi()?.read();
 
   function render(){
-    return '<main id="main" class="owner-studio"><div id="studio-app"><div class="studio-loading"><p class="eyebrow">Owner Studio</p><h1>Opening your workspace…</h1></div></div></main>';
+    return '<main id="main" class="owner-studio"><div id="studio-app">'+loginMarkup()+'</div><noscript><p class="studio-login-note">Enable JavaScript to sign in and use the Owner Studio.</p></noscript></main>';
   }
 
   function statusText(){
@@ -54,7 +73,7 @@
       <div class="studio-actions">
         <p class="studio-persistence ${status.persisted?'saved':'warning'}" role="status"><span></span>${escape(statusText())}</p>
         <button class="button red" type="button" data-preview-store>Preview my storefront →</button>
-        <button class="button outline" type="button" data-return-original>Return to original</button>
+        <button class="button outline" type="button" data-return-original>Return to original</button><div class="studio-session"><span>Signed in as Chelsea${sessionInMemory?' · this page only':''}</span><button type="button" data-studio-signout>Sign out</button></div>
       </div>
     </header>`;
   }
@@ -218,6 +237,7 @@
     const host=root.document?.querySelector('#studio-app'),api=stateApi();
     if(!host||!api)return false;
     if(pendingConfirm)closeConfirm();
+    if(!signedIn()){host.innerHTML=loginMarkup(ui.loginMessage);return true;}
     const state=api.read();
     host.innerHTML=`${headerMarkup(state)}${navMarkup(state)}<div class="studio-message ${ui.messageKind}" role="status" ${ui.message?'':'hidden'}>${escape(ui.message)}</div>${panelMarkup(state)}${confirmMarkup()}`;
     return true;
@@ -226,6 +246,7 @@
   function show(message,kind='status'){ui.message=message;ui.messageKind=kind;renderApp();}
   function action(work,success){
     try{
+      if(!signedIn())throw new Error('Sign in to Owner Studio to make changes.');
       if(stateApi().getStatus().conflict)throw new Error('Another tab has newer Studio changes. Reload this page before editing.');
       work();const persisted=stateApi().getStatus().persisted;ui.message=persisted?(success||''):'Change kept for this visit only. Browser storage could not save it. Export a backup before closing or reloading.';ui.messageKind=persisted?'status':'error';renderApp();
     }
@@ -346,6 +367,7 @@
 
   async function submitCustom(form){
     const data=new root.FormData(form),file=data.get('imageFile'),prepared=root.File&&file instanceof root.File&&file.size?await readImage(file):{dataUrl:'',resized:false};
+    if(!signedIn())throw new Error('Sign in again before adding a sample piece.');
     const title=String(data.get('title')||'').trim(),existing=current().draft.customProducts;
     let now=Date.now();while(existing.some(product=>product.id===String(now)))now++;
     const item={
@@ -361,6 +383,12 @@
 
   function bind(host){
     host.addEventListener('click',async event=>{
+      if(event.target.closest('[data-studio-signout]')){
+        setSignedIn(false);root.clearTimeout(ui.searchTimer);ui.message='';ui.loginMessage=sessionInMemory?'Signed out on this page. Session storage could not be cleared; close this tab to finish signing out.':'';
+        try{stateApi().setActive(false);}catch{}
+        renderApp();root.document.querySelector('#studio-username')?.focus();return;
+      }
+      if(!signedIn())return;
       const cancel=event.target.closest('[data-confirm-cancel]');
       if(cancel){const pending=pendingConfirm;closeConfirm();pending?.onCancel?.();return;}
       if(event.target.closest('[data-confirm-accept]')){await acceptConfirm();return;}
@@ -386,6 +414,7 @@
       if(clearMessages){openConfirm({title:'Clear all practice activity?',copy:'Every browser-local sample newsletter signup and consignment inquiry will be removed. No real communication is affected, and this cannot be undone.',actionLabel:'Clear practice activity',trigger:clearMessages,restoreSelector:'[data-studio-tab="activity"]',work:()=>action(()=>stateApi().clearMessages(),'Practice activity cleared.')});}
     });
     host.addEventListener('input',event=>{
+      if(!signedIn())return;
       if(event.target.id==='studio-product-search'){
         ui.search=event.target.value;ui.inventoryPage=1;root.clearTimeout(ui.searchTimer);
         const cursor=event.target.selectionStart;
@@ -409,6 +438,8 @@
       else if(!event.shiftKey&&root.document.activeElement===last){event.preventDefault();first.focus();}
     });
     host.addEventListener('change',async event=>{
+      if(event.target.matches('[data-show-studio-password]')){const password=host.querySelector('#studio-password');if(password)password.type=event.target.checked?'text':'password';return;}
+      if(!signedIn())return;
       const design=event.target.closest('[data-design-field]');
       if(design){action(()=>stateApi().updateDraft({design:{[design.name]:designValue(design)}}),'Design change saved.');return;}
       const picker=event.target.closest('[data-color-picker]');
@@ -428,6 +459,17 @@
     });
     host.addEventListener('submit',async event=>{
       event.preventDefault();const form=event.target;
+      if(form.id==='studio-login-form'){
+        const fields=new root.FormData(form);
+        if(String(fields.get('username')||'').trim()==='Chelsea'&&fields.get('password')==='Chelsea'){
+          setSignedIn(true);ui.loginMessage='';renderApp();const main=root.document.querySelector('#main');if(main){main.tabIndex=-1;main.focus({preventScroll:true});}
+        }else{
+          const error=host.querySelector('#studio-login-error');error.hidden=false;error.textContent='That login or password does not match. Both are case-sensitive.';
+          const password=host.querySelector('#studio-password');password.value='';password.focus();
+        }
+        return;
+      }
+      if(!signedIn()){renderApp();return;}
       if(form.id==='studio-content-form'){const data=Object.fromEntries(new root.FormData(form).entries());action(()=>stateApi().updateDraft({content:data}),'Words and contact details saved.');return;}
       if(form.id==='studio-version-form'){const name=String(new root.FormData(form).get('name')||'').trim();action(()=>stateApi().saveVersion(name),'Version saved.');return;}
       if(form.matches('[data-product-form]')){
@@ -445,7 +487,7 @@
     const host=root.document?.querySelector('#studio-app');
     if(!host||!context||!stateApi())return false;
     ui.tab=tabFromUrl();
-    if(!mounted){mounted=true;bind(host);unsubscribe=stateApi().subscribe(()=>renderApp());}
+    if(!mounted){mounted=true;bind(host);unsubscribe=stateApi().subscribe(()=>renderApp());root.addEventListener?.('pageshow',()=>renderApp());root.addEventListener?.('pagehide',()=>{volatileSignIn=false;});}
     renderApp();
     return true;
   }

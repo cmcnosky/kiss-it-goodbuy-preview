@@ -36,7 +36,7 @@ Saving a product does not hold or reserve it. Stock, price, taxes, pickup detail
 
 ## Owner Studio — an actual local practice workspace
 
-Open the permanent public review address, then **Open Owner Studio**. No login or subscription is needed. Everyone starts from the original storefront; a visitor's draft is local to that browser and never becomes another visitor's storefront.
+Open the permanent public review address, then **Open Owner Studio**. Use the shared preview login **Chelsea** and password **Chelsea** (case-sensitive). This browser-side convenience gate is not secure server authentication and must not protect real business data. Sign out closes the editor and exits practice mode while preserving the saved workspace. Everyone starts from the original storefront; a visitor's draft is local to that browser and never becomes another visitor's storefront.
 
 - Design controls change six palette colors, heading/body type, text scale, border weight, spacing, three homepage compositions, product columns, and image treatment. The protected Studio controls remain readable while the storefront palette changes.
 - Words & contact edits the homepage welcome and displayed contact details. This is a focused editor, not a free-form page builder or an editor for every paragraph.
@@ -44,7 +44,7 @@ Open the permanent public review address, then **Open Owner Studio**. No login o
 - Preview applies the saved draft to the actual storefront pages, search, product details, shortlist, planner, and a separate practice bag. Practice mode freezes the base catalog at the release snapshot so live refreshes do not overwrite experiments.
 - Practice checkout records a local sample order with status management. Newsletter and consignment practice actions create local activity records. No Shopify cart, payment, reservation, outgoing email, subscription, or actual order is created in practice mode.
 - Draft changes save in localStorage after successful validated changes. The UI reports failed/blocked storage and does not navigate into preview when the mode cannot be persisted.
-- Recovery includes 25 undo steps, redo, up to 10 named versions, reset to original, and validated JSON backup export/import. Backups can transfer a draft to another browser/device; there is no automatic cloud sync or account authentication.
+- Recovery includes 25 undo steps, redo, up to 10 named versions, reset to original, and validated JSON backup export/import. Backups can transfer a draft to another browser/device; there is no automatic cloud sync or secure account authentication.
 - Return to original exits practice mode and restores the original browsing/cart namespace while retaining the draft. Named versions store designs/inventory; a full backup also includes local practice orders and activity.
 
 Storage is finite, browser-specific, and can be removed by clearing site data or private-browsing cleanup. Export a backup before clearing data or changing devices. Limits include a 4 MB state envelope, 100 custom pieces, 250 listing overrides, 50 practice orders, and 25 practice activity records. A saved version containing uploaded photographs contributes to that storage limit. The UI surfaces validation errors instead of silently pretending a save succeeded. Anyone using the same browser profile can access that profile's Studio; use sample data rather than private customer records.

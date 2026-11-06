@@ -158,7 +158,7 @@ function pageHtml(){return (studioActive&&page!=='studio.html'?window.KIGBStudio
 // BROWSER START — the build renders the pure templates above this marker.
 $('#app').innerHTML=pageHtml();
 // A tab opened before a practice-mode change must not submit with stale permissions.
-document.addEventListener('submit',event=>{if((window.KIGBStudioState?.read?.().active===true)!==studioActive){event.preventDefault();event.stopImmediatePropagation();location.reload();}},true);
+document.addEventListener('submit',event=>{if(page!=='studio.html'&&(window.KIGBStudioState?.read?.().active===true)!==studioActive){event.preventDefault();event.stopImmediatePropagation();location.reload();}},true);
 // INTERACTION STATE START — keep controls stable when live data rerenders a region.
 const recentQuickAdds=new Set();
 const focusDataKeys=['cartQuantity','quantity','remove','save','quickAdd','bagFor','shareList','sharePiece','photo','zoom','checkout','openFilters','close','menu'];

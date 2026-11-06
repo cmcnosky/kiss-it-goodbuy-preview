@@ -7,6 +7,12 @@ OWNER STUDIO
 
 Open the same GitHub website above and choose “Open Owner Studio” in the For the owner section below the welcome, or in the footer.
 
+Login: Chelsea
+Password: Chelsea
+Both are case-sensitive.
+
+This is a shared preview sign-in, not secure authentication for a real business account. It keeps the editor behind a welcome screen. Your sign-in is remembered for the current tab when session storage works. Use Sign out to close the editor; saved drafts, named versions, and practice records remain.
+
 Owner Studio is a browser-local design and practice workspace. It does not edit the real Shopify store, submit a payment, reserve inventory, contact a customer, or publish changes to the official business website.
 
 WHAT YOU CAN CHANGE
@@ -39,7 +45,7 @@ Choose “Return to original” to turn preview mode off. This does not delete t
 
 SAVING AND RECOVERY
 
-- Changes save automatically in this browser profile on this device when browser storage is available. There is no account login and no cloud synchronization.
+- Changes save automatically in this browser profile on this device when browser storage is available. The preview sign-in does not create a cloud account or cloud synchronization.
 - Undo and Redo retain up to 25 recent draft states.
 - You can keep up to 10 named Saved versions. Saving an eleventh version removes the oldest named version.
 - “Reset draft to original” resets the current design, welcome/contact content, inventory overrides, and sample pieces. Saved versions and practice records remain, and the reset can be undone while it remains in recent history.
