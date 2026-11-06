@@ -88,7 +88,8 @@ jobs:
         run: npm ci --prefix deployment/browser-qa --ignore-scripts --no-audit --no-fund
 
       - name: Install Chromium for browser release checks
-        run: npx --prefix deployment/browser-qa playwright install --with-deps chromium
+        timeout-minutes: 5
+        run: npx --prefix deployment/browser-qa playwright install chromium
 
       - name: Check representative pages in a real browser
         run: npm test --prefix deployment/browser-qa
