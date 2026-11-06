@@ -17,7 +17,10 @@ const HTML_FILES = [
   'visit.html',
   'shortlist.html',
   'product.html',
-  'cart.html'
+  'cart.html',
+  'planner.html',
+  'studio.html',
+  'practice-checkout.html'
 ];
 const PUBLIC_DIRECTORIES = ['assets', 'products', 'licenses'];
 const REQUIRED_ROOT_FILES = [
@@ -26,6 +29,14 @@ const REQUIRED_ROOT_FILES = [
   'catalog-normalize.js',
   'catalog.js',
   'commerce.js',
+  'checkout-recovery.js',
+  'planner.js',
+  'planner.css',
+  'studio-state.js',
+  'studio-runtime.js',
+  'studio-runtime.css',
+  'studio.js',
+  'studio.css',
   'inventory.js',
   'storefront-data.js',
   'style.css',
@@ -41,7 +52,13 @@ const REQUIRED_TOOLS = [
   'test-storefront.mjs',
   'test-interactions.mjs',
   'test-cross-tab.mjs',
-  'test-palette.mjs'
+  'test-palette.mjs',
+  'test-planner.mjs',
+  'test-studio-state.mjs',
+  'test-studio-runtime.mjs',
+  'test-checkout-recovery.mjs',
+  'test-release-guards.mjs',
+  'check-live-release.mjs'
 ];
 
 function assertSafeBuildPath() {

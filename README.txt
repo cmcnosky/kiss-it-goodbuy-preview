@@ -1,32 +1,62 @@
-KISS IT GOOD BUY — COMPLETE STOREFRONT PROPOSAL
+KISS IT GOOD BUY — OWNER GUIDE
 
-Website: https://cmcnosky.github.io/kiss-it-goodbuy-preview/
+Website
+https://cmcnosky.github.io/kiss-it-goodbuy-preview/
 
-The complete live Shopify inventory, full product pages, search and filters, variants, a persistent browser bag, and real Shopify checkout. Plus shareable comparison and structured consignment inquiries.
+OWNER STUDIO
 
-The existing store remains authoritative for products, stock, prices, accounts, orders, payment, pickup, policies, subscriptions, and personalized gift-card delivery. This independently hosted proposal has not replaced the official domain. Its browser bag is separate from any bag started directly on the original store.
+Open the same GitHub website above and choose “Open Owner Studio” in the For the owner section below the welcome, or in the footer.
 
-Local run: python3 -m http.server 8765
+Owner Studio is a browser-local design and practice workspace. It does not edit the real Shopify store, submit a payment, reserve inventory, contact a customer, or publish changes to the official business website.
 
-Rehearse publication:
-  node _build-tools/stage-public-build.mjs
-  node .build/scripts/render-pages.mjs --dist .build/dist
-  node .build/scripts/test-commerce.mjs
-  node .build/scripts/test-storefront-data.mjs
-  node .build/scripts/test-storefront.mjs
-  node .build/scripts/test-interactions.mjs
+WHAT YOU CAN CHANGE
 
-Refresh before rendering: node .build/scripts/sync-catalog.mjs
+Design
+- Choose a coordinated color preset or edit the coral, celadon, ochre, cream, ink, and frame colors.
+- Choose heading and body type, text scale, border weight, compact/comfortable/spacious spacing, the home-page opening layout, product columns, and whether product photographs fill or fit their frames.
+- The Studio preview uses real catalog photographs so the design can be judged with actual merchandise.
 
-GitHub Actions deploys main pushes, manual dispatches, and a daily refreshed build. Refreshed data is an artifact, not a commit. Failed refresh or validation leaves the last successful deployment. The browser also refreshes live inventory, and checkout rechecks exact variants, quantities, prices, and stock.
+Words and contact
+- Edit only the main home-page welcome: its opening line, emphasized line, and short introduction.
+- Edit the practice phone, email, street address, and city/state/ZIP.
+- This is not a general page editor. Story, policy, product-description, consignment-term, and other site copy are not editable here.
 
-No secret API key is embedded. The explicit Storefront API version 2026-10 needs review before Shopify retires it. No payment, account sign-in, newsletter subscription, or recipient gift delivery was submitted during QA.
+Inventory
+- Search the real catalog and make browser-local practice overrides to a listing’s title, price, availability, displayed measurements, photograph, or visibility.
+- Restore any edited real listing to its original catalog presentation.
+- Add clearly marked sample pieces for practice. A sample can use a safe photograph URL or a PNG, JPEG, or WebP upload. Large uploads are reduced to a browser-local embedded copy; the original file is not changed. SVG uploads are not accepted.
+- These edits and samples never update Shopify or the business’s real inventory.
 
-Original first-party logo and store imagery are preserved. Font licenses are in licenses/.
+PREVIEWING THE STOREFRONT
 
-November 4, 2026 owner review: 249 products, 253 variants, 31 collections at the recorded source fetch. More readable business identity, newest arrivals, verified Readers Choice recognition, gallery values, clearer item/transport details, resilient live refresh, and stricter price review. Counts and availability remain time-specific.
+Choose “Preview my storefront” to open the proposal with the current local draft applied. Preview mode has its own practice bag and saved pieces.
 
-November 5, 2026 gallery-layout redesign: the actual showroom opens the page, followed by a search/category directory, a mobile arrivals shelf, and differently arranged lighting, furniture, and art displays. Archive imagery is clearly labeled; available product selections have category-specific fallbacks. The matching photographic link image keeps the original logo unchanged and the business name prominent.
-Share this revision: https://cmcnosky.github.io/kiss-it-goodbuy-preview/
+You can browse the proposed store, add practice pieces, complete a practice checkout, try the newsletter form, and prepare a practice consignment inquiry. Practice orders appear under Practice orders. Sample newsletter signups and consignment inquiries appear under Practice activity.
 
-The shared URL remains unchanged between releases. Internal stylesheet and JavaScript references include content hashes to prevent updated pages from reusing older cached assets.
+No payment, reservation, subscription, email, customer record, Shopify order, or real inventory change is created in practice mode.
+
+Choose “Return to original” to turn preview mode off. This does not delete the draft, named versions, sample inventory, practice orders, or practice activity. It only returns the visible storefront to its original proposal state.
+
+SAVING AND RECOVERY
+
+- Changes save automatically in this browser profile on this device when browser storage is available. There is no account login and no cloud synchronization.
+- Undo and Redo retain up to 25 recent draft states.
+- You can keep up to 10 named Saved versions. Saving an eleventh version removes the oldest named version.
+- “Reset draft to original” resets the current design, welcome/contact content, inventory overrides, and sample pieces. Saved versions and practice records remain, and the reset can be undone while it remains in recent history.
+- “Export backup” downloads a JSON backup containing the current draft, named versions, practice orders, and practice activity.
+- “Import backup” validates a Studio JSON backup and replaces the current local Studio workspace with the imported draft, versions, orders, activity, and preview-mode setting. It is not a merge. Export the current workspace first if it needs to be kept.
+- Export and import are the supported way to transfer the Studio workspace to another browser profile or device.
+
+IF BROWSER STORAGE IS BLOCKED
+
+The Studio will say that browser storage is unavailable. Changes can remain in memory only while that page stays open. Cross-page Preview and Return to original are blocked when their mode change cannot be saved reliably.
+
+Export a backup before closing the page, then enable browser storage or import the backup in a browser where storage works. Do not assume an unsaved in-memory draft will survive a refresh, closed tab, private-browsing cleanup, or browser-data cleanup.
+
+IMPORTANT BOUNDARIES
+
+- Owner Studio is a working demonstration of design, content, inventory, checkout, and follow-up flows. It is not a production content-management system or Shopify admin.
+- Studio data is saved locally in the browser, not to GitHub, Shopify, the business, or a cloud account.
+- Do not enter real customer information into practice orders or practice activity.
+- The public proposal can read current public inventory and can hand ordinary shoppers to Shopify for real checkout outside Studio preview mode. Owner Studio’s edits, samples, practice checkout, and practice activity remain local demonstrations.
+- Moving these controls into production would require the owner’s authorization, secure authentication, durable storage, Shopify integration, permissions, backups, and an operating support plan.

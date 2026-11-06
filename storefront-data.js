@@ -35,6 +35,7 @@
     const copy = { ...options };
     delete copy.commerce;
     delete copy.concurrency;
+    copy.requestKind = 'read';
     return copy;
   }
 

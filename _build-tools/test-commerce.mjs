@@ -253,8 +253,186 @@ await assert.rejects(
   (error) => error.code === 'STOREFRONT_GRAPHQL_ERROR'
 );
 await assert.rejects(
-  C.fetchGraphQL('query { shop { name } }', {}, { fetchImpl: async () => response({}, 503) }),
+  C.fetchGraphQL('query { shop { name } }', {}, { fetchImpl: async () => response({}, 503), retryDelayMs: 0 }),
   (error) => error.code === 'STOREFRONT_HTTP_ERROR'
 );
+
+let networkRetryCalls = 0;
+const recoveredRead = await C.fetchGraphQL('query { shop { name } }', {}, {
+  requestKind: 'read',
+  maxAttempts: 2,
+  retryDelayMs: 0,
+  fetchImpl: async () => {
+    networkRetryCalls += 1;
+    if (networkRetryCalls === 1) throw new TypeError('temporary connection failure');
+    return response({ data: { shop: { name: 'Kiss It Good Buy' } } });
+  }
+});
+assert.equal(networkRetryCalls, 2, 'a safe read retries one transient network failure');
+assert.equal(recoveredRead.shop.name, 'Kiss It Good Buy');
+
+let serviceRetryCalls = 0;
+await C.fetchGraphQL('query { shop { name } }', {}, {
+  requestKind: 'read',
+  maxAttempts: 2,
+  retryDelayMs: 0,
+  fetchImpl: async () => {
+    serviceRetryCalls += 1;
+    return serviceRetryCalls === 1
+      ? response({}, 503)
+      : response({ data: { shop: { name: 'Kiss It Good Buy' } } });
+  }
+});
+assert.equal(serviceRetryCalls, 2, 'a safe read retries a transient service response');
+
+let graphqlErrorCalls = 0;
+await assert.rejects(
+  C.fetchGraphQL('query { shop { name } }', {}, {
+    requestKind: 'read',
+    maxAttempts: 3,
+    retryDelayMs: 0,
+    fetchImpl: async () => {
+      graphqlErrorCalls += 1;
+      return response({ errors: [{ message: 'Denied' }] });
+    }
+  }),
+  (error) => error.code === 'STOREFRONT_GRAPHQL_ERROR'
+);
+assert.equal(graphqlErrorCalls, 1, 'GraphQL rejections are not transient retries');
+
+let authorizationCalls = 0;
+await assert.rejects(
+  C.fetchGraphQL('query { shop { name } }', {}, {
+    requestKind: 'read',
+    maxAttempts: 3,
+    retryDelayMs: 0,
+    fetchImpl: async () => {
+      authorizationCalls += 1;
+      return response({}, 401);
+    }
+  }),
+  (error) => error.code === 'STOREFRONT_HTTP_ERROR' && error.details.status === 401
+);
+assert.equal(authorizationCalls, 1, 'authorization failures are not retried');
+
+let malformedResponseCalls = 0;
+await assert.rejects(
+  C.fetchGraphQL('query { shop { name } }', {}, {
+    requestKind: 'read',
+    maxAttempts: 3,
+    retryDelayMs: 0,
+    fetchImpl: async () => {
+      malformedResponseCalls += 1;
+      return {
+        ok: true,
+        status: 200,
+        async json() { throw new SyntaxError('Unexpected end of JSON input'); }
+      };
+    }
+  }),
+  (error) => error.code === 'STOREFRONT_INVALID_RESPONSE'
+);
+assert.equal(malformedResponseCalls, 1, 'malformed successful responses are not treated as transient network failures');
+
+let primitiveResponseCalls = 0;
+await assert.rejects(
+  C.fetchGraphQL('query { shop { name } }', {}, {
+    requestKind: 'read',
+    maxAttempts: 3,
+    retryDelayMs: 0,
+    fetchImpl: async () => {
+      primitiveResponseCalls += 1;
+      return response(null);
+    }
+  }),
+  (error) => error.code === 'STOREFRONT_INVALID_RESPONSE'
+);
+assert.equal(primitiveResponseCalls, 1, 'non-object GraphQL payloads are not retried');
+
+let mutationCalls = 0;
+await assert.rejects(
+  C.fetchGraphQL('mutation { cartCreate(input: {}) { cart { id } } }', {}, {
+    requestKind: 'mutation',
+    maxAttempts: 3,
+    retryDelayMs: 0,
+    fetchImpl: async () => {
+      mutationCalls += 1;
+      throw new TypeError('ambiguous mutation failure');
+    }
+  }),
+  (error) => error.code === 'STOREFRONT_NETWORK_ERROR'
+);
+assert.equal(mutationCalls, 1, 'mutations are never retried after an ambiguous failure');
+
+let createFailureCalls = 0;
+await assert.rejects(
+  C.createCheckout([lamp], {
+    maxAttempts: 3,
+    retryDelayMs: 0,
+    fetchImpl: async () => {
+      createFailureCalls += 1;
+      if (createFailureCalls === 1) return response({ data: { nodes: [remoteVariant()] } });
+      throw new TypeError('cartCreate result was interrupted');
+    }
+  }),
+  (error) => error.code === 'STOREFRONT_NETWORK_ERROR'
+);
+assert.equal(createFailureCalls, 2, 'cart validation runs once and cartCreate is not retried');
+
+const alreadyCancelled = new AbortController();
+alreadyCancelled.abort();
+let cancelledCalls = 0;
+await assert.rejects(
+  C.fetchGraphQL('query { shop { name } }', {}, {
+    requestKind: 'read',
+    signal: alreadyCancelled.signal,
+    maxAttempts: 3,
+    retryDelayMs: 0,
+    fetchImpl: async () => {
+      cancelledCalls += 1;
+      return response({ data: { shop: { name: 'Kiss It Good Buy' } } });
+    }
+  }),
+  (error) => error.code === 'STOREFRONT_REQUEST_CANCELLED'
+);
+assert.equal(cancelledCalls, 0, 'a cancelled request never starts');
+
+const cancelledInFlight = new AbortController();
+let inFlightCalls = 0;
+setTimeout(() => cancelledInFlight.abort(), 5);
+await assert.rejects(
+  C.fetchGraphQL('query { shop { name } }', {}, {
+    requestKind: 'read',
+    signal: cancelledInFlight.signal,
+    maxAttempts: 3,
+    retryDelayMs: 0,
+    fetchImpl: async (_url, init) => {
+      inFlightCalls += 1;
+      await new Promise((_resolve, reject) => {
+        init.signal.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
+      });
+    }
+  }),
+  (error) => error.code === 'STOREFRONT_REQUEST_CANCELLED'
+);
+assert.equal(inFlightCalls, 1, 'an in-flight cancellation is reported and never retried');
+
+const cancelledDuringBackoff = new AbortController();
+let backoffCalls = 0;
+setTimeout(() => cancelledDuringBackoff.abort(), 5);
+await assert.rejects(
+  C.fetchGraphQL('query { shop { name } }', {}, {
+    requestKind: 'read',
+    signal: cancelledDuringBackoff.signal,
+    maxAttempts: 3,
+    retryDelayMs: 50,
+    fetchImpl: async () => {
+      backoffCalls += 1;
+      return response({}, 503);
+    }
+  }),
+  (error) => error.code === 'STOREFRONT_REQUEST_CANCELLED'
+);
+assert.equal(backoffCalls, 1, 'cancellation during backoff prevents another attempt');
 
 console.log('commerce helpers: tests passed');

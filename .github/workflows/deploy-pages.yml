@@ -6,8 +6,8 @@ on:
       - main
   workflow_dispatch:
     inputs:
-      refresh:
-        description: Refresh the public Shopify catalog before deployment
+      allow_large_catalog_change:
+        description: Publish a reviewed large inventory reduction and record the guard override
         required: false
         type: boolean
         default: false
@@ -26,6 +26,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      inventory_sha256: ${{ steps.release.outputs.inventory_sha256 }}
     steps:
       - name: Check out the public repository
         uses: actions/checkout@v6
@@ -41,9 +43,18 @@ jobs:
       - name: Stage the public allowlist
         run: node _build-tools/stage-public-build.mjs
 
-      - name: Refresh Shopify catalog
-        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.refresh == true) }}
-        run: node .build/scripts/sync-catalog.mjs
+      - name: Refresh Shopify catalog against the current public release
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.allow_large_catalog_change != true }}
+        run: >-
+          node .build/scripts/sync-catalog.mjs
+          --baseline-url https://cmcnosky.github.io/kiss-it-goodbuy-preview/inventory.json
+
+      - name: Refresh a reviewed large catalog change
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_large_catalog_change == true }}
+        run: >-
+          node .build/scripts/sync-catalog.mjs
+          --baseline-url https://cmcnosky.github.io/kiss-it-goodbuy-preview/inventory.json
+          --allow-large-change
 
       - name: Render static entry points and product pages
         run: node .build/scripts/render-pages.mjs --dist .build/dist
@@ -53,7 +64,13 @@ jobs:
           node --check .build/dist/app.js
           node --check .build/dist/catalog-normalize.js
           node --check .build/dist/commerce.js
+          node --check .build/dist/checkout-recovery.js
+          node --check .build/dist/planner.js
+          node --check .build/dist/studio-state.js
+          node --check .build/dist/studio-runtime.js
+          node --check .build/dist/studio.js
           node --check .build/dist/storefront-data.js
+          node --check .build/scripts/check-live-release.mjs
           node .build/scripts/sync-catalog.mjs --self-test
           node .build/scripts/test-commerce.mjs
           node .build/scripts/test-storefront-data.mjs
@@ -61,6 +78,39 @@ jobs:
           node .build/scripts/test-interactions.mjs
           node .build/scripts/test-cross-tab.mjs
           node .build/scripts/test-palette.mjs
+          node .build/scripts/test-planner.mjs
+          node .build/scripts/test-checkout-recovery.mjs
+          node .build/scripts/test-studio-state.mjs
+          node .build/scripts/test-studio-runtime.mjs
+          node .build/scripts/test-release-guards.mjs
+
+      - name: Install the pinned browser test runtime
+        run: npm ci --prefix deployment/browser-qa --ignore-scripts --no-audit --no-fund
+
+      - name: Install Chromium for browser release checks
+        run: npx --prefix deployment/browser-qa playwright install --with-deps chromium
+
+      - name: Check representative pages in a real browser
+        run: npm test --prefix deployment/browser-qa
+
+      - name: Preserve browser failure evidence
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-release-failure
+          path: deployment/browser-qa/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Record the exact catalog in the release
+        id: release
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const crypto = require('node:crypto');
+          const bytes = fs.readFileSync('.build/dist/inventory.json');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, `inventory_sha256=${crypto.createHash('sha256').update(bytes).digest('hex')}\n`);
+          NODE
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
@@ -78,6 +128,23 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - name: Check out the public repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          package-manager-cache: false
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Verify the published release anonymously
+        run: >-
+          node _build-tools/check-live-release.mjs
+          --base-url "${{ steps.deployment.outputs.page_url }}"
+          --expected-inventory-sha256 "${{ needs.build.outputs.inventory_sha256 }}"

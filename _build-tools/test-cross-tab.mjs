@@ -12,13 +12,15 @@ const end = app.indexOf('// CROSS-TAB STATE END');
 assert.ok(start > 0 && end > start, 'cross-tab state helpers should remain a distinct testable block');
 const source = app.slice(start, end);
 
-function fixture(page = 'cart.html') {
+function fixture(page = 'cart.html', practice = false) {
   const counts = [{ textContent: '' }, { textContent: '' }];
   const calls = { render: [], favorites: 0, catalog: 0, product: 0, home: 0 };
   const listeners = {};
   const localStorage = {};
   const context = {
     page,
+    cartStorageKey: practice ? 'kigb-studio-cart-v1' : 'kigb-cart-v1',
+    favoritesStorageKey: practice ? 'kigb-studio-favorites' : 'kigb-favorites',
     cartLines: [],
     saved: new Set(),
     localStorage,
@@ -91,6 +93,14 @@ const line = {
   state.listeners.storage({ key: null, newValue: null, storageArea: state.localStorage });
   assert.equal(state.context.cartLines.length, 0, 'clearing storage should clear the synchronized bag');
   assert.equal(state.context.saved.size, 0, 'clearing storage should clear synchronized favorites');
+}
+
+{
+  const state = fixture('cart.html', true);
+  state.listeners.storage({ key: 'kigb-cart-v1', newValue: JSON.stringify([line]), storageArea: state.localStorage });
+  assert.equal(state.context.cartLines.length, 0, 'real-store bag events must not enter the practice bag');
+  state.listeners.storage({ key: 'kigb-studio-cart-v1', newValue: JSON.stringify([line]), storageArea: state.localStorage });
+  assert.equal(state.context.cartLines.length, 1, 'practice bags synchronize only with their own storage key');
 }
 
 assert.match(app, /function renderCart\(\{save=true\}=\{\}\).*if\(save\)persistCart\(\);else updateCartCount\(\)/,

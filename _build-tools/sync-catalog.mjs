@@ -2,7 +2,7 @@
 
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
-import { mkdir, rename, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -18,6 +18,12 @@ const MAX_ATTEMPTS = 4;
 const RETRY_BASE_MS = 1000;
 const MAX_RETRY_DELAY_MS = 30000;
 const RETRYABLE_STATUS = new Set([429, 503]);
+const DROP_LIMITS = Object.freeze({
+  products: { ratio: 0.25, minimum: 10 },
+  variants: { ratio: 0.25, minimum: 10 },
+  collections: { ratio: 0.25, minimum: 3 },
+  memberships: { ratio: 0.35, minimum: 20 }
+});
 
 let lastRequestStartedAt = 0;
 
@@ -30,14 +36,187 @@ function parseArguments(argv) {
     else if (argument === '--out') values.out = path.resolve(argv[++index]);
     else if (argument === '--recorded-at') values.recordedAt = argv[++index];
     else if (argument === '--research-dir') values.researchDir = path.resolve(argv[++index]);
+    else if (argument === '--baseline') values.baseline = path.resolve(argv[++index]);
+    else if (argument === '--baseline-url') values.baselineUrl = argv[++index];
+    else if (argument === '--allow-large-change') values.allowLargeChange = true;
     else throw new Error(`Unknown or incomplete argument: ${argument}`);
   }
   values.baseUrl = String(values.baseUrl || '').replace(/\/+$/, '');
   const parsedBase = new URL(values.baseUrl);
   if (parsedBase.protocol !== 'https:') throw new Error('--base-url must use HTTPS.');
+  if (values.baseline && values.baselineUrl) throw new Error('Use either --baseline or --baseline-url, not both.');
+  if (values.baselineUrl) {
+    const parsedBaseline = new URL(values.baselineUrl);
+    if (parsedBaseline.protocol !== 'https:') throw new Error('--baseline-url must use HTTPS.');
+    values.baselineUrl = parsedBaseline.href;
+  }
   values.researchDir ||= path.join(projectRoot, 'research');
   if (values.recordedAt && Number.isNaN(Date.parse(values.recordedAt))) throw new Error('--recorded-at must be an ISO-compatible date.');
   return values;
+}
+
+function inventoryCounts(inventory, label = 'Catalog') {
+  if (!inventory || inventory.schemaVersion !== 1 || !Array.isArray(inventory.products) || !Array.isArray(inventory.collections)) {
+    throw new Error(`${label} is not a supported inventory snapshot.`);
+  }
+  if (!inventory.products.length) throw new Error(`${label} contains no products.`);
+  const productIds = new Set();
+  const handles = new Set();
+  const variantIds = new Set();
+  const productCollections = new Map();
+  for (const product of inventory.products) {
+    if (!product || typeof product.id !== 'string' || !product.id || productIds.has(product.id)) {
+      throw new Error(`${label} contains a missing or duplicate product id.`);
+    }
+    if (typeof product.handle !== 'string' || !product.handle || handles.has(product.handle)) {
+      throw new Error(`${label} contains a missing or duplicate product handle.`);
+    }
+    if (!Array.isArray(product.variants) || !product.variants.length) {
+      throw new Error(`${label} product ${product.handle} has no variants.`);
+    }
+    if (typeof product.title !== 'string' || !product.title.trim()) {
+      throw new Error(`${label} product ${product.handle} has no title.`);
+    }
+    if (typeof product.available !== 'boolean') {
+      throw new Error(`${label} product ${product.handle} has invalid availability.`);
+    }
+    if (!Array.isArray(product.images)
+      || product.images.some(image => !image || typeof image.src !== 'string' || !image.src.startsWith('https://'))) {
+      throw new Error(`${label} product ${product.handle} has an invalid image list.`);
+    }
+    if (!Array.isArray(product.collections)) {
+      throw new Error(`${label} product ${product.handle} has no collection-membership list.`);
+    }
+    const membershipsForProduct = new Set(product.collections);
+    if (membershipsForProduct.size !== product.collections.length
+      || [...membershipsForProduct].some(handle => typeof handle !== 'string' || !handle)) {
+      throw new Error(`${label} product ${product.handle} has invalid or duplicate collection memberships.`);
+    }
+    productIds.add(product.id);
+    handles.add(product.handle);
+    productCollections.set(product.id, membershipsForProduct);
+    for (const variant of product.variants) {
+      if (!variant || typeof variant.id !== 'string' || !variant.id || variantIds.has(variant.id)) {
+        throw new Error(`${label} contains a missing or duplicate variant id.`);
+      }
+      if (!Number.isSafeInteger(variant.priceCents) || variant.priceCents < 0) {
+        throw new Error(`${label} variant ${variant.id} has an invalid price.`);
+      }
+      if (typeof variant.available !== 'boolean') {
+        throw new Error(`${label} variant ${variant.id} has invalid availability.`);
+      }
+      variantIds.add(variant.id);
+    }
+  }
+  const collectionHandles = new Set();
+  const membershipPairs = new Set();
+  const membershipByCollection = {};
+  let memberships = 0;
+  for (const collection of inventory.collections) {
+    if (!collection || typeof collection.handle !== 'string' || !collection.handle || collectionHandles.has(collection.handle)) {
+      throw new Error(`${label} contains a missing or duplicate collection handle.`);
+    }
+    if (!Array.isArray(collection.productIds)) throw new Error(`${label} collection ${collection.handle} has no membership list.`);
+    const collectionProducts = new Set();
+    for (const productId of collection.productIds) {
+      if (!productIds.has(String(productId))) throw new Error(`${label} collection ${collection.handle} refers to an unknown product ${productId}.`);
+      if (collectionProducts.has(String(productId))) throw new Error(`${label} collection ${collection.handle} repeats product ${productId}.`);
+      collectionProducts.add(String(productId));
+      membershipPairs.add(`${collection.handle}\0${String(productId)}`);
+    }
+    collectionHandles.add(collection.handle);
+    membershipByCollection[collection.handle] = collectionProducts.size;
+    memberships += collectionProducts.size;
+  }
+  for (const [productId, listedCollections] of productCollections) {
+    for (const collectionHandle of listedCollections) {
+      if (!collectionHandles.has(collectionHandle)) {
+        throw new Error(`${label} product ${productId} refers to unknown collection ${collectionHandle}.`);
+      }
+      if (!membershipPairs.has(`${collectionHandle}\0${productId}`)) {
+        throw new Error(`${label} product ${productId} and collection ${collectionHandle} disagree on membership.`);
+      }
+    }
+  }
+  for (const pair of membershipPairs) {
+    const [collectionHandle, productId] = pair.split('\0');
+    if (!productCollections.get(productId)?.has(collectionHandle)) {
+      throw new Error(`${label} collection ${collectionHandle} and product ${productId} disagree on membership.`);
+    }
+  }
+  const fetchedAt = Date.parse(inventory.fetchedAt);
+  if (!Number.isFinite(fetchedAt)) throw new Error(`${label} has an invalid fetchedAt timestamp.`);
+  if (inventory.source != null) {
+    if (!inventory.source || typeof inventory.source !== 'object' || Array.isArray(inventory.source)) {
+      throw new Error(`${label} has invalid source metadata.`);
+    }
+    const expectedCounts = {
+      productCount: productIds.size,
+      variantCount: variantIds.size,
+      collectionCount: collectionHandles.size,
+      collectionMembershipCount: memberships
+    };
+    for (const [field, expected] of Object.entries(expectedCounts)) {
+      if (inventory.source[field] !== expected) {
+        throw new Error(`${label} source ${field} does not match its records.`);
+      }
+    }
+    if (Date.parse(inventory.source.fetchedAt) !== fetchedAt) {
+      throw new Error(`${label} source fetchedAt does not match its snapshot timestamp.`);
+    }
+  }
+  return {
+    fetchedAt,
+    fetchedAtIso: new Date(fetchedAt).toISOString(),
+    products: productIds.size,
+    variants: variantIds.size,
+    collections: collectionHandles.size,
+    memberships,
+    membershipByCollection
+  };
+}
+
+function dropViolation(name, current, baseline, limit = DROP_LIMITS[name]) {
+  const lost = baseline - current;
+  if (lost < limit.minimum || lost / baseline < limit.ratio) return null;
+  return `${name} fell from ${baseline} to ${current} (${Math.round((lost / baseline) * 100)}% loss)`;
+}
+
+function evaluateReleaseGuard(currentInventory, baselineInventory) {
+  const current = inventoryCounts(currentInventory, 'Refreshed catalog');
+  const baseline = inventoryCounts(baselineInventory, 'Baseline catalog');
+  const invariantViolations = [];
+  const changeViolations = [];
+  if (current.fetchedAt <= baseline.fetchedAt) {
+    invariantViolations.push(`refreshed timestamp ${current.fetchedAtIso} is not newer than baseline ${baseline.fetchedAtIso}`);
+  }
+  for (const name of Object.keys(DROP_LIMITS)) {
+    const violation = dropViolation(name, current[name], baseline[name]);
+    if (violation) changeViolations.push(violation);
+  }
+  for (const [handle, baselineMemberships] of Object.entries(baseline.membershipByCollection)) {
+    if (!Object.prototype.hasOwnProperty.call(current.membershipByCollection, handle)) {
+      changeViolations.push(`collection ${handle} is missing from the refreshed catalog`);
+      continue;
+    }
+    const currentMemberships = current.membershipByCollection[handle];
+    const lost = baselineMemberships - currentMemberships;
+    if (baselineMemberships >= 10 && lost >= 10 && lost / baselineMemberships >= 0.5) {
+      changeViolations.push(`collection ${handle} memberships fell from ${baselineMemberships} to ${currentMemberships} (${Math.round((lost / baselineMemberships) * 100)}% loss)`);
+    }
+  }
+  return { current, baseline, invariantViolations, changeViolations, violations: [...invariantViolations, ...changeViolations] };
+}
+
+function enforceReleaseGuard(currentInventory, baselineInventory, { allowLargeChange = false } = {}) {
+  const result = evaluateReleaseGuard(currentInventory, baselineInventory);
+  if (result.invariantViolations.length) {
+    throw new Error(`Catalog release guard blocked publication:\n- ${result.invariantViolations.join('\n- ')}\nSchema, integrity, and recency failures cannot be overridden.`);
+  }
+  if (result.changeViolations.length && !allowLargeChange) {
+    throw new Error(`Catalog release guard blocked publication:\n- ${result.changeViolations.join('\n- ')}\nReview the source change. For a verified legitimate removal, rerun manually with --allow-large-change.`);
+  }
+  return { ...result, overridden: Boolean(result.changeViolations.length && allowLargeChange) };
 }
 
 function sha256(value) {
@@ -222,6 +401,13 @@ async function main() {
   const fetchedAt = config.recordedAt ? new Date(config.recordedAt).toISOString() : new Date().toISOString();
   const dateStamp = fetchedAt.slice(0, 10);
 
+  let baselineInventory = null;
+  if (config.baselineUrl) {
+    const response = await fetchJson(config.baselineUrl);
+    baselineInventory = response.payload;
+    inventoryCounts(baselineInventory, 'Published baseline catalog');
+  }
+
   const productSource = await fetchPages(config.baseUrl, '/products.json', 'products');
   const collectionSource = await fetchPages(config.baseUrl, '/collections.json', 'collections');
   const rawProducts = productSource.records;
@@ -301,6 +487,21 @@ async function main() {
     collectionPageHashes: collectionSource.pages.map(page => ({ url: page.url, sha256: page.sha256, etag: page.headers.etag || null }))
   };
   const inventory = { schemaVersion: 1, fetchedAt, source, collections: normalizedCollections, products };
+  inventoryCounts(inventory, 'Refreshed catalog');
+
+  let releaseGuard = null;
+  if (config.baseline || baselineInventory) {
+    let baseline = baselineInventory;
+    try {
+      if (!baseline) baseline = JSON.parse(await readFile(config.baseline, 'utf8'));
+    } catch (error) {
+      throw new Error(`Could not read baseline catalog ${config.baseline}: ${error.message}`);
+    }
+    releaseGuard = enforceReleaseGuard(inventory, baseline, { allowLargeChange: config.allowLargeChange });
+    if (releaseGuard.overridden) {
+      process.stderr.write(`CATALOG RELEASE GUARD OVERRIDE\n${releaseGuard.violations.map(item => `- ${item}`).join('\n')}\n`);
+    }
+  }
 
   const rawEvidence = {
     schemaVersion: 1,
@@ -350,11 +551,22 @@ async function main() {
     products: source.productCount,
     variants: source.variantCount,
     collections: source.collectionCount,
-    collectionCountDiscrepancies: discrepancies
+    collectionCountDiscrepancies: discrepancies,
+    releaseGuard: releaseGuard && {
+      baseline: releaseGuard.baseline,
+      current: releaseGuard.current,
+      overridden: releaseGuard.overridden,
+      violations: releaseGuard.violations
+    }
   }, null, 2)}\n`);
 }
 
-main().catch(error => {
-  process.stderr.write(`${error.stack || error.message}\n`);
-  process.exitCode = 1;
-});
+const invokedDirectly = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (invokedDirectly) {
+  main().catch(error => {
+    process.stderr.write(`${error.stack || error.message}\n`);
+    process.exitCode = 1;
+  });
+}
+
+export { DROP_LIMITS, evaluateReleaseGuard, enforceReleaseGuard, inventoryCounts };

@@ -9,6 +9,12 @@
   const UCP_ENDPOINT = 'https://kissitgoodbuy.net/buy';
   const UCP_VERSION = '2026-08-25';
   const DEFAULT_TIMEOUT_MS = 12000;
+  const DEFAULT_READ_TIMEOUT_MS = 8000;
+  const DEFAULT_READ_ATTEMPTS = 2;
+  const MAX_READ_ATTEMPTS = 3;
+  const DEFAULT_RETRY_DELAY_MS = 150;
+  const MAX_RETRY_DELAY_MS = 1000;
+  const RETRYABLE_HTTP_STATUS = new Set([408, 429, 500, 502, 503, 504]);
   const VARIANT_GID_PREFIX = 'gid://shopify/ProductVariant/';
   const NUMERIC_ID = /^\d+$/;
   const VARIANT_GID = /^gid:\/\/shopify\/ProductVariant\/(\d+)$/;
@@ -160,10 +166,39 @@
     };
   }
 
-  async function fetchGraphQL(query, variables = {}, options = {}) {
+  function boundedInteger(value, fallback, minimum, maximum) {
+    return Number.isInteger(value) ? Math.min(maximum, Math.max(minimum, value)) : fallback;
+  }
+
+  function retryableStorefrontError(error) {
+    return error?.code === 'STOREFRONT_NETWORK_ERROR'
+      || error?.code === 'STOREFRONT_TIMEOUT'
+      || (error?.code === 'STOREFRONT_HTTP_ERROR' && RETRYABLE_HTTP_STATUS.has(error.details?.status));
+  }
+
+  function waitForRetry(delayMs, signal) {
+    if (!delayMs) return Promise.resolve();
+    return new Promise((resolve, reject) => {
+      if (signal?.aborted) {
+        reject(new CommerceError('STOREFRONT_REQUEST_CANCELLED', 'The store request was cancelled.'));
+        return;
+      }
+      const timer = setTimeout(done, delayMs);
+      function cancelled() {
+        clearTimeout(timer);
+        reject(new CommerceError('STOREFRONT_REQUEST_CANCELLED', 'The store request was cancelled.'));
+      }
+      function done() {
+        signal?.removeEventListener('abort', cancelled);
+        resolve();
+      }
+      signal?.addEventListener('abort', cancelled, { once: true });
+    });
+  }
+
+  async function fetchGraphQLOnce(query, variables, options, timeoutMs) {
     const fetchImpl = options.fetchImpl || (typeof fetch === 'function' ? fetch.bind(globalThis) : null);
     if (!fetchImpl) throw new CommerceError('FETCH_UNAVAILABLE', 'This browser cannot connect to the store.');
-    const timeoutMs = Number.isFinite(options.timeoutMs) ? options.timeoutMs : DEFAULT_TIMEOUT_MS;
     const controller = new AbortController();
     const parentSignal = options.signal;
     const abortFromParent = () => controller.abort(parentSignal.reason);
@@ -182,10 +217,35 @@
         body: JSON.stringify({ query, variables }),
         signal: controller.signal
       });
-      if (!response || !response.ok) {
-        throw new CommerceError('STOREFRONT_HTTP_ERROR', `The store returned HTTP ${response?.status || 'error'}.`);
+      if (parentSignal?.aborted) {
+        throw new CommerceError('STOREFRONT_REQUEST_CANCELLED', 'The store request was cancelled.');
       }
-      const payload = await response.json();
+      if (!response || !response.ok) {
+        throw new CommerceError(
+          'STOREFRONT_HTTP_ERROR',
+          `The store returned HTTP ${response?.status || 'error'}.`,
+          { status: Number(response?.status) || null }
+        );
+      }
+      let payload;
+      try {
+        payload = await response.json();
+      } catch (error) {
+        if (parentSignal?.aborted) {
+          throw new CommerceError('STOREFRONT_REQUEST_CANCELLED', 'The store request was cancelled.');
+        }
+        if (controller.signal.aborted) {
+          throw new CommerceError('STOREFRONT_TIMEOUT', 'The store took too long to respond. Please try again.');
+        }
+        throw new CommerceError(
+          'STOREFRONT_INVALID_RESPONSE',
+          'The store returned an unreadable response.',
+          { cause: error }
+        );
+      }
+      if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+        throw new CommerceError('STOREFRONT_INVALID_RESPONSE', 'The store returned an invalid response.');
+      }
       if (Array.isArray(payload.errors) && payload.errors.length) {
         throw new CommerceError(
           'STOREFRONT_GRAPHQL_ERROR',
@@ -197,6 +257,9 @@
       return payload.data;
     } catch (error) {
       if (error instanceof CommerceError) throw error;
+      if (parentSignal?.aborted) {
+        throw new CommerceError('STOREFRONT_REQUEST_CANCELLED', 'The store request was cancelled.');
+      }
       if (controller.signal.aborted) {
         throw new CommerceError('STOREFRONT_TIMEOUT', 'The store took too long to respond. Please try again.');
       }
@@ -205,6 +268,35 @@
       clearTimeout(timer);
       if (parentSignal) parentSignal.removeEventListener('abort', abortFromParent);
     }
+  }
+
+  async function fetchGraphQL(query, variables = {}, options = {}) {
+    // Unclassified operations remain single-attempt. Callers must explicitly
+    // identify reads before transient failures are safe to retry.
+    const requestKind = options.requestKind === 'read' ? 'read' : 'mutation';
+    const timeoutFallback = requestKind === 'read' ? DEFAULT_READ_TIMEOUT_MS : DEFAULT_TIMEOUT_MS;
+    const timeoutMs = Number.isFinite(options.timeoutMs)
+      ? Math.min(30000, Math.max(1, options.timeoutMs))
+      : timeoutFallback;
+    const attempts = requestKind === 'mutation'
+      ? 1
+      : boundedInteger(options.maxAttempts, DEFAULT_READ_ATTEMPTS, 1, MAX_READ_ATTEMPTS);
+    const baseDelay = Number.isFinite(options.retryDelayMs)
+      ? Math.min(MAX_RETRY_DELAY_MS, Math.max(0, options.retryDelayMs))
+      : DEFAULT_RETRY_DELAY_MS;
+
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      if (options.signal?.aborted) {
+        throw new CommerceError('STOREFRONT_REQUEST_CANCELLED', 'The store request was cancelled.');
+      }
+      try {
+        return await fetchGraphQLOnce(query, variables, options, timeoutMs);
+      } catch (error) {
+        if (requestKind === 'mutation' || attempt === attempts || !retryableStorefrontError(error)) throw error;
+        await waitForRetry(Math.min(MAX_RETRY_DELAY_MS, baseDelay * (2 ** (attempt - 1))), options.signal);
+      }
+    }
+    throw new CommerceError('STOREFRONT_NETWORK_ERROR', 'The store could not be reached. Please try again.');
   }
 
   const PRODUCT_QUERY = `
@@ -251,7 +343,7 @@
     if (!/^[a-z0-9][a-z0-9-]{0,254}$/.test(clean)) {
       throw new CommerceError('INVALID_PRODUCT_HANDLE', 'The product address is invalid.');
     }
-    const data = await fetchGraphQL(PRODUCT_QUERY, { handle: clean }, options);
+    const data = await fetchGraphQL(PRODUCT_QUERY, { handle: clean }, { ...options, requestKind: 'read' });
     if (!data.product) throw new CommerceError('PRODUCT_NOT_FOUND', 'This item is no longer in the live catalog.');
     return data.product;
   }
@@ -291,7 +383,11 @@
     const requested = normalizeCart(lines, { strict: true });
     if (!requested.length) throw new CommerceError('EMPTY_CART', 'Your cart is empty.');
     if (requested.length > 250) throw new CommerceError('CART_TOO_LARGE', 'The cart has too many distinct items.');
-    const data = await fetchGraphQL(VALIDATE_QUERY, { ids: requested.map((line) => line.variantId) }, options);
+    const data = await fetchGraphQL(
+      VALIDATE_QUERY,
+      { ids: requested.map((line) => line.variantId) },
+      { ...options, requestKind: 'read' }
+    );
     const returned = Array.isArray(data.nodes) ? data.nodes : [];
     const byId = new Map(returned.filter(Boolean).map((variant) => [variant.id, variant]));
     const issues = [];
@@ -419,7 +515,11 @@
     const input = {
       lines: checked.lines.map((line) => ({ merchandiseId: line.variantId, quantity: line.quantity }))
     };
-    const data = await fetchGraphQL(CREATE_CART_MUTATION, { input }, options);
+    const data = await fetchGraphQL(
+      CREATE_CART_MUTATION,
+      { input },
+      { ...options, requestKind: 'mutation', maxAttempts: 1 }
+    );
     const result = data.cartCreate;
     if (!result) throw new CommerceError('CART_CREATE_FAILED', 'Shopify did not return a cart.');
     if (Array.isArray(result.userErrors) && result.userErrors.length) {
