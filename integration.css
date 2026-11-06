@@ -37,6 +37,15 @@
 .brand-name>small{display:block;font:10px/1.5 Mono,monospace;text-transform:uppercase;letter-spacing:.08em;margin-top:7px;color:var(--muted)}
 .site-header .header-inner{gap:20px}
 .site-header .nav{gap:20px}
+.mobile-login{display:none}
+.account-menu{position:relative;flex:none}
+.account-menu>summary{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;list-style:none;cursor:pointer}
+.account-menu>summary::-webkit-details-marker{display:none}
+.account-menu>summary:hover,.account-menu[open]>summary{color:var(--red)}
+.account-menu-panel{position:absolute;z-index:80;top:calc(100% + 8px);right:0;display:grid;min-width:220px;padding:7px;background:var(--cream);border:var(--border-width) solid var(--frame);box-shadow:6px 6px 0 var(--ochre)}
+.account-menu-panel a{display:block;min-height:42px;padding:10px 12px;font-size:12px;font-weight:700;line-height:1.5;white-space:nowrap}
+.account-menu-panel a+a{border-top:2px solid var(--line)}
+.account-menu-panel a:last-child{border-top:var(--border-width) solid var(--frame);font-weight:600}
 .new-arrivals-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:26px}
 .new-arrivals-grid .product-title{font-size:16px;line-height:1.4}
 .new-arrivals-grid .product-photo img{aspect-ratio:1;object-fit:contain;background:var(--soft)}
@@ -52,10 +61,12 @@
 @media(max-width:1000px){
  .site-header .header-inner{min-height:90px}
  .site-header .menu-button{display:inline-flex}
+ .site-header .account-menu{display:none}
  .site-header .nav{display:none;position:absolute;top:100%;left:0;right:0;background:white;padding:15px var(--space) 20px;border-bottom:var(--border-width) solid var(--ink)}
  .site-header .nav.open{display:flex;flex-direction:column;align-items:stretch;gap:2px}
  .site-header .nav a{font-size:15px;padding:11px 0}
  .site-header .nav .mobile-inventory{display:block;margin-top:5px;color:var(--red);font-size:13px}
+ .site-header .nav .mobile-login{display:block;margin-top:8px;border-top:var(--border-width) solid var(--frame);font-size:13px}
  .new-arrivals-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:30px 20px}
 }
 @media(max-width:640px){

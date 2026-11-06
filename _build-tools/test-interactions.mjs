@@ -114,6 +114,27 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
     'the newsletter posts to the current official form anchor');
   assert.match(footer, /href="https:\/\/kissitgoodbuy\.net\/apps\/consignor"/,
     'the consignor portal uses the verified canonical URL without an avoidable redirect');
+  assert.doesNotMatch(footer, /studio\.html|Owner Studio/,
+    'the public footer does not advertise the editing workspace');
+  const headerMarkup = run('header()');
+  assert.match(headerMarkup, /<details class="account-menu">.*<nav class="account-menu-panel" aria-label="Account options">/s,
+    'desktop account access is a compact top-right disclosure');
+  assert.match(headerMarkup, /href="https:\/\/kissitgoodbuy\.net\/account">Customer account ↗<\/a>/,
+    'the editor login does not replace the real customer account destination');
+  assert.match(headerMarkup, /href="https:\/\/kissitgoodbuy\.net\/apps\/consignor">Consignor account ↗<\/a>/,
+    'the account menu preserves the verified consignor portal');
+  assert.equal((headerMarkup.match(/href="studio\.html">Log in<\/a>/g) || []).length, 2,
+    'plain Log in is available in the desktop account disclosure and mobile top-right menu');
+  assert.doesNotMatch(headerMarkup, /Owner Studio|practice workspace|Try it\./i,
+    'the public navigation does not promote or explain the editor');
+  const homeMarkup = run('home()');
+  assert.doesNotMatch(homeMarkup, /studio-entry|For the owner|Open Owner Studio|href="studio\.html"/,
+    'the homepage contains no editing-workspace promotion');
+  assert.doesNotMatch(app, /toolbar\(false\)/,
+    'signed-out storefront pages do not append an editor advertisement');
+  assert.match(run('studioHeader()'), /ACCOUNT ACCESS/);
+  assert.doesNotMatch(run('studioHeader()'), /Owner Studio|practice workspace/i,
+    'the signed-out account header stays neutral');
   const consignMarkup = run('consign()');
   assert.match(consignMarkup, /href="consign\.html#inquiry-form"/,
     'the consignment shortcut remains on consign.html despite the document base');

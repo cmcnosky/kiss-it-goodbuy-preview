@@ -161,6 +161,75 @@ assert.match(Runtime.toolbar(true), /Your practice storefront/);
 assert.match(Runtime.toolbar(true), /data-exit-studio/);
 assert.doesNotMatch(Runtime.toolbar(false), /data-exit-studio/);
 
+const styleValues = new Map();
+const addedClasses = [];
+const phoneLink = { href: 'tel:+18174819754', textContent: 'Call 817-481-9754' };
+const emailLink = {
+  href: 'mailto:info@kissitgoodbuy.net?subject=Question',
+  textContent: 'info@kissitgoodbuy.net',
+  getAttribute(name) { assert.equal(name, 'href'); return this.href; }
+};
+const directionsLink = { href: 'https://www.google.com/maps/search/?api=1&query=Kiss+It+Good+Buy+Grapevine' };
+const placardStreet = { textContent: '201 E. FRANKLIN.' };
+const placardCity = { textContent: 'GRAPEVINE, TX 76051' };
+const addressText = {
+  nodeValue: 'Visit 201 East Franklin Street in Grapevine, TX 76051.',
+  parentElement: { closest() { return null; } }
+};
+const previewDocument = {
+  documentElement: {
+    classList: { add(value) { addedClasses.push(value); } },
+    style: { setProperty(name, value) { styleValues.set(name, value); } },
+    dataset: {}
+  },
+  querySelectorAll(selector) {
+    if (selector === 'a[href^="tel:"]') return [phoneLink];
+    if (selector === 'a[href^="mailto:"]') return [emailLink];
+    if (selector === 'a[href^="https://www.google.com/maps/search/"]') return [directionsLink];
+    return [];
+  },
+  querySelector(selector) {
+    if (selector === '.location-placard strong') return placardStreet;
+    if (selector === '.location-placard strong + span') return placardCity;
+    return null;
+  },
+  getElementById(id) { assert.equal(id, 'app'); return {}; },
+  createTreeWalker() {
+    let pending = true;
+    return {
+      currentNode: null,
+      nextNode() {
+        if (!pending) return false;
+        pending = false;
+        this.currentNode = addressText;
+        return true;
+      }
+    };
+  }
+};
+globalThis.NodeFilter = { SHOW_TEXT: 4 };
+globalThis.document = previewDocument;
+Runtime.applyTheme({
+  design: {
+    coral: '#c95747', celadon: '#bfd9b7', ochre: '#edc56b', cream: '#fff9ed', ink: '#2d2927', frame: '#8f2f28',
+    borderWidth: 7, textScale: 1.15, productColumns: 4, headingFont: 'Optima', bodyFont: 'Arial', heroLayout: 'split', density: 'spacious', imageFit: 'cover'
+  },
+  content: {
+    phone: '817-555-0199', email: 'gallery@example.test', address: '42 New Gallery Road', city: 'Grapevine, TX 76052'
+  }
+});
+assert.deepEqual(addedClasses, ['studio-preview']);
+assert.equal(styleValues.get('--studio-columns'), '4');
+assert.equal(previewDocument.documentElement.dataset.studioHero, 'split');
+assert.equal(phoneLink.href, 'tel:+18175550199');
+assert.equal(phoneLink.textContent, 'Call 817-555-0199');
+assert.equal(emailLink.href, 'mailto:gallery%40example.test?subject=Question');
+assert.equal(emailLink.textContent, 'gallery@example.test');
+assert.equal(directionsLink.href, 'https://www.google.com/maps/search/?api=1&query=42%20New%20Gallery%20Road%2C%20Grapevine%2C%20TX%2076052');
+assert.equal(placardStreet.textContent, '42 New Gallery Road');
+assert.equal(placardCity.textContent, 'Grapevine, TX 76052');
+assert.equal(addressText.nodeValue, 'Visit 42 New Gallery Road in Grapevine, TX 76052.');
+
 const inactiveCheckout = Runtime.checkoutPage([], false);
 assert.match(inactiveCheckout, /Open the Owner Studio/);
 assert.doesNotMatch(inactiveCheckout, /practice-order-form/);

@@ -21,7 +21,7 @@
     }catch{sessionInMemory=true;}
   }
   function loginMarkup(message=''){
-    return `<section class="studio-login"><div class="studio-login-welcome"><p class="eyebrow">Kiss It Good Buy · Owner Studio</p><h1>Owner<br><em>Studio.</em></h1><p>Sign in with your login credentials to access the workspace.</p></div><div class="studio-login-card"><p class="eyebrow">Workspace access</p><h2>Open your workspace.</h2><form id="studio-login-form" method="dialog"><label for="studio-username">Login</label><input id="studio-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required maxlength="100"><label for="studio-password">Password</label><input id="studio-password" name="password" type="password" autocomplete="current-password" required maxlength="100"><label class="studio-show-password"><input type="checkbox" data-show-studio-password> Show password</label><p id="studio-login-error" role="alert" ${message?'':'hidden'}>${escape(message)}</p><button type="submit" class="button red">Sign in to Owner Studio →</button></form><p class="studio-login-note">This shared preview sign-in is a convenience, not a secure business account. Your saved edits stay on this browser.</p><a class="text-link" href="index.html">Back to the storefront →</a></div></section>`;
+    return `<section class="studio-login"><div class="studio-login-welcome"><p class="eyebrow">Kiss It Good Buy</p><h1>Log in.</h1><p>Enter your credentials to continue.</p></div><div class="studio-login-card"><p class="eyebrow">Workspace access</p><h2>Welcome back.</h2><form id="studio-login-form" method="dialog"><label for="studio-username">Login</label><input id="studio-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required maxlength="100"><label for="studio-password">Password</label><input id="studio-password" name="password" type="password" autocomplete="current-password" required maxlength="100"><label class="studio-show-password"><input type="checkbox" data-show-studio-password> Show password</label><p id="studio-login-error" role="alert" ${message?'':'hidden'}>${escape(message)}</p><button type="submit" class="button red">Log in</button></form><p class="studio-login-note">This shared preview sign-in is a convenience, not a secure business account. Your saved edits stay on this browser.</p><a class="text-link" href="index.html">Back to the storefront →</a></div></section>`;
   }
 
   const TABS=['design','content','inventory','versions','orders','activity'];
@@ -48,10 +48,30 @@
     return '<main id="main" class="owner-studio"><div id="studio-app">'+loginMarkup()+'</div><noscript><p class="studio-login-note">Enable JavaScript to sign in and use the Owner Studio.</p></noscript></main>';
   }
 
+  const editableForms='#studio-content-form,[data-product-form],#studio-custom-product-form';
+  function hasUnsavedEntries(){
+    return [...(root.document?.querySelectorAll(editableForms)||[])].some(form=>[...form.elements].some(field=>{
+      if(!field.name||field.disabled)return false;
+      if(field.type==='file')return Boolean(field.files?.length);
+      if(field.type==='checkbox'||field.type==='radio')return field.checked!==field.defaultChecked;
+      if(field.tagName==='SELECT')return field.value!==(Array.from(field.options).find(option=>option.defaultSelected)||field.options[0])?.value;
+      return 'defaultValue' in field&&field.value!==field.defaultValue;
+    }));
+  }
+  function markFormSaved(form){
+    if(!form)return;
+    for(const field of form.elements){
+      if(field.type==='file'){field.value='';continue;}
+      if(field.type==='checkbox'||field.type==='radio')field.defaultChecked=field.checked;
+      else if(field.tagName==='SELECT')for(const option of field.options)option.defaultSelected=option.selected;
+      else if('defaultValue' in field)field.defaultValue=field.value;
+    }
+  }
   function statusText(){
     const status=stateApi().getStatus();
     if(status.conflict)return 'Another tab has newer Studio changes. Reload before editing.';
     if(!status.persisted)return 'Browser storage is unavailable. Changes are kept only until this page closes.';
+    if(hasUnsavedEntries())return 'Unsaved entries · use this form’s Save button.';
     return `Saved on this browser · revision ${status.revision}`;
   }
 
@@ -233,27 +253,57 @@
     return `<dialog id="studio-confirm-dialog" class="studio-confirm-dialog" aria-labelledby="studio-confirm-title" aria-describedby="studio-confirm-copy"><div class="studio-confirm-card"><p class="eyebrow">Please confirm</p><h2 id="studio-confirm-title">Confirm this change</h2><p id="studio-confirm-copy"></p><div class="studio-confirm-actions"><button class="button outline" type="button" data-confirm-cancel>Cancel</button><button class="button red" type="button" data-confirm-accept>Continue</button></div></div></dialog>`;
   }
 
+  function refreshFeedback(){
+    const host=root.document?.querySelector('#studio-app');if(!host)return;
+    const status=host.querySelector('.studio-persistence');
+    if(status){status.className='studio-persistence '+(stateApi().getStatus().persisted&&!hasUnsavedEntries()?'saved':'warning');status.innerHTML='<span></span>'+escape(statusText());}
+    const message=host.querySelector('.studio-message');
+    if(message){message.className='studio-message '+ui.messageKind;message.textContent=ui.message;message.hidden=!ui.message;}
+    const pending=host.querySelector('.studio-unsaved');if(pending)pending.hidden=!hasUnsavedEntries();
+  }
+  function requireSavedEntries(){
+    if(!hasUnsavedEntries())return true;
+    show('Save or discard your unsaved entries before changing sections or previewing.','error');return false;
+  }
   function renderApp(){
     const host=root.document?.querySelector('#studio-app'),api=stateApi();
     if(!host||!api)return false;
+    if(ui.mutating)return false;
+    if(signedIn()&&(ui.keepDesignControls||hasUnsavedEntries())){
+      refreshFeedback();
+      if(ui.keepDesignControls){
+        const draft=api.read().draft,preview=host.querySelector('.studio-live-preview');
+        for(const picker of host.querySelectorAll('[data-color-picker]'))picker.value=draft.design[picker.dataset.colorPicker];
+        for(const field of host.querySelectorAll('[data-design-field]')){
+          field.value=String(draft.design[field.name]);
+          const output=field.parentElement.querySelector('output');if(output)output.value=field.value+(field.name==='borderWidth'?'px':'×');
+        }
+        if(preview)preview.outerHTML=previewMarkup(draft);
+      }
+      return true;
+    }
     if(pendingConfirm)closeConfirm();
     if(!signedIn()){host.innerHTML=loginMarkup(ui.loginMessage);return true;}
     const state=api.read();
-    host.innerHTML=`${headerMarkup(state)}${navMarkup(state)}<div class="studio-message ${ui.messageKind}" role="status" ${ui.message?'':'hidden'}>${escape(ui.message)}</div>${panelMarkup(state)}${confirmMarkup()}`;
+    host.innerHTML=`${headerMarkup(state)}${navMarkup(state)}<div class="studio-message ${ui.messageKind}" role="status" ${ui.message?'':'hidden'}>${escape(ui.message)}</div><div class="studio-unsaved" hidden><span>Save this form to keep your entries.</span><button class="text-link" type="button" data-discard-edits>Discard unsaved entries</button></div>${panelMarkup(state)}${confirmMarkup()}`;
     return true;
   }
 
   function show(message,kind='status'){ui.message=message;ui.messageKind=kind;renderApp();}
-  function action(work,success){
+  function action(work,success,{form,keepDesignControls=false}={}){
+    ui.keepDesignControls=keepDesignControls;
     try{
       if(!signedIn())throw new Error('Sign in to Owner Studio to make changes.');
       if(stateApi().getStatus().conflict)throw new Error('Another tab has newer Studio changes. Reload this page before editing.');
-      work();const persisted=stateApi().getStatus().persisted;ui.message=persisted?(success||''):'Change kept for this visit only. Browser storage could not save it. Export a backup before closing or reloading.';ui.messageKind=persisted?'status':'error';renderApp();
+      ui.mutating=true;work();markFormSaved(form);ui.mutating=false;
+      const persisted=stateApi().getStatus().persisted;ui.message=persisted?(success||''):'Change kept for this visit only. Browser storage could not save it. Export a backup before closing or reloading.';ui.messageKind=persisted?'status':'error';renderApp();
     }
-    catch(error){show(error?.message||'That change could not be saved.','error');}
+    catch(error){ui.mutating=false;show(error?.message||'That change could not be saved.','error');}
+    finally{ui.keepDesignControls=false;ui.mutating=false;}
   }
 
   function activateAndNavigate(active){
+    if(!requireSavedEntries())return;
     try{
       if(stateApi().getStatus().conflict)throw new Error('Another tab has newer Studio changes. Reload this page before changing preview mode.');
       stateApi().setActive(active);
@@ -377,23 +427,35 @@
       category:String(data.get('category')||'').trim()
     };
     const customProducts=[...existing,item];
-    stateApi().updateDraft({customProducts});
-    ui.message=prepared.resized?'Sample piece added. A resized browser-local copy of the photo was embedded; the original file was not changed.':'Sample piece added to the practice inventory.';ui.messageKind='status';
+    action(()=>stateApi().updateDraft({customProducts}),prepared.resized?'Sample piece added. A resized browser-local copy of the photo was embedded; the original file was not changed.':'Sample piece added to the practice inventory.',{form});
+  }
+
+  function signOut(){
+    setSignedIn(false);root.clearTimeout(ui.searchTimer);ui.message='';
+    const warnings=[];
+    if(sessionInMemory)warnings.push('Signed out on this page. Session storage could not be cleared; close this tab to finish signing out.');
+    try{
+      stateApi().setActive(false);
+      if(!stateApi().getStatus().persisted)warnings.push('Signed out. Browser storage could not save the end of preview mode. Your previously saved preview may still appear after a reload.');
+    }catch{warnings.push('Signed out. Preview mode could not be ended because another tab has newer changes. Reload and sign in again to return to the original storefront.');}
+    ui.loginMessage=warnings.join(' ');renderApp();root.document.querySelector('#studio-username')?.focus();
   }
 
   function bind(host){
     host.addEventListener('click',async event=>{
       if(event.target.closest('[data-studio-signout]')){
-        setSignedIn(false);root.clearTimeout(ui.searchTimer);ui.message='';ui.loginMessage=sessionInMemory?'Signed out on this page. Session storage could not be cleared; close this tab to finish signing out.':'';
-        try{stateApi().setActive(false);}catch{}
-        renderApp();root.document.querySelector('#studio-username')?.focus();return;
+        if(hasUnsavedEntries())openConfirm({title:'Sign out with unsaved entries?',copy:'Entries you have not saved will be discarded. Your saved draft, versions, and practice records remain on this browser.',actionLabel:'Discard entries and sign out',trigger:event.target.closest('[data-studio-signout]'),work:signOut});
+        else signOut();return;
       }
       if(!signedIn())return;
       const cancel=event.target.closest('[data-confirm-cancel]');
       if(cancel){const pending=pendingConfirm;closeConfirm();pending?.onCancel?.();return;}
       if(event.target.closest('[data-confirm-accept]')){await acceptConfirm();return;}
       if(pendingConfirm&&!event.target.closest('#studio-confirm-dialog')){event.preventDefault();return;}
-      const tab=event.target.closest('[data-studio-tab]');if(tab){setTab(tab.dataset.studioTab);return;}
+      const discard=event.target.closest('[data-discard-edits]');
+      if(discard){openConfirm({title:'Discard unsaved entries?',copy:'Only entries you have not saved in the current section will be discarded. Saved changes remain.',actionLabel:'Discard unsaved entries',trigger:discard,restoreSelector:'[aria-current="page"]',work:()=>{host.querySelectorAll(editableForms).forEach(form=>form.reset());ui.message='Unsaved entries discarded.';ui.messageKind='status';renderApp();}});return;}
+      const tab=event.target.closest('[data-studio-tab]');if(tab){if(requireSavedEntries())setTab(tab.dataset.studioTab);return;}
+      if(event.target.closest('[data-load-products],[data-reset-product],[data-delete-custom]')&&!requireSavedEntries())return;
       const preset=event.target.closest('[data-preset]');if(preset){action(()=>stateApi().updateDraft({design:PRESETS[preset.dataset.preset].design}),PRESETS[preset.dataset.preset].label+' applied.');return;}
       if(event.target.closest('[data-preview-store]')){activateAndNavigate(true);return;}
       if(event.target.closest('[data-return-original]')){activateAndNavigate(false);return;}
@@ -415,7 +477,9 @@
     });
     host.addEventListener('input',event=>{
       if(!signedIn())return;
+      if(event.target.closest(editableForms))refreshFeedback();
       if(event.target.id==='studio-product-search'){
+        if(!requireSavedEntries())return;
         ui.search=event.target.value;ui.inventoryPage=1;root.clearTimeout(ui.searchTimer);
         const cursor=event.target.selectionStart;
         ui.searchTimer=root.setTimeout(()=>{renderApp();const search=root.document.querySelector('#studio-product-search');search?.focus();search?.setSelectionRange?.(cursor,cursor);},180);
@@ -440,10 +504,11 @@
     host.addEventListener('change',async event=>{
       if(event.target.matches('[data-show-studio-password]')){const password=host.querySelector('#studio-password');if(password)password.type=event.target.checked?'text':'password';return;}
       if(!signedIn())return;
+      if(event.target.closest(editableForms))refreshFeedback();
       const design=event.target.closest('[data-design-field]');
-      if(design){action(()=>stateApi().updateDraft({design:{[design.name]:designValue(design)}}),'Design change saved.');return;}
+      if(design){action(()=>stateApi().updateDraft({design:{[design.name]:designValue(design)}}),'Design change saved.',{keepDesignControls:true});return;}
       const picker=event.target.closest('[data-color-picker]');
-      if(picker){action(()=>stateApi().updateDraft({design:{[picker.dataset.colorPicker]:picker.value}}),'Color saved.');return;}
+      if(picker){action(()=>stateApi().updateDraft({design:{[picker.dataset.colorPicker]:picker.value}}),'Color saved.',{keepDesignControls:true});return;}
       const order=event.target.closest('[data-order-status]');
       if(order){action(()=>stateApi().updateOrderStatus(order.dataset.orderStatus,order.value),'Practice order updated.');return;}
       const message=event.target.closest('[data-message-status]');
@@ -470,13 +535,13 @@
         return;
       }
       if(!signedIn()){renderApp();return;}
-      if(form.id==='studio-content-form'){const data=Object.fromEntries(new root.FormData(form).entries());action(()=>stateApi().updateDraft({content:data}),'Words and contact details saved.');return;}
+      if(form.id==='studio-content-form'){const data=Object.fromEntries(new root.FormData(form).entries());action(()=>stateApi().updateDraft({content:data}),'Words and contact details saved.',{form});return;}
       if(form.id==='studio-version-form'){const name=String(new root.FormData(form).get('name')||'').trim();action(()=>stateApi().saveVersion(name),'Version saved.');return;}
       if(form.matches('[data-product-form]')){
         const handle=form.dataset.productForm,product=baseProducts().find(item=>item.handle===handle);if(!product)return;
         const data=new root.FormData(form),basePrice=Math.round(product.price*100),priceCents=Math.round(Number(data.get('price'))*100);
         const patch={title:String(data.get('title')).trim()===product.title?null:String(data.get('title')).trim(),priceCents:priceCents===basePrice?null:priceCents,available:(data.get('available')==='true')===product.available?null:data.get('available')==='true',dimensionsRaw:String(data.get('dimensionsRaw')||'')===(product.dimensionsRaw||'')?null:String(data.get('dimensionsRaw')||''),imageUrl:String(data.get('imageUrl')||'')===(product.images?.[0]?.src||'')?null:String(data.get('imageUrl')||''),hidden:data.get('hidden')==='on'?true:null};
-        action(()=>stateApi().updateDraft({products:{[handle]:patch}}),'Practice listing saved.');return;
+        action(()=>stateApi().updateDraft({products:{[handle]:patch}}),'Practice listing saved.',{form});return;
       }
       if(form.id==='studio-custom-product-form'){try{await submitCustom(form);renderApp();}catch(error){show(error.message,'error');}}
     });
@@ -487,7 +552,7 @@
     const host=root.document?.querySelector('#studio-app');
     if(!host||!context||!stateApi())return false;
     ui.tab=tabFromUrl();
-    if(!mounted){mounted=true;bind(host);unsubscribe=stateApi().subscribe(()=>renderApp());root.addEventListener?.('pageshow',()=>renderApp());root.addEventListener?.('pagehide',()=>{volatileSignIn=false;});}
+    if(!mounted){mounted=true;bind(host);unsubscribe=stateApi().subscribe(()=>renderApp());root.addEventListener?.('pageshow',()=>renderApp());root.addEventListener?.('pagehide',()=>{volatileSignIn=false;});root.addEventListener?.('beforeunload',event=>{if(signedIn()&&hasUnsavedEntries()){event.preventDefault();event.returnValue='';}});}
     renderApp();
     return true;
   }

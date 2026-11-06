@@ -46,6 +46,15 @@
     const content=draft.content||{};
     for(const link of root.document.querySelectorAll('a[href^="tel:"]')){if(content.phone){const digits=content.phone.replace(/\D/g,'');link.href='tel:+'+(digits.length===10?'1':'')+digits;if(link.textContent.includes('817-481-9754'))link.textContent=link.textContent.replace('817-481-9754',content.phone);}}
     for(const link of root.document.querySelectorAll('a[href^="mailto:"]')){if(content.email){link.href=link.getAttribute('href').replace('info@kissitgoodbuy.net',encodeURIComponent(content.email));if(link.textContent==='info@kissitgoodbuy.net')link.textContent=content.email;}}
+    const destination=[content.address,content.city].filter(value=>typeof value==='string'&&value.trim()).join(', ');
+    if(destination){
+      const mapHref='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(destination);
+      for(const link of root.document.querySelectorAll('a[href^="https://www.google.com/maps/search/"]'))link.href=mapHref;
+    }
+    const placardStreet=root.document.querySelector('.location-placard strong');
+    const placardCity=root.document.querySelector('.location-placard strong + span');
+    if(placardStreet&&content.address)placardStreet.textContent=content.address;
+    if(placardCity&&content.city)placardCity.textContent=content.city;
     const walker=root.document.createTreeWalker(root.document.getElementById('app'),root.NodeFilter.SHOW_TEXT);
     const pairs=[['201 East Franklin Street',content.address],['201 E. Franklin Street',content.address],['Grapevine, TX 76051',content.city],['Grapevine, Texas 76051',content.city]];
     while(walker.nextNode()){const node=walker.currentNode;if(node.parentElement.closest('.owner-preview-bar'))continue;for(const [old,value] of pairs)if(value&&node.nodeValue.includes(old))node.nodeValue=node.nodeValue.replaceAll(old,value);}
