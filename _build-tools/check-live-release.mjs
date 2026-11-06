@@ -85,6 +85,23 @@ function pngSize(bytes) {
   return { width: bytes.readUInt32BE(16), height: bytes.readUInt32BE(20) };
 }
 
+function documentBaseUrl(html, pageUrl, siteBaseUrl) {
+  const baseHref = html.match(/<base\b[^>]*\bhref\s*=\s*(["'])([^"']+)\1/i)?.[2];
+  const documentBase = new URL(baseHref || pageUrl, pageUrl);
+  const siteBase = new URL(siteBaseUrl);
+  if (documentBase.origin !== siteBase.origin || !documentBase.pathname.startsWith(siteBase.pathname)) {
+    throw new Error(`${pageUrl} declares a document base outside the published site: ${documentBase.href}`);
+  }
+  return documentBase;
+}
+
+function localAssetUrls(html, pageUrl, siteBaseUrl) {
+  const documentBase = documentBaseUrl(html, pageUrl, siteBaseUrl);
+  return [...html.matchAll(/(?:src|href)\s*=\s*(["'])([^"'#]+)\1/gi)]
+    .map(match => new URL(match[2], documentBase))
+    .filter(url => url.origin === new URL(siteBaseUrl).origin && /\.(?:css|js)$/.test(url.pathname));
+}
+
 async function runChecks(options) {
   const report = { baseUrl: options.baseUrl, checkedAt: new Date().toISOString(), pages: [], assets: [] };
   const inventoryUrl = new URL('inventory.json', options.baseUrl);
@@ -138,9 +155,7 @@ async function runChecks(options) {
   if (previewSize.width !== 1200 || previewSize.height !== 630) throw new Error(`Social preview is ${previewSize.width}x${previewSize.height}, expected 1200x630.`);
   report.socialPreview = { url: metadata.ogImage, sha256: sha256(preview.bytes), ...previewSize };
 
-  const localAssets = pageHtml.flatMap(page => [...page.html.matchAll(/(?:src|href)="([^"#]+)"/g)]
-    .map(match => new URL(match[1], page.url)))
-    .filter(url => url.origin === new URL(options.baseUrl).origin && /\.(?:css|js)(?:\?|$)/.test(url.href));
+  const localAssets = pageHtml.flatMap(page => localAssetUrls(page.html, page.url, options.baseUrl));
   const loadedAssets = new Map();
   for (const url of [...new Map(localAssets.map(asset => [asset.href, asset])).values()]) {
     const response = await fetchBytes(url.href);
@@ -242,4 +257,4 @@ async function main() {
 const invokedDirectly = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
 if (invokedDirectly) main().catch(error => { process.stderr.write(`${error.stack || error.message}\n`); process.exitCode = 1; });
 
-export { htmlMetadata, parseArguments, pngSize, runChecks, validateHtml };
+export { documentBaseUrl, htmlMetadata, localAssetUrls, parseArguments, pngSize, runChecks, validateHtml };

@@ -2,6 +2,7 @@
 
 import assert from 'node:assert/strict';
 import { evaluateReleaseGuard, enforceReleaseGuard, inventoryCounts } from './sync-catalog.mjs';
+import { documentBaseUrl, localAssetUrls } from './check-live-release.mjs';
 
 function inventory({
   fetchedAt = '2026-11-06T12:00:00.000Z',
@@ -103,4 +104,28 @@ const report = evaluateReleaseGuard(ordinary, baseline);
 assert.equal(report.baseline.fetchedAtIso, '2026-11-06T10:00:00.000Z');
 assert.equal(report.current.fetchedAtIso, '2026-11-06T11:00:00.000Z');
 
-console.log('Release guard checks passed: structure, recency, count loss, membership loss, and explicit override logging.');
+const siteBaseUrl = 'https://example.test/kiss-it-goodbuy-preview/';
+const rootPageUrl = siteBaseUrl;
+assert.equal(documentBaseUrl('<link href="style.css">', rootPageUrl, siteBaseUrl).href, rootPageUrl);
+assert.deepEqual(
+  localAssetUrls('<link href="style.css?v=1"><script src="app.js?v=2"></script>', rootPageUrl, siteBaseUrl).map(url => url.href),
+  [`${siteBaseUrl}style.css?v=1`, `${siteBaseUrl}app.js?v=2`]
+);
+
+const productPageUrl = `${siteBaseUrl}products/example-piece/`;
+const nestedAssets = localAssetUrls(
+  '<base href="../../"><link href="style.css?v=1"><script src="app.js?v=2"></script>',
+  productPageUrl,
+  siteBaseUrl
+);
+assert.deepEqual(nestedAssets.map(url => url.href), [`${siteBaseUrl}style.css?v=1`, `${siteBaseUrl}app.js?v=2`]);
+assert.throws(
+  () => localAssetUrls('<base href="https://hostile.example/"><link href="style.css">', productPageUrl, siteBaseUrl),
+  /document base outside the published site/
+);
+assert.throws(
+  () => localAssetUrls('<base href="/"><link href="style.css">', productPageUrl, siteBaseUrl),
+  /document base outside the published site/
+);
+
+console.log('Release guard checks passed: catalog integrity, explicit override logging, and document-base-aware asset resolution.');
