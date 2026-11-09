@@ -283,7 +283,13 @@
       return true;
     }
     if(pendingConfirm)closeConfirm();
-    if(!signedIn()){host.innerHTML=loginMarkup(ui.loginMessage);return true;}
+    if(!signedIn()){
+      // Keep credentials entered into the server-rendered form while scripts load.
+      // Replacing that form during mount/pageshow would silently erase the entry.
+      if(!host.querySelector('#studio-login-form'))host.innerHTML=loginMarkup(ui.loginMessage);
+      else if(ui.loginMessage){const error=host.querySelector('#studio-login-error');if(error){error.hidden=false;error.textContent=ui.loginMessage;}}
+      return true;
+    }
     const state=api.read();
     host.innerHTML=`${headerMarkup(state)}${navMarkup(state)}<div class="studio-message ${ui.messageKind}" role="status" ${ui.message?'':'hidden'}>${escape(ui.message)}</div><div class="studio-unsaved" hidden><span>Save this form to keep your entries.</span><button class="text-link" type="button" data-discard-edits>Discard unsaved entries</button></div>${panelMarkup(state)}${confirmMarkup()}`;
     return true;

@@ -199,6 +199,56 @@ test('public storefront keeps Studio promotion private and exposes only a plain 
   await expect(page.locator('body')).not.toContainText('Chelsea');
 });
 
+test('credentials entered before deferred startup survive initialization and pageshow', async ({ page }) => {
+  let releaseStartup;
+  const startupGate = new Promise(resolve => { releaseStartup = resolve; });
+  await page.route('**/studio.js*', async route => {
+    await startupGate;
+    await route.continue();
+  });
+  try {
+    await page.goto('/studio.html', { waitUntil: 'commit' });
+    await page.locator('#studio-username').fill('Chelsea');
+    await page.locator('#studio-password').fill('Chelsea');
+  } finally {
+    releaseStartup();
+  }
+  await page.waitForLoadState('load');
+  await expect(page.locator('#studio-username')).toHaveValue('Chelsea');
+  await expect(page.locator('#studio-password')).toHaveValue('Chelsea');
+  await page.evaluate(() => dispatchEvent(new Event('pageshow')));
+  await expect(page.locator('#studio-username')).toHaveValue('Chelsea');
+  await expect(page.locator('#studio-password')).toHaveValue('Chelsea');
+  await page.locator('#studio-login-form').getByRole('button', { name: 'Log in', exact: true }).click();
+  await expect(page.locator('.studio-tabs')).toBeVisible();
+});
+
+test('a nonempty but truncated live catalog retains the saved inventory and offers retry', async ({ page }) => {
+  await page.route('https://kissitgoodbuy.net/products.json**', route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify({products:[{id:9911223344,handle:'incomplete-live-response',title:'Incomplete response fixture',product_type:'Furniture',vendor:'Fixture',tags:[],images:[],options:[],variants:[{id:9911223355,title:'Default Title',price:'10.00',available:true}]}]})
+  }));
+  await page.goto('/collection.html', { waitUntil: 'load' });
+  await expect(page.locator('[data-retry-inventory]').first()).toBeVisible();
+  await expect(page.locator('#catalog-results')).toContainText(`of ${inventory.products.length}`);
+  await expect(page.locator('#catalog-results')).not.toContainText('Incomplete response fixture');
+  await expect(page.locator('[data-live-status]').first()).not.toContainText('Inventory checked');
+});
+
+test('the product pickup planner stays available after product refresh', async ({ page }) => {
+  await page.goto(`/products/${encodeURIComponent(studioProduct.handle)}/`, { waitUntil: 'load' });
+  const planner = page.locator('.planner-link');
+  await expect(planner).toBeVisible();
+  const originalHref = await planner.getAttribute('href');
+  await page.evaluate(() => refreshProductMain());
+  await expect(planner).toBeVisible();
+  await expect(planner).toHaveAttribute('href', originalHref);
+  await planner.click();
+  await expect(page).toHaveURL(/planner\.html\?items=/);
+  await expect(page.locator('h1')).toBeVisible();
+});
+
 test('layout audit detects representative broken CSS, image, and markup', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/index.html', { waitUntil: 'load' });

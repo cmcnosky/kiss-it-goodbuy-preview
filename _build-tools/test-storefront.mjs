@@ -10,6 +10,39 @@ vm.createContext(context);
 vm.runInContext(fs.readFileSync(path.join(dist,'catalog.js'),'utf8')+'\n'+fs.readFileSync(path.join(dist,'commerce.js'),'utf8')+'\n'+app,context);
 const run=code=>vm.runInContext(code,context);
 assert.equal(run('PRODUCTS.length'),inventory.products.length);
+assert.deepEqual(
+  JSON.parse(JSON.stringify(run('catalogCardinality(baseInventory.products)'))),
+  {
+    products: inventory.products.length,
+    variants: inventory.products.reduce((total, product) => total + product.variants.length, 0)
+  }
+);
+context.incompleteLiveCatalog=[inventory.products[0]];
+assert.throws(
+  ()=>run('assertLiveCatalogComplete(incompleteLiveCatalog)'),
+  /Live catalog products fell/,
+  'a syntactically valid but drastically incomplete live response must not replace the snapshot'
+);
+context.smallLegitimateRemoval=inventory.products.slice(1);
+assert.doesNotThrow(
+  ()=>run('assertLiveCatalogComplete(smallLegitimateRemoval)'),
+  'a small ordinary removal must not disable live inventory'
+);
+const additionSource=structuredClone(inventory.products[0]);
+additionSource.id='99999999999998';
+additionSource.handle='synthetic-new-live-product';
+additionSource.variants=additionSource.variants.map((variant,index)=>({...variant,id:String(99999999999000+index)}));
+context.legitimateGrowth=[...inventory.products,additionSource];
+assert.doesNotThrow(
+  ()=>run('assertLiveCatalogComplete(legitimateGrowth)'),
+  'newly published products must be accepted'
+);
+context.duplicateHandleCatalog=[...inventory.products,{...additionSource,id:'99999999999997',variants:additionSource.variants.map((variant,index)=>({...variant,id:String(99999999998000+index)})),handle:inventory.products[0].handle}];
+assert.throws(
+  ()=>run('assertLiveCatalogComplete(duplicateHandleCatalog)'),
+  /duplicate product handle/,
+  'duplicate handles must not create ambiguous product routes'
+);
 assert.equal(run("filterProducts(PRODUCTS,filterState(new URLSearchParams('collection=seating'))).length"),inventory.collections.find(c=>c.handle==='seating').productIds.length);
 assert.equal(run("filterProducts(PRODUCTS,filterState(new URLSearchParams('q=gift%20card&min=100&budget=250'))).length"),1,'variant range must match gift denomination');
 assert.equal(run("filterProducts(PRODUCTS,filterState(new URLSearchParams('q=8468-7')))[0].itemNumber"),'8468-7');

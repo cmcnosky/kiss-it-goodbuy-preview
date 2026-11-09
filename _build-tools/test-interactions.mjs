@@ -84,7 +84,7 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
   const gift = inventory.products.find((entry) => /gift.?card/i.test(`${entry.sourceProductType || ''} ${entry.title}`));
   assert.ok(gift, 'catalog fixture includes the gift card used by the product-page regression');
   const run = bootStorage({}, new Set(), gift.handle);
-  const markup = run('productPage()');
+  const markup = run('productWithPlanner()');
   const galleryAt = markup.indexOf('class="product-gallery"');
   const purchaseAt = markup.indexOf('class="product-purchase"');
   const descriptionAt = markup.indexOf('class="product-description"');
@@ -211,7 +211,7 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
 
 {
   const run = bootStorage({}, new Set(), product.handle);
-  const markup = run('productPage()');
+  const markup = run('productWithPlanner()');
   assert.match(markup, /data-zoom[^>]+aria-haspopup="dialog" aria-controls="photo-dialog"/,
     'the photograph disclosure identifies the enlargement dialog');
   const escapedTitle = run(`esc(PRODUCTS.find(p=>p.handle===${JSON.stringify(product.handle)}).displayTitle)`);
