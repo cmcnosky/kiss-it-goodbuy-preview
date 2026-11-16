@@ -32,12 +32,12 @@
 
   const DEFAULT_DRAFT = {
     design: {
-      coral: '#e58a78',
-      celadon: '#bfd9b7',
+      coral: '#df7d69',
+      celadon: '#cedbb2',
       ochre: '#edc56b',
-      cream: '#fff9ed',
-      ink: '#2d2927',
-      frame: '#8f2f28',
+      cream: '#fff8ed',
+      ink: '#302c28',
+      frame: '#812c23',
       headingFont: 'Georgia',
       bodyFont: 'Grotesk',
       textScale: 1,
@@ -48,9 +48,9 @@
       imageFit: 'contain'
     },
     content: {
-      heroTitle: 'A home with',
-      heroAccent: 'something to say.',
-      heroIntro: 'Furniture. Art. The unexpected.\nCome find what feels like you.',
+      heroTitle: 'Objects of',
+      heroAccent: 'affection.',
+      heroIntro: 'A sculptural chair. A little sparkle.\nA piece you keep thinking about.',
       phone: '817-481-9754',
       email: 'info@kissitgoodbuy.net',
       address: '201 East Franklin Street',

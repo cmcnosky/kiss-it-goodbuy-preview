@@ -36,7 +36,7 @@
     const variables={coral:'--coral',celadon:'--celadon',ochre:'--ochre',cream:'--cream',ink:'--ink',frame:'--frame'};
     for(const [key,css] of Object.entries(variables))if(/^#[a-f\d]{6}$/i.test(d[key]||''))element.style.setProperty(css,d[key]);
     if(d.cream)element.style.setProperty('--paper',d.cream);
-    if(d.frame)element.style.setProperty('--red',d.frame);
+    if(d.frame)element.style.setProperty('--red',d.frame.toLowerCase()==='#812c23'?'#b54333':d.frame);
     element.style.setProperty('--border-width',(d.borderWidth||5)+'px');
     element.style.setProperty('--studio-text-scale',String(d.textScale||1));
     element.style.setProperty('--studio-columns',String(d.productColumns||3));

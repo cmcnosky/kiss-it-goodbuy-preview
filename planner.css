@@ -6,3 +6,24 @@
 @media print{.utility,.site-header,.store-navigation,.planner-hero,.site-footer,.planner-workspace{display:none!important}.planner-page{background:white!important}.planner-print-summary{display:block!important;padding:24px}}
 .planner-hero{min-height:340px}.planner-hero-copy{padding:48px var(--space)}.planner-hero h1{font-size:clamp(44px,5.5vw,82px);line-height:1;letter-spacing:-.05em}.planner-hero-note strong{font-size:38px}.planner-hero-note p{font-size:15px}.planner-field span{font-size:15px}.planner-field small,.planner-notes small,.planner-save-status{font-size:13px;line-height:1.5}.planner-review p{font-size:14px;line-height:1.55}.planner-confirmed summary{font-size:14px}.planner-confirmed label span,.planner-confirmed small{font-size:12px}.planner-section-heading h2{font-size:clamp(36px,4vw,58px)}
 @media(max-width:640px){.planner-hero-copy{padding:28px var(--space)}.planner-hero h1{font-size:48px;line-height:1;margin:16px 0 20px}.planner-hero-note{padding:18px var(--space)}.planner-hero-note div{padding:18px;box-shadow:6px 6px 0 var(--ochre)}.planner-hero-note strong{font-size:26px;margin:10px 0}.planner-hero-note strong br{display:none}.planner-measurements{gap:24px}.planner-section-heading h2{margin-bottom:16px}.planner-field-grid{grid-template-columns:1fr 1fr;gap:14px}.planner-field small{font-size:12px}.planner-pickup h2{font-size:40px}}
+
+@media screen{
+.planner-hero{background:var(--cream);border-bottom:var(--border-width) solid var(--coral);min-height:420px}
+.planner-hero h1{font-size:clamp(60px,6.5vw,96px);line-height:1.02;letter-spacing:-.05em}
+.planner-hero-note{border-left:1px solid var(--line);padding:38px}
+.planner-hero-note div,.planner-form,.planner-pickup-card{border:1px solid var(--line);border-top:var(--border-width) solid var(--coral);box-shadow:none}
+.planner-hero-note strong{font-size:clamp(34px,3.4vw,49px);line-height:1.08}
+.planner-hero-note p,.planner-section-heading>p:not(.eyebrow){font-size:15px;line-height:1.7}
+.planner-measurements,.planner-selection,.planner-pickup{padding-block:65px}
+.planner-section-heading h2{font-size:clamp(39px,4.2vw,62px);line-height:1.08}
+.planner-form input,.planner-form textarea{border-width:1px;font-size:16px}
+.planner-field small,.planner-notes small,.planner-save-status{font-size:12px;line-height:1.6}
+.planner-piece{border-width:1px;padding:30px}.planner-piece-photo{border:0;background:var(--soft)}
+.planner-piece-photo img{object-fit:contain}.planner-piece-copy h2{font-size:clamp(30px,3vw,43px);line-height:1.15}
+.planner-empty{border-width:1px}.planner-review p{font-size:13px}.planner-pickup-card{padding:32px}
+.planner-pickup h2{font-size:clamp(43px,4.5vw,65px);line-height:1.05}
+}
+@media screen and (max-width:850px){.planner-hero-note{border-left:0;border-top:1px solid var(--line);padding:27px}.planner-measurements,.planner-selection,.planner-pickup{padding-block:42px}}
+@media screen and (max-width:640px){.planner-hero h1{font-size:62px}.planner-hero-note div{box-shadow:none;padding:25px}.planner-form{box-shadow:none;padding:22px}.planner-empty{padding:28px}.planner-pickup-card{box-shadow:none;padding:25px}.planner-section-heading h2{font-size:39px}.planner-pickup h2{font-size:42px}.planner-piece{padding:22px}}
+
+@media screen and (max-width:640px){.planner-hero-note strong br{display:block}}

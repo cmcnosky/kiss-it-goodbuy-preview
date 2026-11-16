@@ -12,17 +12,21 @@ const studioProduct = inventory.products.find(product => product?.handle && prod
 const pages = [
   ['home', '/index.html'],
   ['catalog', '/collection.html'],
+  ['story', '/story.html'],
+  ['consignment', '/consign.html'],
   ['planner', '/planner.html'],
   ['owner studio', '/studio.html'],
   ['practice checkout', '/practice-checkout.html'],
   ['visit', '/visit.html'],
   ['shortlist', '/shortlist.html'],
   ['bag', '/cart.html'],
+  ['generic product', '/product.html'],
   ['product', `/products/${encodeURIComponent(firstProduct.handle)}/`]
 ];
 const viewports = [
   ['phone', { width: 320, height: 812 }],
   ['wide phone', { width: 390, height: 844 }],
+  ['tablet', { width: 768, height: 900 }],
   ['desktop', { width: 1440, height: 1000 }]
 ];
 
@@ -57,6 +61,11 @@ async function auditPage(page) {
     });
     if (brokenLocalImages.length) issues.push(`broken local images: ${brokenLocalImages.map(image => image.getAttribute('src')).join(', ')}`);
     if (!document.querySelector('.site-header, .studio-site-header') || !document.querySelector('main')) issues.push('missing header or main landmark');
+    const brand = document.querySelector('.site-header .wordmark img, .studio-site-header img');
+    const brandBox = brand?.getBoundingClientRect();
+    if (!brand || brand.alt !== 'Kiss It Good Buy — Furniture Consignment' || brand.naturalWidth < 1000 || brand.naturalHeight < 400 || brandBox.width < 80 || brandBox.height < 30) {
+      issues.push('missing, unreadable, or altered header brand artwork');
+    }
     return issues;
   });
 }
@@ -421,7 +430,7 @@ test('Owner Studio commits a field blur before the directly clicked preview acti
   await signInToStudio(page);
 
   const coralPicker = page.locator('[data-color-picker="coral"]');
-  await expect(coralPicker).toHaveValue('#e58a78');
+  await expect(coralPicker).toHaveValue('#df7d69');
   await page.locator('[name="coral"][data-design-field]').fill('#b24d3e');
   await page.locator('[name="coral"][data-design-field]').press('Tab');
   await expect(coralPicker).toHaveValue('#b24d3e');

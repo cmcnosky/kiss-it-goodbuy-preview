@@ -26,3 +26,19 @@
 
 .studio-preview h1,.studio-preview h2,.studio-preview .product-card h3,.studio-preview .product-purchase h1,.studio-preview .practice-order-line{overflow-wrap:anywhere}
 @media(max-width:600px){.studio-site-header{flex-wrap:wrap;justify-content:center;gap:4px}.studio-site-header span{max-width:none;width:100%;font-size:11px;text-align:center;letter-spacing:.05em}.studio-site-header img{flex-shrink:0}}
+
+.studio-site-header{background:var(--cream);color:var(--ink);border-bottom:1px solid var(--line);border-top:6px solid var(--coral)}
+.studio-preview .affection-hero .room-welcome h1{font-family:var(--studio-heading-font);font-size:clamp(60px,calc(7vw * var(--studio-text-scale)),calc(108px * var(--studio-text-scale)))}
+.studio-preview .affection-hero .welcome-action>p{font-size:calc(18px * var(--studio-text-scale))}
+.studio-preview[data-studio-hero="split"] .affection-hero{padding:32px;gap:32px;background:var(--celadon);grid-template-columns:1fr 1fr}
+.studio-preview[data-studio-hero="split"] .affection-hero .room-photograph{grid-column:1;grid-row:1;min-height:600px}
+.studio-preview[data-studio-hero="split"] .affection-hero .room-welcome{grid-column:2;grid-row:1;padding:36px;gap:0}
+.studio-preview[data-studio-hero="editorial"] .affection-hero{display:block;padding:65px var(--space);background:var(--celadon)}
+.studio-preview[data-studio-hero="editorial"] .affection-hero .room-welcome{padding:35px 0;background:transparent;max-width:1000px;margin:auto}
+.studio-preview[data-studio-hero="editorial"] .affection-hero .welcome-action{max-width:740px}
+.studio-preview[data-studio-density="compact"] .gallery-discovery,.studio-preview[data-studio-density="compact"] .affection-editorial{padding-block:35px}
+.studio-preview[data-studio-density="spacious"] .gallery-discovery,.studio-preview[data-studio-density="spacious"] .affection-editorial{padding-block:90px}
+.practice-layout>section,.practice-layout>form{border:1px solid var(--line);border-top:var(--border-width) solid var(--coral)}
+.practice-layout h2{font-size:32px}.practice-layout select{border-width:1px}
+@media(max-width:900px){.studio-preview[data-studio-hero="split"] .affection-hero{grid-template-columns:1fr;padding:23px;gap:0}.studio-preview[data-studio-hero="split"] .affection-hero .room-photograph{grid-column:1;grid-row:1;min-height:330px;max-height:none}.studio-preview[data-studio-hero="split"] .affection-hero .room-welcome{grid-column:1;grid-row:2;padding:30px;min-width:0}}
+@media(max-width:700px){.studio-preview .affection-hero .room-welcome h1{font-size:clamp(46px,calc(19vw * var(--studio-text-scale)),calc(82px * var(--studio-text-scale)))}.studio-preview .affection-hero .welcome-action>p{font-size:calc(17px * var(--studio-text-scale))}.studio-preview[data-studio-hero="editorial"] .affection-hero{padding:30px 23px}}

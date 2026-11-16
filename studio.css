@@ -946,3 +946,30 @@ html.studio-dialog-open body{overflow:hidden}
 @media(max-width:1300px){.studio-login{margin-inline:var(--space)}}@media(max-width:760px){.studio-login{grid-template-columns:1fr;margin:24px var(--space) 55px;box-shadow:7px 7px 0 var(--ochre)}.studio-login-welcome{padding:28px;border-right:0;border-bottom:5px solid var(--frame)}.studio-login-welcome h1{font-size:48px;margin:16px 0 20px}.studio-login-welcome>p:not(.eyebrow){font-size:16px}.studio-login-welcome>span{margin-top:22px;padding-top:16px}.studio-login-card{padding:26px}.studio-login-card h2{font-size:32px}.studio-session{grid-column:1/-1}}
 
 .studio-unsaved{display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:1500px;margin:0 auto 24px;padding:16px 20px;background:#fff0ce;border:2px solid #8f2f28;font-size:14px}.studio-unsaved[hidden]{display:none}.studio-unsaved button{font:inherit;font-weight:700;flex-shrink:0}@media(max-width:600px){.studio-unsaved{align-items:flex-start;flex-direction:column;gap:10px}}
+
+/* Objects of affection: readable, quiet owner controls. */
+.owner-studio{--studio-shadow:none;--studio-rule:1px solid var(--line)}
+.studio-top{background:var(--cream);border-bottom:var(--border-width) solid var(--coral);padding-block:46px}
+.studio-title h1{font-size:clamp(44px,5vw,72px);line-height:1.03;letter-spacing:-.045em}
+.studio-title>p:not(.eyebrow){font-size:17px;line-height:1.7}
+.studio-tabs{box-shadow:none;border-bottom:var(--border-width) solid var(--coral)}
+.studio-tabs button{border-right:1px solid var(--line);font-size:13px}
+.studio-tabs button[aria-current=page]{box-shadow:inset 0 -4px 0 var(--frame)}
+.studio-card{background:var(--cream);box-shadow:none;border:1px solid var(--line);border-top:var(--border-width) solid var(--coral)}
+.studio-panel-heading h2{font-size:clamp(37px,4vw,55px);line-height:1.08;letter-spacing:-.04em}
+.studio-panel-heading>p:not(.eyebrow){font-size:16px;line-height:1.7}
+.studio-preset-grid button{border:1px solid var(--line);padding:18px;background:var(--cream)}
+.studio-preset-grid strong{font-size:14px;line-height:1.5}.studio-preset-grid button:hover{background:var(--celadon)}
+.preset-swatches{border:1px solid var(--frame)}
+.studio-field>span,.studio-save-version label>span,.studio-colors>label>span{font-size:13px}
+.studio-colors input[type=color],.studio-colors input[type=text]{border-width:1px}
+.studio-field input:not([type=range]):not([type=file]),.studio-field select,.studio-field textarea{border-width:1px;font-size:15px}
+.studio-confirm-dialog{border:1px solid var(--frame);border-top:var(--border-width) solid var(--coral);box-shadow:0 18px 70px #302c2833}
+.studio-confirm-card h2{font-size:clamp(34px,5vw,46px);line-height:1.08}.studio-confirm-actions{border-top:1px solid var(--line)}
+.studio-login{max-width:1160px;border:1px solid var(--line);border-top:var(--border-width) solid var(--coral);box-shadow:none}
+.studio-login-welcome{background:var(--cream);border-right:1px solid var(--line)}
+.studio-login-welcome h1{font-size:clamp(48px,5.5vw,76px);line-height:1.05;letter-spacing:-.045em}
+.studio-login-welcome>span{border-top:1px solid var(--line)}.studio-login-card{background:var(--celadon)}
+.studio-login-card input:not([type=checkbox]){border-width:1px;background:var(--cream)}
+.studio-login-card .button{border-width:1px;border-bottom-width:var(--border-width)}
+@media(max-width:760px){.studio-top{padding-block:32px}.studio-title h1{font-size:47px}.studio-title>p:not(.eyebrow){font-size:16px}.studio-tabs button{font-size:12px}.studio-login{box-shadow:none}.studio-login-welcome{border-right:0;border-bottom:1px solid var(--line)}.studio-login-welcome h1{font-size:48px}.studio-login-card{padding:26px}.studio-login-card h2{font-size:32px}}

@@ -41,13 +41,13 @@ const Studio = require('../dist/studio-state.js');
 assert.ok(Studio, 'KIGBStudioState loads');
 assert.equal(Studio.STORAGE_KEY, 'kigb-owner-studio-v1');
 assert.equal(Studio.read().active, false);
-assert.equal(Studio.read().draft.design.coral, '#e58a78');
+assert.equal(Studio.read().draft.design.coral, '#df7d69');
 assert.equal(Studio.getStatus().persisted, true);
 assert.equal(storage.getItem(Studio.STORAGE_KEY), null, 'loading the helper does not write visitor storage');
 
 const defaults = Studio.defaults();
 defaults.design.coral = '#000000';
-assert.equal(Studio.defaults().design.coral, '#e58a78', 'defaults returns a defensive copy');
+assert.equal(Studio.defaults().design.coral, '#df7d69', 'defaults returns a defensive copy');
 
 let subscriberCalls = 0;
 const unsubscribe = Studio.subscribe((_state, status, reason) => {

@@ -26,7 +26,7 @@
 
   const TABS=['design','content','inventory','versions','orders','activity'];
   const PRESETS={
-    original:{label:'Gallery original',design:{coral:'#e58a78',celadon:'#bfd9b7',ochre:'#edc56b',cream:'#fff9ed',ink:'#2d2927',frame:'#8f2f28'}},
+    original:{label:'Objects of affection',design:{coral:'#df7d69',celadon:'#cedbb2',ochre:'#edc56b',cream:'#fff8ed',ink:'#302c28',frame:'#812c23'}},
     collected:{label:'Collected color',design:{coral:'#de755f',celadon:'#b9d8c0',ochre:'#f0c65e',cream:'#fff8e9',ink:'#282321',frame:'#873228'}},
     twilight:{label:'Gallery twilight',design:{coral:'#c77468',celadon:'#a8c9b7',ochre:'#dcb35d',cream:'#f7f0df',ink:'#27252d',frame:'#633445'}},
     mineral:{label:'Mineral & linen',design:{coral:'#cf806f',celadon:'#b7c9b9',ochre:'#d5b56c',cream:'#faf5e9',ink:'#292c2c',frame:'#6f4139'}}
