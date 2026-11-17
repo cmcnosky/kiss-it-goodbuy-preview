@@ -960,6 +960,8 @@ html.studio-dialog-open body{overflow:hidden}
 .studio-panel-heading>p:not(.eyebrow){font-size:16px;line-height:1.7}
 .studio-preset-grid button{border:1px solid var(--line);padding:18px;background:var(--cream)}
 .studio-preset-grid strong{font-size:14px;line-height:1.5}.studio-preset-grid button:hover{background:var(--celadon)}
+.studio-preset-grid button[aria-pressed="true"]{border-color:var(--frame);background:var(--celadon);box-shadow:inset 0 -4px 0 var(--frame)}
+.studio-preset-status{display:inline-block;margin-top:10px;padding:4px 8px;background:var(--frame);color:var(--cream);font:700 10px/1.2 Mono,monospace;letter-spacing:.06em;text-transform:uppercase}
 .preset-swatches{border:1px solid var(--frame)}
 .studio-field>span,.studio-save-version label>span,.studio-colors>label>span{font-size:13px}
 .studio-colors input[type=color],.studio-colors input[type=text]{border-width:1px}

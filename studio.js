@@ -148,13 +148,31 @@
     </aside>`;
   }
 
+  function presetMatches(design,preset){
+    return Object.entries(preset.design).every(([name,value])=>String(design[name]).toLowerCase()===String(value).toLowerCase());
+  }
+
+  function refreshPresetStates(host,design){
+    for(const button of host.querySelectorAll('[data-preset]')){
+      const active=presetMatches(design,PRESETS[button.dataset.preset]);
+      button.setAttribute('aria-pressed',String(active));
+      const status=button.querySelector('.studio-preset-status');
+      if(active&&!status)button.insertAdjacentHTML('beforeend','<span class="studio-preset-status">Current palette</span>');
+      else if(!active)status?.remove();
+    }
+  }
+
   function designPanel(state){
     const design=state.draft.design;
     const colors=[['coral','Coral'],['celadon','Celadon'],['ochre','Ochre'],['cream','Cream'],['ink','Ink'],['frame','Frame']];
     const select=(name,label,options)=>`<label class="studio-field"><span>${label}</span><select name="${name}" data-design-field>${options.map(([value,text])=>`<option value="${value}" ${design[name]===value?'selected':''}>${text}</option>`).join('')}</select></label>`;
+    const presets=Object.entries(PRESETS).map(([id,preset])=>{
+      const active=presetMatches(design,preset);
+      return `<button type="button" data-preset="${id}" aria-pressed="${active}"><span class="preset-swatches">${Object.values(preset.design).slice(0,4).map(color=>`<i style="background:${color}"></i>`).join('')}</span><strong>${preset.label}</strong>${active?'<span class="studio-preset-status">Current palette</span>':''}</button>`;
+    }).join('');
     return `<section class="studio-panel design-panel" aria-labelledby="design-title">
       <div class="studio-panel-heading"><p class="eyebrow">Design</p><h2 id="design-title">Shape the feeling.</h2><p>Start with a complete palette, then tune type, spacing, borders, photography, and the home-page composition.</p></div>
-      <div class="studio-preset-grid">${Object.entries(PRESETS).map(([id,preset])=>`<button type="button" data-preset="${id}"><span class="preset-swatches">${Object.values(preset.design).slice(0,4).map(color=>`<i style="background:${color}"></i>`).join('')}</span><strong>${preset.label}</strong></button>`).join('')}</div>
+      <div class="studio-preset-grid">${presets}</div>
       <div class="studio-design-grid">
         <fieldset class="studio-card"><legend>Color palette</legend><div class="studio-colors">${colors.map(([name,label])=>`<label><span>${label}</span><div><input type="color" value="${design[name]}" data-color-picker="${name}" aria-label="Choose ${label} color"><input type="text" name="${name}" value="${design[name]}" pattern="#[0-9A-Fa-f]{6}" maxlength="7" data-design-field aria-label="${label} hex color"></div></label>`).join('')}</div></fieldset>
         <fieldset class="studio-card"><legend>Type & rhythm</legend><div class="studio-control-grid">
@@ -319,6 +337,7 @@
           field.value=String(draft.design[field.name]);
           const output=field.parentElement.querySelector('output');if(output)output.value=field.value+(field.name==='borderWidth'?'px':'×');
         }
+        refreshPresetStates(host,draft.design);
         if(preview)preview.outerHTML=previewMarkup(draft);
       }
       return true;
@@ -518,7 +537,7 @@
       }
       const tab=event.target.closest('[data-studio-tab]');if(tab){if(requireSavedEntries())setTab(tab.dataset.studioTab);return;}
       if(event.target.closest('[data-load-products],[data-reset-product],[data-delete-custom]')&&!requireSavedEntries())return;
-      const preset=event.target.closest('[data-preset]');if(preset){action(()=>stateApi().updateDraft({design:PRESETS[preset.dataset.preset].design}),PRESETS[preset.dataset.preset].label+' applied.');return;}
+      const preset=event.target.closest('[data-preset]');if(preset){action(()=>stateApi().updateDraft({design:PRESETS[preset.dataset.preset].design}),PRESETS[preset.dataset.preset].label+' palette applied.');return;}
       if(event.target.closest('[data-preview-store]')){activateAndNavigate(true);return;}
       if(event.target.closest('[data-return-original]')){activateAndNavigate(false);return;}
       if(event.target.closest('[data-undo]')){action(()=>stateApi().undo(),'Last Studio change undone.');return;}

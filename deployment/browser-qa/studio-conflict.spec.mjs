@@ -9,6 +9,53 @@ async function signIn(page) {
   await expect(page.locator('#studio-content-form')).toBeVisible();
 }
 
+async function signInToDesign(page) {
+  await page.goto('/studio.html');
+  await page.locator('[name="username"]').fill('Chelsea');
+  await page.locator('[name="password"]').fill('Chelsea');
+  await page.getByRole('button', { name: 'Log in', exact: true }).click();
+  await expect(page.locator('.design-panel')).toBeVisible();
+}
+
+test('palette choices identify the current saved palette after selection and reload', async ({ page }) => {
+  await page.goto('/studio.html');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await signInToDesign(page);
+
+  const original = page.locator('[data-preset="original"]');
+  const collected = page.locator('[data-preset="collected"]');
+  await expect(original).toHaveAttribute('aria-pressed', 'true');
+  await expect(original).toContainText('Current palette');
+  await expect(collected).toHaveAttribute('aria-pressed', 'false');
+
+  await collected.click();
+  await expect(collected).toHaveAttribute('aria-pressed', 'true');
+  await expect(collected).toContainText('Current palette');
+  await expect(original).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('.studio-message')).toContainText('Collected color palette applied.');
+
+  await page.reload();
+  await expect(collected).toHaveAttribute('aria-pressed', 'true');
+  await expect(collected).toContainText('Current palette');
+
+  await page.locator('[data-studio-tab="versions"]').click();
+  await page.locator('#studio-version-form [name="name"]').fill('Collected palette checkpoint');
+  await page.locator('#studio-version-form button[type="submit"]').click();
+  await page.locator('[data-studio-tab="design"]').click();
+  await page.locator('[data-preset="twilight"]').click();
+  await page.locator('[data-studio-tab="versions"]').click();
+  await page.locator('[data-restore-version]').click();
+  await page.locator('[data-studio-tab="design"]').click();
+  await expect(collected).toHaveAttribute('aria-pressed', 'true');
+  await expect(collected).toContainText('Current palette');
+
+  const coral = page.locator('[name="coral"][data-design-field]');
+  await coral.fill('#c95747');
+  await coral.press('Tab');
+  await expect(page.locator('[data-preset][aria-pressed="true"]')).toHaveCount(0);
+});
+
 test('two owner tabs merge unrelated content and offer explicit same-field choices', async ({ context, page }) => {
   await page.goto('/studio.html');
   await page.evaluate(() => localStorage.clear());
