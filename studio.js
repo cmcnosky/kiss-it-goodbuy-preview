@@ -35,7 +35,7 @@
   let unsubscribe=null;
   let mounted=false;
   let pendingConfirm=null;
-  const ui={tab:'design',search:'',message:'',messageKind:'status',inventoryPage:1,loginMessage:''};
+  const ui={tab:'design',search:'',message:'',messageKind:'status',inventoryPage:1,loginMessage:'',contentConflict:null,contentExpected:{}};
 
   const escape=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const money=cents=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format((Number(cents)||0)/100);
@@ -66,6 +66,40 @@
       else if(field.tagName==='SELECT')for(const option of field.options)option.defaultSelected=option.selected;
       else if('defaultValue' in field)field.defaultValue=field.value;
     }
+  }
+  function changedContent(form){
+    const changes={},expected={};
+    for(const field of form.elements){
+      if(!field.name||field.disabled||field.type==='file')continue;
+      const value=field.type==='checkbox'||field.type==='radio'?(field.checked?field.value:''):field.value;
+      const baseline=field.type==='checkbox'||field.type==='radio'?(field.defaultChecked?field.value:''):field.defaultValue;
+      if(value!==baseline){changes[field.name]=value;expected[field.name]=baseline;}
+    }
+    return {changes,expected};
+  }
+  const contentLabels={heroTitle:'Opening line',heroAccent:'Emphasized line',heroIntro:'Introduction',phone:'Phone',email:'Email',address:'Street address',city:'City, state and ZIP'};
+  function refreshContentConflict(){
+    const box=root.document?.querySelector('[data-content-conflict]'),conflict=ui.contentConflict;
+    if(!box)return;
+    box.hidden=!conflict;
+    if(!conflict)return;
+    const form=root.document.querySelector('#studio-content-form'),field=form?.elements?.namedItem(conflict.field);
+    box.querySelector('[data-conflict-title]').textContent=`${contentLabels[conflict.field]||conflict.field} changed in another tab.`;
+    box.querySelector('[data-conflict-mine]').textContent=field?.value||'';
+    box.querySelector('[data-conflict-saved]').textContent=conflict.savedValue||'';
+  }
+  function contentConflict(error,form){
+    if(error?.code!=='STALE_CONTENT'||!error.details?.field)return false;
+    const field=error.details.field;
+    delete ui.contentExpected[field];
+    ui.contentConflict={field,savedValue:current().draft.content[field]};ui.message=error.message;ui.messageKind='error';refreshFeedback();
+    form?.querySelector('[data-content-conflict]')?.scrollIntoView?.({block:'nearest'});
+    return true;
+  }
+  function saveContentForm(form,success){
+    const {changes,expected}=changedContent(form);
+    for(const [field,value] of Object.entries(ui.contentExpected))if(Object.hasOwn(changes,field))expected[field]=value;
+    action(()=>{stateApi().updateContent(changes,expected);ui.contentConflict=null;ui.contentExpected={};},Object.keys(changes).length?success:'Your words and contact details are already saved.',{form,onError:error=>contentConflict(error,form)});
   }
   function statusText(){
     const status=stateApi().getStatus();
@@ -146,6 +180,12 @@
     return `<section class="studio-panel content-panel" aria-labelledby="content-title">
       <div class="studio-panel-heading"><p class="eyebrow">Words & contact</p><h2 id="content-title">Sound like the gallery.</h2><p>Edit the most visible welcome and contact details. These changes appear only in Owner Studio preview mode.</p></div>
       <form id="studio-content-form" class="studio-card studio-content-form">
+        <section class="studio-content-conflict" data-content-conflict role="alert" hidden>
+          <h3 data-conflict-title></h3>
+          <p>Choose the value to keep. Your other unsaved fields will stay in the form.</p>
+          <div class="studio-conflict-values"><div><span>Your entry</span><strong data-conflict-mine></strong></div><div><span>Newer saved entry</span><strong data-conflict-saved></strong></div></div>
+          <div class="studio-conflict-actions"><button class="button outline" type="button" data-content-use-saved>Use newer saved value</button><button class="button red" type="button" data-content-use-mine>Keep my entry</button></div>
+        </section>
         <fieldset><legend>Home-page welcome</legend>
           ${input('heroTitle','Opening line',c.heroTitle)}
           ${input('heroAccent','Emphasized line',c.heroAccent)}
@@ -260,6 +300,7 @@
     const message=host.querySelector('.studio-message');
     if(message){message.className='studio-message '+ui.messageKind;message.textContent=ui.message;message.hidden=!ui.message;}
     const pending=host.querySelector('.studio-unsaved');if(pending)pending.hidden=!hasUnsavedEntries();
+    refreshContentConflict();
   }
   function requireSavedEntries(){
     if(!hasUnsavedEntries())return true;
@@ -296,7 +337,7 @@
   }
 
   function show(message,kind='status'){ui.message=message;ui.messageKind=kind;renderApp();}
-  function action(work,success,{form,keepDesignControls=false}={}){
+  function action(work,success,{form,keepDesignControls=false,onError}={}){
     ui.keepDesignControls=keepDesignControls;
     try{
       if(!signedIn())throw new Error('Sign in to Owner Studio to make changes.');
@@ -304,7 +345,7 @@
       ui.mutating=true;work();markFormSaved(form);ui.mutating=false;
       const persisted=stateApi().getStatus().persisted;ui.message=persisted?(success||''):'Change kept for this visit only. Browser storage could not save it. Export a backup before closing or reloading.';ui.messageKind=persisted?'status':'error';renderApp();
     }
-    catch(error){ui.mutating=false;show(error?.message||'That change could not be saved.','error');}
+    catch(error){ui.mutating=false;if(onError?.(error)!==true)show(error?.message||'That change could not be saved.','error');}
     finally{ui.keepDesignControls=false;ui.mutating=false;}
   }
 
@@ -437,7 +478,7 @@
   }
 
   function signOut(){
-    setSignedIn(false);root.clearTimeout(ui.searchTimer);ui.message='';
+    setSignedIn(false);root.clearTimeout(ui.searchTimer);ui.message='';ui.contentConflict=null;ui.contentExpected={};
     const warnings=[];
     if(sessionInMemory)warnings.push('Signed out on this page. Session storage could not be cleared; close this tab to finish signing out.');
     try{
@@ -459,7 +500,22 @@
       if(event.target.closest('[data-confirm-accept]')){await acceptConfirm();return;}
       if(pendingConfirm&&!event.target.closest('#studio-confirm-dialog')){event.preventDefault();return;}
       const discard=event.target.closest('[data-discard-edits]');
-      if(discard){openConfirm({title:'Discard unsaved entries?',copy:'Only entries you have not saved in the current section will be discarded. Saved changes remain.',actionLabel:'Discard unsaved entries',trigger:discard,restoreSelector:'[aria-current="page"]',work:()=>{host.querySelectorAll(editableForms).forEach(form=>form.reset());ui.message='Unsaved entries discarded.';ui.messageKind='status';renderApp();}});return;}
+      if(discard){openConfirm({title:'Discard unsaved entries?',copy:'Only entries you have not saved in the current section will be discarded. Saved changes remain.',actionLabel:'Discard unsaved entries',trigger:discard,restoreSelector:'[aria-current="page"]',work:()=>{host.querySelectorAll(editableForms).forEach(form=>form.reset());ui.contentConflict=null;ui.contentExpected={};ui.message='Unsaved entries discarded.';ui.messageKind='status';renderApp();}});return;}
+      const useSaved=event.target.closest('[data-content-use-saved]');
+      if(useSaved&&ui.contentConflict){
+        const form=host.querySelector('#studio-content-form'),conflict=ui.contentConflict,field=form?.elements?.namedItem(conflict.field),saved=conflict.savedValue,latest=current().draft.content[conflict.field];
+        if(latest!==saved){ui.contentConflict={field:conflict.field,savedValue:latest};ui.message='A still newer saved value arrived. Review the updated comparison before choosing.';ui.messageKind='error';refreshFeedback();return;}
+        if(field){field.value=saved;field.defaultValue=saved;}
+        delete ui.contentExpected[conflict.field];ui.contentConflict=null;
+        if(form.reportValidity())saveContentForm(form,'The newer saved value was kept with your other unsaved changes.');else{ui.message='The newer saved value is in the form. Correct the highlighted field before saving your other entries.';ui.messageKind='error';refreshFeedback();}return;
+      }
+      const useMine=event.target.closest('[data-content-use-mine]');
+      if(useMine&&ui.contentConflict){
+        const form=host.querySelector('#studio-content-form');
+        if(!form.reportValidity())return;
+        const conflict=ui.contentConflict;ui.contentExpected[conflict.field]=conflict.savedValue;ui.contentConflict=null;
+        saveContentForm(form,'Your entry was saved with the other unsaved changes.');return;
+      }
       const tab=event.target.closest('[data-studio-tab]');if(tab){if(requireSavedEntries())setTab(tab.dataset.studioTab);return;}
       if(event.target.closest('[data-load-products],[data-reset-product],[data-delete-custom]')&&!requireSavedEntries())return;
       const preset=event.target.closest('[data-preset]');if(preset){action(()=>stateApi().updateDraft({design:PRESETS[preset.dataset.preset].design}),PRESETS[preset.dataset.preset].label+' applied.');return;}
@@ -541,7 +597,7 @@
         return;
       }
       if(!signedIn()){renderApp();return;}
-      if(form.id==='studio-content-form'){const data=Object.fromEntries(new root.FormData(form).entries());action(()=>stateApi().updateDraft({content:data}),'Words and contact details saved.',{form});return;}
+      if(form.id==='studio-content-form'){saveContentForm(form,'Words and contact details saved.');return;}
       if(form.id==='studio-version-form'){const name=String(new root.FormData(form).get('name')||'').trim();action(()=>stateApi().saveVersion(name),'Version saved.');return;}
       if(form.matches('[data-product-form]')){
         const handle=form.dataset.productForm,product=baseProducts().find(item=>item.handle===handle);if(!product)return;

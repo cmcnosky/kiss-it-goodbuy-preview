@@ -101,6 +101,19 @@
     return { raw: winner.raw, labelStatus: winner.labelStatus, source: 'title' };
   }
 
+  function accurateTitle(product) {
+    const sourceTitle = stringValue(product?.title).trim();
+    const displayedTitle = stringValue(product?.displayTitle ?? sourceTitle).trim() || sourceTitle;
+    if (!sourceTitle || displayedTitle !== sourceTitle) return displayedTitle;
+    const description = stringValue(product?.description).trim()
+      || plainHtmlText(product?.sourceHtml ?? product?.body_html ?? '');
+    const descriptionLead = description.split(/\n+/).map(value => value.trim()).find(Boolean) || '';
+    if (!descriptionLead.startsWith(sourceTitle)) return displayedTitle;
+    const completion = descriptionLead.slice(sourceTitle.length);
+    const hasExplicitCondition = /\b(?:AS IS|LIKE NEW|NEW)\s*$/i.test(descriptionLead);
+    return /^[A-Za-z]{1,3}$/.test(completion) && hasExplicitCondition ? descriptionLead : displayedTitle;
+  }
+
   function moneyToCents(value) {
     if (value == null || value === '') return null;
     const cleaned = stringValue(value).trim().replace(/^\$/, '').replace(/,/g, '');
@@ -226,6 +239,7 @@
     STORE_URL,
     sanitizeSourceHtml,
     plainHtmlText,
+    accurateTitle,
     extractDimensions,
     moneyToCents,
     normalizeProduct,

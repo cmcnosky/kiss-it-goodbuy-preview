@@ -7,6 +7,10 @@ function writeRenderedFile(file,content){const temporary=file+'.render-tmp';fs.w
 const flag=process.argv.indexOf('--dist');
 const dist=flag>=0?path.resolve(process.argv[flag+1]):path.resolve(import.meta.dirname,'../dist');
 const inventory=JSON.parse(fs.readFileSync(path.join(dist,'inventory.json'),'utf8'));
+const catalogContext={URL};
+catalogContext.window=catalogContext;
+vm.runInNewContext(fs.readFileSync(path.join(dist,'catalog-normalize.js'),'utf8'),catalogContext);
+const productTitle=product=>catalogContext.KIGBCatalog.accurateTitle(product);
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const encode=x=>JSON.stringify(x).replaceAll('<','\\u003c').replaceAll('>','\\u003e').replaceAll('&','\\u0026');
 writeRenderedFile(path.join(dist,'inventory.js'),'window.KIGB_INVENTORY='+encode(inventory)+';\n');
@@ -20,7 +24,7 @@ const setup=['catalog-normalize.js','catalog.js','commerce.js','checkout-recover
 function render(url,product){const context={location:new URL(url,'https://cmcnosky.github.io'),URL,URLSearchParams,Intl,Date,localStorage:{getItem:()=>null},KIGB_INVENTORY:inventory,KIGB_PRODUCT_HANDLE:product?.handle};context.window=context;const result=vm.runInNewContext(setup+'\n'+prefix+'\npageHtml()',context);assert.equal((result.match(/<h1[\s>]/g)||[]).length,1,'Exactly one H1 on '+url);return result;}
 const siteUrl='https://cmcnosky.github.io/kiss-it-goodbuy-preview/';
 // Give preview artwork an immutable content-based URL without changing the shared page URL.
-const previewBytes=fs.readFileSync(path.join(dist,'assets/social-preview-kiss-it-good-buy-v13.png'));
+const previewBytes=fs.readFileSync(path.join(dist,'assets/social-preview-kiss-it-good-buy-v14.png'));
 const previewHash=createHash('sha256').update(previewBytes).digest('hex').slice(0,16);
 const previewPath='assets/kiss-it-good-buy-gallery-'+previewHash+'.png';
 writeRenderedFile(path.join(dist,previewPath),previewBytes);
@@ -30,7 +34,8 @@ function html(body,{base='./',title,description,product,pagePath=''}={}){
 const pageUrl=siteUrl+pagePath;
 const photo=product?.images[0];
 const image=photo?.src||siteUrl+previewPath;
-const imageAlt=photo?.src?(photo.alt||product.title):'Kiss It Good Buy Furniture Consignment, with its original red lipstick kiss, Objects of affection lettering, and crystal lighting from the gallery archive.';
+const suppliedImageAlt=String(photo?.alt||'').trim();
+const imageAlt=photo?.src?(!suppliedImageAlt||suppliedImageAlt===product.title?productTitle(product):suppliedImageAlt):'Kiss It Good Buy Furniture Consignment, with its original red lipstick kiss, Objects of affection lettering, and crystal lighting from the gallery archive.';
 const width=photo?.src?photo.width:1200;
 const height=photo?.src?photo.height:630;
 const imageType=photo?.src?({jpg:'image/jpeg',jpeg:'image/jpeg',png:'image/png',webp:'image/webp'}[new URL(image).pathname.split('.').pop().toLowerCase()]):'image/png';
@@ -42,7 +47,7 @@ for(const [name,[title,description]] of Object.entries(pages))writeRenderedFile(
 fs.mkdirSync(path.join(dist,'products'),{recursive:true});
 const handles=new Set(inventory.products.map(p=>p.handle));
 for(const name of fs.readdirSync(path.join(dist,'products')))if(!handles.has(name))fs.rmSync(path.join(dist,'products',name),{recursive:true,force:true});
-for(const product of inventory.products){assert.match(product.handle,/^[a-z0-9][a-z0-9-]*$/);const dir=path.join(dist,'products',product.handle);fs.mkdirSync(dir,{recursive:true});writeRenderedFile(path.join(dir,'index.html'),html(render('/products/'+product.handle+'/',product),{base:'../../',title:product.title,description:product.description.replace(/\s+/g,' ').slice(0,200),product,pagePath:'products/'+product.handle+'/'}));}
+for(const product of inventory.products){assert.match(product.handle,/^[a-z0-9][a-z0-9-]*$/);const dir=path.join(dist,'products',product.handle);fs.mkdirSync(dir,{recursive:true});writeRenderedFile(path.join(dir,'index.html'),html(render('/products/'+product.handle+'/',product),{base:'../../',title:productTitle(product),description:product.description.replace(/\s+/g,' ').slice(0,200),product,pagePath:'products/'+product.handle+'/'}));}
 for(const url of ['/','/index','/index/','/collection','/collection/','/kiss-it-goodbuy-preview/','/cart','/shortlist'])render(url);
 const allFiles=[...Object.keys(pages).map(x=>path.join(dist,x+'.html')),...inventory.products.map(p=>path.join(dist,'products',p.handle,'index.html'))];
 let refs=0;

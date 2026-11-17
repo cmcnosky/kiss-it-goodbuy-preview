@@ -7,6 +7,7 @@ const root = path.resolve(import.meta.dirname, '..');
 const dist = path.join(root, 'dist');
 const app = fs.readFileSync(path.join(dist, 'app.js'), 'utf8');
 const inventory = JSON.parse(fs.readFileSync(path.join(dist, 'inventory.json'), 'utf8'));
+const catalogNormalize = fs.readFileSync(path.join(dist, 'catalog-normalize.js'), 'utf8');
 const commerce = fs.readFileSync(path.join(dist, 'commerce.js'), 'utf8');
 const renderer = fs.readFileSync(path.join(root, 'scripts', 'render-pages.mjs'), 'utf8');
 const prefix = app.slice(0, app.indexOf('// BROWSER START'));
@@ -44,7 +45,7 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
   };
   context.window = context;
   vm.createContext(context);
-  vm.runInContext(`${commerce}\n${prefix}`, context);
+  vm.runInContext(`${catalogNormalize}\n${commerce}\n${prefix}`, context);
   return (code) => vm.runInContext(code, context);
 }
 
@@ -217,6 +218,46 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
   const escapedTitle = run(`esc(PRODUCTS.find(p=>p.handle===${JSON.stringify(product.handle)}).displayTitle)`);
   assert.ok(markup.includes(`data-save="${product.handle}" aria-pressed="false" aria-label="Save ${escapedTitle}"`),
     'the product-page shortlist control keeps its item-specific accessible name after a rerender');
+  assert.equal(run(`KIGBCatalog.accurateTitle({title:'Pendant AS I',displayTitle:'Pendant AS I',description:'Pendant AS IS\\n\\nBrand = Vintage'})`), 'Pendant AS IS',
+    'a narrowly cut-off source title is completed from the matching listing description');
+  assert.equal(run(`KIGBCatalog.accurateTitle({title:'Original title',displayTitle:'Owner-edited title',description:'Original title with more detail'})`), 'Owner-edited title',
+    'a deliberate display-title edit is never replaced by source-description text');
+  assert.equal(run(`presentProducts([{...PRODUCTS[0],title:'Owner AS I',description:'Owner AS IS',_studioEditedTitle:true}])[0].displayTitle`), 'Owner AS I',
+    'the studio edit marker keeps an owner title authoritative even when source text resembles a completion');
+  assert.equal(run(`KIGBCatalog.accurateTitle({title:'Table AS I',displayTitle:'Table AS I',description:'Table AS IF made for this room'})`), 'Table AS I',
+    'description text is not used unless it explicitly completes a recognized condition phrase');
+  assert.equal(run(`statedProductCondition({displayTitle:KIGBCatalog.accurateTitle({title:'Pendant AS I',displayTitle:'Pendant AS I',description:'Pendant AS IS'})})`), 'AS IS',
+    'explicit listing condition is retained after source-title reconciliation');
+}
+
+{
+  const run = bootStorage({}, new Set(), product.handle);
+  run(`{const piece=PRODUCTS.find(p=>p.handle===${JSON.stringify(product.handle)});piece.displayTitle='Owner-edited gallery title';piece.images[0].alt=piece.exactTitle;}`);
+  const card = run(`productCard(PRODUCTS.find(p=>p.handle===${JSON.stringify(product.handle)}))`);
+  const detail = run('productWithPlanner()');
+  assert.match(card, /alt="Owner-edited gallery title"/,
+    'owner-edited titles propagate to catalog image alternatives');
+  assert.match(card, />Owner-edited gallery title<\/a>/,
+    'owner-edited titles propagate to catalog card text');
+  assert.match(detail, /<h1>Owner-edited gallery title<\/h1>/,
+    'owner-edited titles propagate to the product heading');
+  assert.match(detail, /aria-label="Enlarge photograph of Owner-edited gallery title"/,
+    'owner-edited titles propagate to product-gallery controls');
+  assert.match(detail, /id="main-product-image"[^>]+alt="Owner-edited gallery title"/,
+    'owner-edited titles replace title-like source alternatives on the product image');
+}
+
+{
+  const gift = inventory.products.find((entry) => /gift.?card/i.test(`${entry.sourceProductType || ''} ${entry.title}`));
+  assert.ok(gift, 'catalog fixture includes a gift card');
+  const run = bootStorage({}, new Set(), gift.handle);
+  const markup = run('productWithPlanner()');
+  assert.equal((markup.match(/class="piece-question"/g) || []).length, 1,
+    'gift-card pages retain one item-specific inquiry panel');
+  assert.match(markup, /Questions about the gift card\?/,
+    'the gift-card inquiry panel uses gift-specific language');
+  assert.equal((markup.match(/id="gift-personalize-link"/g) || []).length, 1,
+    'gift-card pages retain one recipient-personalization path');
 }
 
 const interactionStart = app.indexOf('// INTERACTION STATE START');

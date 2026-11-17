@@ -791,6 +791,110 @@ img.main-product-image {
   .newsletter-form small { grid-column: auto; }
 }
 
+/* Mobile catalog refinement ------------------------------------------------
+   Keep high-value discovery controls visible, make active filters obvious,
+   and give each object enough room to judge on a phone. */
+.catalog-page .catalog-quick-browse {
+  margin: 2px 0 18px;
+}
+
+
+
+.catalog-page .catalog-quick-browse .collection-chips {
+  margin-bottom: 0;
+}
+
+.catalog-page .catalog-search-button .icon {
+  width: 17px;
+  height: 17px;
+}
+
+@media (max-width: 640px) {
+  body:has(.catalog-page) .store-navigation {
+    display: none;
+  }
+
+  .catalog-page .catalog-quick-browse .collection-chips {
+    display: flex;
+    margin-inline: calc(var(--space) * -1);
+    padding-inline: var(--space);
+    padding-bottom: 10px;
+    scroll-padding-inline: var(--space);
+  }
+
+  .catalog-page .catalog-quick-browse .collection-chips::after {
+    content: "";
+    flex: 0 0 calc(var(--space) - 7px);
+  }
+
+  .catalog-page .catalog-search-button {
+    width: 52px;
+    min-width: 52px;
+    padding-inline: 12px;
+  }
+
+  .catalog-page .catalog-search-button > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .catalog-page .filter-toggle {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 420px) {
+  .catalog-page .shop-layout {
+    padding-inline: 16px;
+  }
+
+  .catalog-page .catalog-quick-browse .collection-chips {
+    margin-inline: -16px;
+    padding-inline: 16px;
+  }
+
+  .catalog-page .shop-main .product-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 50px;
+  }
+
+  .catalog-page .shop-main .product-title {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+
+  .catalog-page .shop-main .object-tag {
+    display: flex;
+  }
+
+  .catalog-page .shop-main .object-tag span {
+    display: inline;
+    font-size: 10px;
+  }
+
+  .catalog-page .shop-main .card-dimensions {
+    font-size: 13px;
+  }
+
+  .catalog-page .shop-main .price {
+    font-size: 22px;
+  }
+
+  .catalog-page .shop-main .card-add {
+    min-height: 50px;
+    padding-inline: 15px;
+    font-size: 13px;
+  }
+
+  .catalog-page .shop-main .save {
+    width: 44px;
+    height: 44px;
+  }
+}
+
 @media (max-width: 380px) {
   .wordmark { width: 84px; }
   .header-actions .account-link,

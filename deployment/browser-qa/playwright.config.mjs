@@ -5,7 +5,7 @@ const buildRoot = path.resolve(process.env.KIGB_BROWSER_QA_ROOT || '../../.build
 
 export default defineConfig({
   testDir: '.',
-  testMatch: 'storefront.spec.mjs',
+  testMatch: ['storefront.spec.mjs', 'studio-conflict.spec.mjs'],
   timeout: 30000,
   expect: { timeout: 8000 },
   fullyParallel: false,

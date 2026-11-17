@@ -961,3 +961,32 @@ test('Owner Studio stays in place when browser storage cannot persist preview mo
   await expect(page.locator('.studio-message.error')).toContainText('cross-page preview cannot open reliably');
   await expect(page.locator('.studio-persistence')).toContainText('Browser storage is unavailable');
 });
+
+
+test('a consignment inquiry typed during startup stays in its form and off the URL', async ({ page }) => {
+  let start;
+  const boot = new Promise(resolve => { start = resolve; });
+  await page.route('**/app.js*', async route => {
+    await boot;
+    await route.continue();
+  });
+  try {
+    await page.goto('/consign.html', { waitUntil: 'commit' });
+    await page.getByLabel('Your name').fill('Sample seller');
+    await page.locator('#item-category').selectOption({ label: 'Seating' });
+    await page.locator('#item-description').fill('Oak chair');
+    await page.locator('#item-condition').selectOption({ index: 1 });
+    await page.locator('#item-notes').fill('One mark on the back.');
+    await expect(page.getByRole('button', { name: 'Prepare my email' })).toBeDisabled();
+    await page.locator('#item-description').press('Enter');
+    await expect(page).toHaveURL(/consign\.html$/);
+  } finally {
+    start();
+  }
+  await page.waitForLoadState('load');
+  await expect(page.locator('#item-description')).toBeFocused();
+  await page.getByRole('button', { name: 'Prepare my email' }).click();
+  await expect(page.locator('#email-body')).toHaveValue(/Oak chair/);
+  await expect(page.locator('#email-body')).toHaveValue(/One mark on the back/);
+  await expect(page).toHaveURL(/consign\.html$/);
+});

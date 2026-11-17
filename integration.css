@@ -635,3 +635,142 @@ body{background:var(--cream);color:var(--ink)}
 @media(max-width:380px){.location-placard{padding:20px;grid-template-columns:minmax(0,1fr)}.location-placard strong{font-size:49px;overflow-wrap:anywhere}.location-placard>span,.location-placard>a{min-width:0;overflow-wrap:anywhere}}
 
 @media(max-width:380px){.location-placard .placard-arrow{display:none}}
+
+/* Product details: make photographs and pre-purchase questions easier to use. */
+.product-photo-nav{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:16px;
+ min-height:51px;
+ margin-top:10px;
+ padding:6px 0 6px 2px;
+ border-bottom:1px solid var(--line);
+ color:var(--muted);
+ font-size:12px;
+}
+.product-photo-nav>div{display:flex;gap:6px}
+.product-photo-nav .icon-button{
+ width:42px;
+ min-width:42px;
+ height:42px;
+ border:1px solid var(--line);
+ background:var(--cream);
+ color:var(--ink);
+ font-size:18px;
+}
+.product-photo-nav .icon-button:disabled{opacity:.35;cursor:default}
+.listed-condition strong{display:block;margin-bottom:3px;color:var(--ink);font-size:15px}
+.piece-question{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) auto;
+ gap:24px;
+ align-items:center;
+ margin-top:28px;
+ padding:24px;
+ border-top:var(--border-width) solid var(--frame);
+ background:var(--celadon);
+}
+.piece-question strong{
+ display:block;
+ margin:5px 0 4px;
+ font:400 26px/1.1 Georgia,serif;
+}
+.piece-question p{margin:0;font-size:13px;line-height:1.5}
+.piece-question .button{margin:0;white-space:nowrap}
+
+@media(max-width:640px){
+ .product-photo-nav{position:relative;margin-top:8px}
+ .product-photo-nav .icon-button{width:46px;min-width:46px;height:46px}
+ .product-thumbnails{margin-top:7px;padding-bottom:11px;scroll-snap-type:x proximity}
+ .product-thumbnails button{scroll-snap-align:center}
+ .piece-question{grid-template-columns:1fr;gap:17px;padding:22px 20px}
+ .piece-question .button{width:100%}
+}
+
+/* The archive print and its separate catalog label stay legible at every width. */
+.affection-hero .gallery-print {
+  display: flex;
+  flex-direction: column;
+  background: var(--celadon);
+  padding: clamp(14px, 2.1vw, 34px);
+  gap: 0;
+  min-height: clamp(470px, 41vw, 620px);
+}
+.gallery-print-image {
+  flex: 1 1 auto;
+  position: relative;
+  min-height: 235px;
+  overflow: hidden;
+  background: #211d19;
+}
+.gallery-print-image > img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 48% 45%;
+}
+.gallery-print-image > span {
+  position: absolute; bottom: 0; left: 0;
+  background: #302c28; color: #fff8ed;
+  padding: 7px 12px; font: 600 12px/1.35 Grotesk, Arial, sans-serif;
+}
+.affection-hero .gallery-print figcaption {
+  position: static;
+  background: var(--cream); color: var(--ink);
+  margin: 0; padding: 0;
+  border-bottom: var(--border-width) solid var(--frame);
+}
+.lighting-pick {
+  display: grid; grid-template-columns: 64px minmax(0, 1fr) auto;
+  gap: 14px; align-items: center; padding: 13px 16px;
+  color: inherit; text-decoration: none;
+}
+.lighting-pick > img { width: 64px; height: 64px; object-fit: contain; }
+.lighting-pick-text { display: grid; gap: 4px; min-width: 0; }
+.lighting-pick-text > span { font: 600 12px/1.3 Grotesk, Arial, sans-serif; color: var(--muted); }
+.lighting-pick-text strong { font: 400 clamp(17px, 1.35vw, 22px)/1.18 Georgia, serif; overflow-wrap: anywhere; }
+.lighting-pick-price { display: flex; align-items: center; gap: 10px; font: 700 14px/1.4 Grotesk, Arial, sans-serif; }
+.lighting-pick:hover strong, .lighting-pick:focus-visible strong { text-decoration: underline; text-underline-offset: 3px; }
+.lighting-directory-link { display: flex; justify-content: space-between; align-items: center; padding: 16px; }
+.department-portraits {
+  display: grid; grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: clamp(10px, 1.8vw, 26px); margin-top: 30px;
+}
+.department-portraits a {
+  display: flex; flex-direction: column; justify-content: flex-end; min-width: 0;
+  background: var(--soft); border-bottom: var(--border-width) solid var(--frame); color: var(--ink);
+}
+.department-portraits img { display: block; width: 100%; height: clamp(90px, 10vw, 164px); object-fit: cover; }
+.department-portraits span {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 5px; padding: 13px 15px; background: var(--celadon);
+  font: 400 clamp(18px, 1.55vw, 25px)/1.2 Georgia, serif;
+}
+.department-portraits a:nth-child(2) span { background: var(--ochre); }
+.department-portraits a:nth-child(3) span { background: var(--coral); }
+.department-portraits a:nth-child(4) span { background: var(--soft); }
+.department-portraits .icon { width: 18px; flex: none; }
+.department-portraits a:hover span,.department-portraits a:focus-visible span { text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 700px) {
+  .affection-hero .room-welcome { padding-block: 28px; }
+  .affection-hero .room-welcome h1 { margin: 13px 0 16px; }
+  .affection-hero .welcome-action { gap: 10px 16px; }
+  .affection-hero .welcome-action > p { margin-bottom: 3px; }
+  .affection-hero .gallery-print { height: auto; min-height: 0; padding: 14px; }
+  .gallery-print-image { flex: none; aspect-ratio: 1.64; min-height: 0; }
+  .lighting-pick { grid-template-columns: 52px minmax(0,1fr) auto; padding: 10px; gap: 9px; }
+  .lighting-pick > img { width: 52px; height: 52px; }
+  .lighting-pick-price { flex-direction: column; gap: 2px; }
+  .department-portraits { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px 12px; margin-top: 22px; }
+  .department-portraits img { height: auto; aspect-ratio: 1.85; }
+  .department-portraits span { padding: 10px; font-size: 18px; }
+}
+
+@media (max-width: 640px) {
+  .catalog-page .catalog-intro { padding-block: 13px 16px; }
+  .catalog-page .catalog-intro .breadcrumb { margin-bottom: 7px; }
+  .catalog-page .catalog-title-row h1 { margin: 0; font-size: clamp(37px, 10vw, 51px); }
+  .catalog-page .catalog-toolbar { margin-bottom: 12px; }
+  .catalog-page .catalog-quick-browse { margin-bottom: 8px; }
+  .catalog-page #catalog-search { min-width: 0; font-size: 16px; }
+}

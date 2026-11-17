@@ -592,6 +592,35 @@
     return commit(nextState({ draft, undo, redo: [] }), 'draft');
   }
 
+  function updateContent(changes, expected) {
+    const allowed = Object.keys(DEFAULT_DRAFT.content);
+    const contentChanges = exactKeys(changes, allowed, 'content changes', []);
+    const baseline = exactKeys(expected, Object.keys(contentChanges), 'content baseline', Object.keys(contentChanges));
+
+    validateContent({ ...state.draft.content, ...clone(contentChanges) });
+    validateContent({ ...state.draft.content, ...clone(baseline) });
+
+    const labels = {
+      heroTitle: 'Opening line',
+      heroAccent: 'Emphasized line',
+      heroIntro: 'Introduction',
+      phone: 'Phone',
+      email: 'Email',
+      address: 'Street address',
+      city: 'City, state and ZIP'
+    };
+    for (const key of Object.keys(contentChanges)) {
+      if (state.draft.content[key] !== baseline[key]) {
+        throw new StudioStateError(
+          'STALE_CONTENT',
+          `${labels[key] || key} changed in another Studio tab. Choose which value to keep.`,
+          { field: key }
+        );
+      }
+    }
+    return updateDraft({ content: contentChanges });
+  }
+
   function setActive(active) {
     boolean(active, 'active');
     if (state.active === active) return read();
@@ -857,6 +886,7 @@
     defaults,
     read,
     updateDraft,
+    updateContent,
     setActive,
     undo,
     redo,

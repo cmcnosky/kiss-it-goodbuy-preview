@@ -68,6 +68,33 @@ assert.equal(Studio.read().draft.design.coral, '#d65f52');
 Studio.redo();
 assert.equal(Studio.read().draft.content.heroTitle, 'Collected for real rooms');
 
+// A form open in one tab must merge an edit with an unrelated save from another tab.
+// It must stop before overwriting the same field when both tabs changed it.
+const contentBaseline = Studio.read().draft.content.heroTitle;
+const externalContactEdit = Studio.read();
+externalContactEdit.draft.content.phone = '817-555-0134';
+externalContactEdit.revision += 1;
+externalContactEdit.updatedAt += 1;
+externalContactEdit.writerId = 'another_tab_writer';
+storage.setItem(Studio.STORAGE_KEY, JSON.stringify(externalContactEdit));
+listeners.get('storage')({ key: Studio.STORAGE_KEY, storageArea: storage, newValue: JSON.stringify(externalContactEdit) });
+Studio.updateContent({ heroTitle: 'A local headline edit' }, { heroTitle: contentBaseline });
+assert.equal(Studio.read().draft.content.heroTitle, 'A local headline edit');
+assert.equal(Studio.read().draft.content.phone, '817-555-0134', 'an unrelated newer contact edit survives the merge');
+
+const externalHeadlineEdit = Studio.read();
+externalHeadlineEdit.draft.content.heroTitle = 'A newer headline from another tab';
+externalHeadlineEdit.revision += 1;
+externalHeadlineEdit.updatedAt += 1;
+externalHeadlineEdit.writerId = 'second_tab_writer';
+storage.setItem(Studio.STORAGE_KEY, JSON.stringify(externalHeadlineEdit));
+listeners.get('storage')({ key: Studio.STORAGE_KEY, storageArea: storage, newValue: JSON.stringify(externalHeadlineEdit) });
+unchangedAfterFailure(
+  () => Studio.updateContent({ heroTitle: 'Do not overwrite the newer headline' }, { heroTitle: 'A local headline edit' }),
+  'STALE_CONTENT'
+);
+assert.equal(Studio.read().draft.content.heroTitle, 'A newer headline from another tab');
+
 Studio.setActive(true);
 assert.equal(Studio.read().active, true);
 Studio.updateDraft({
