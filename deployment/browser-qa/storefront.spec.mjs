@@ -814,8 +814,26 @@ test('practice newsletter and consignment activity stay local and support follow
     page.locator('[data-preview-store]').click()
   ]);
 
-  await page.locator('.newsletter-form [name="contact[email]"]').fill('practice-only@example.test');
-  await page.locator('.newsletter-form button[type="submit"]').click();
+  // Rehearse on a slow reload: the HTML form is visible before the preview scripts.
+  let resumeStartup;
+  const waiting = new Promise(resolve => { resumeStartup = resolve; });
+  await page.route('**/app.js*', async route => {
+    await waiting;
+    await route.continue();
+  });
+  await page.reload({ waitUntil: 'commit' });
+  const subscribe = page.locator('.newsletter-form button[type="submit"]');
+  const email = page.locator('#newsletter-email');
+  try {
+    await email.fill('practice-only@example.test');
+    await expect(subscribe).toBeDisabled();
+    await email.press('Enter');
+  } finally { resumeStartup(); }
+  await page.waitForLoadState('load');
+  await expect(email).toHaveValue('practice-only@example.test');
+  await expect(subscribe).toBeEnabled();
+  expect(contactRequests).toEqual([]);
+  await subscribe.click();
   await expect(page.locator('#toast')).toContainText('Practice signup recorded in Owner Studio');
   expect(contactRequests).toEqual([]);
 
@@ -827,8 +845,18 @@ test('practice newsletter and consignment activity stay local and support follow
   await page.locator('#item-condition').selectOption({ label: 'Very good — minor visible wear' });
   await page.locator('#item-notes').fill('A small practice-only scuff is noted near the base.');
   await page.locator('#consignment-form button[type="submit"]').click();
-  await expect(page.locator('#email-ready')).toBeVisible();
+  const draft = page.locator('#email-ready');
+  await expect(draft).toBeFocused();
+  await page.locator('#item-notes').fill('Two small marks on the base.');
+  await expect(draft).toBeHidden();
+  await page.getByRole('button', { name: 'Update email draft' }).click();
+  await expect(page.locator('#email-body')).toHaveValue(/Two small marks/);
+  await expect(page.locator('#email-launch')).toHaveAttribute('href', /Two%20small%20marks/);
+  await expect(draft).toBeFocused();
   await page.locator('[data-practice-inquiry]').click();
+  await expect(page.locator('[data-practice-inquiry]')).toBeDisabled();
+  await page.getByRole('button', { name: 'Update email draft' }).click();
+  await expect(page.locator('[data-practice-inquiry]')).toBeDisabled();
   await expect(page.locator('#toast')).toContainText('Practice inquiry recorded in Owner Studio');
   expect(page.url()).toBe(localUrl);
   expect(contactRequests).toEqual([]);

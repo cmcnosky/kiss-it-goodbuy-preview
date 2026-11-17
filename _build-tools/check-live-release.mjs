@@ -155,6 +155,13 @@ async function runChecks(options) {
   if (previewSize.width !== 1200 || previewSize.height !== 630) throw new Error(`Social preview is ${previewSize.width}x${previewSize.height}, expected 1200x630.`);
   report.socialPreview = { url: metadata.ogImage, sha256: sha256(preview.bytes), ...previewSize };
 
+  const briefUrl = new URL('assets/website-decision-brief.pdf', options.baseUrl);
+  const brief = await fetchBytes(briefUrl.href, { accept: 'application/pdf' });
+  if (!brief.contentType.includes('application/pdf') || brief.bytes.subarray(0, 5).toString() !== '%PDF-') {
+    throw new Error('The signed-in website brief link must serve a PDF document.');
+  }
+  report.decisionBrief = { url: briefUrl.href, bytes: brief.bytes.length, sha256: sha256(brief.bytes) };
+
   const localAssets = pageHtml.flatMap(page => localAssetUrls(page.html, page.url, options.baseUrl));
   const loadedAssets = new Map();
   for (const url of [...new Map(localAssets.map(asset => [asset.href, asset])).values()]) {

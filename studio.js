@@ -127,7 +127,7 @@
       <div class="studio-actions">
         <p class="studio-persistence ${status.persisted?'saved':'warning'}" role="status"><span></span>${escape(statusText())}</p>
         <button class="button red" type="button" data-preview-store>Preview my storefront →</button>
-        <button class="button outline" type="button" data-return-original>Return to original</button><div class="studio-session"><span>Signed in${sessionInMemory?' · this page only':''}</span><button type="button" data-studio-signout>Sign out</button></div>
+        <button class="button outline" type="button" data-return-original>Return to original</button><div class="studio-session"><span>Signed in${sessionInMemory?' · this page only':''}</span><a href="assets/website-decision-brief.pdf" target="_blank" rel="noopener">Website brief (PDF) ↗</a><button type="button" data-studio-signout>Sign out</button></div>
       </div>
     </header>`;
   }

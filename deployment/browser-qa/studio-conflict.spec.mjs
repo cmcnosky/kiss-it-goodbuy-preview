@@ -17,6 +17,26 @@ async function signInToDesign(page) {
   await expect(page.locator('.design-panel')).toBeVisible();
 }
 
+test('website brief link appears after sign-in and opens the PDF document', async ({ page }) => {
+  await page.goto('/studio.html');
+  const brief = page.getByRole('link', { name: 'Website brief (PDF) ↗', exact: true });
+  await expect(brief).toHaveCount(0);
+  await expect(page.locator('body')).not.toContainText('Website brief');
+
+  await page.locator('[name="username"]').fill('Chelsea');
+  await page.locator('[name="password"]').fill('Chelsea');
+  await page.getByRole('button', { name: 'Log in', exact: true }).click();
+
+  await expect(brief).toBeVisible();
+  await expect(brief).toHaveAttribute('href', 'assets/website-decision-brief.pdf');
+  await expect(brief).toHaveAttribute('target', '_blank');
+  await expect(brief).toHaveAttribute('rel', 'noopener');
+  expect(await brief.evaluate(link => new URL(link.href).pathname)).toMatch(/\/assets\/website-decision-brief\.pdf$/);
+  const response = await page.request.get(await brief.evaluate(link => link.href));
+  expect(response.status()).toBe(200);
+  expect((await response.body()).subarray(0, 5).toString()).toBe('%PDF-');
+});
+
 test('palette choices identify the current saved palette after selection and reload', async ({ page }) => {
   await page.goto('/studio.html');
   await page.evaluate(() => localStorage.clear());

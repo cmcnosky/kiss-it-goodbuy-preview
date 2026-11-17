@@ -6,7 +6,7 @@ import path from 'node:path';
 
 const root = path.resolve(process.argv[2] || '');
 if (!root || !existsSync(path.join(root, 'index.html'))) throw new Error(`Static build not found: ${root}`);
-const types = { '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml' };
+const types = { '.pdf': 'application/pdf', '.css': 'text/css; charset=utf-8', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml' };
 
 createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url, 'http://127.0.0.1').pathname);

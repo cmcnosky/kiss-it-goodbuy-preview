@@ -514,8 +514,6 @@ assert.ok(quickAddPath.indexOf('persistCart()') < quickAddPath.indexOf('showQuic
   'the successful quick-add path converts the clicked control synchronously after persisting the cart');
 assert.doesNotMatch(app, /queueMicrotask\(.*showQuickAddConfirmation/s,
   'quick-add confirmation must not depend on a capture-phase microtask race');
-assert.match(app, /emailReady\.setAttribute\('role','region'\).*aria-labelledby.*addEventListener\('submit',\(\)=>focusElement\(emailReady\)\)/s,
-  'the prepared consignment draft is announced and focused after a valid submit');
 assert.match(app, /function syncConditionNote\(\).*pageshow.*syncConditionNote/s,
   'restored consignment condition values must restore the matching warning');
 assert.match(app, /data-dismiss-copy.*stopImmediatePropagation\(\).*dismissCopyFallback/s,

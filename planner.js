@@ -189,6 +189,15 @@
     return `<details class="planner-confirmed" ${count?'open':''}><summary>Measurements you confirmed with the gallery${count?` · ${count} of 3 entered`:''}</summary><form data-confirmed-piece="${context.esc(product.handle)}"><label><span>Units</span><select name="unit"><option value="in" ${confirmed.unit==='in'?'selected':''}>Inches</option><option value="cm" ${confirmed.unit==='cm'?'selected':''}>Centimeters</option></select></label>${fields}<small>Optional. Enter all three measurements only after you personally confirm them with the gallery. They are saved in this tab and kept separate from the store listing.</small></form></details>`;
   }
 
+  function purchaseAction(product){
+    if(!product.available)return '';
+    const handle=context.esc(product.handle);
+    if(context.inBag?.(product.handle))return `<a class="button red planner-bag-action" data-planner-bag-for="${handle}" href="cart.html">In your bag · review ${context.icon('arrow')}</a>`;
+    const variant=product.variants?.length===1?product.variants[0]:null;
+    if(variant?.available)return `<button class="button red planner-bag-action" type="button" data-planner-add="${handle}">Add to bag ${context.icon('bag')}</button>`;
+    return `<a class="button red planner-bag-action" href="${context.productHref(product)}">Choose options & buy ${context.icon('arrow')}</a>`;
+  }
+
   function piecesMarkup(){
     const products=context.shortlistItems().filter(product=>!/gift.?card/i.test((product.sourceProductType||'')+' '+product.title));
     if(!products.length)return `<div class="planner-empty"><span>01</span><div><h2>Save a piece to begin.</h2><p>Use the heart on furniture or decor, then return here to compare its listed measurements with your room and route.</p><a class="button red" href="collection.html">Explore the finds →</a></div></div>`;
@@ -204,7 +213,7 @@
           <p class="planner-listed"><strong>Store listing</strong><span>${context.esc(product.dimensionsRaw||'Measurements not supplied')}</span>${product.dimensions?.labelStatus!=='labeled'&&product.dimensionsRaw?'<small>Order or units are not fully labeled. Confirm them with the gallery.</small>':''}</p>
           ${confirmedForm(product,confirmed)}
           <div class="planner-review ${result.kind}"><strong>${result.title}</strong><p>${context.esc(result.checks.join(' '))}</p>${result.parsed.source==='shopper-confirmed'?'<small>Comparison uses all three measurements you entered above.</small>':''}</div>
-          <div class="planner-piece-links"><a class="text-link" href="${context.productHref(product)}">${product.images.length} ${product.images.length===1?'photograph':'photographs'} & details →</a><span class="stock-label ${product.available?'':'sold-out'}">${product.available?'Available at last check':'Unavailable at last check'}</span></div>
+          <div class="planner-piece-links"><div class="planner-piece-actions">${purchaseAction(product)}<a class="text-link" href="${context.productHref(product)}">${product.images.length} ${product.images.length===1?'photograph':'photographs'} & details →</a></div><span class="stock-label ${product.available?'':'sold-out'}">${product.available?'Available at last check':'Unavailable at last check'}</span></div>
         </div>
       </article>`;
     });
@@ -272,6 +281,16 @@
       updatePieceList(handle,event.target.name);
     });
     target.addEventListener('click',event=>{
+      const add=event.target.closest('[data-planner-add]');
+      if(add){
+        if(context.addToBag?.(add.dataset.plannerAdd)){
+          const handle=add.dataset.plannerAdd;
+          updatePieceList();
+          target.querySelector(`[data-planner-bag-for="${handle}"]`)?.focus();
+          context.toast?.('Added to your bag. Review it when you are ready.');
+        }
+        return;
+      }
       const unit=event.target.closest('[data-plan-unit]');
       if(unit){updateUnit(form,unit.dataset.planUnit);return;}
       if(event.target.closest('[data-clear-plan]')){

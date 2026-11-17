@@ -27,3 +27,7 @@
 @media screen and (max-width:640px){.planner-hero h1{font-size:62px}.planner-hero-note div{box-shadow:none;padding:25px}.planner-form{box-shadow:none;padding:22px}.planner-empty{padding:28px}.planner-pickup-card{box-shadow:none;padding:25px}.planner-section-heading h2{font-size:39px}.planner-pickup h2{font-size:42px}.planner-piece{padding:22px}}
 
 @media screen and (max-width:640px){.planner-hero-note strong br{display:block}}
+
+.planner-piece-actions{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.planner-bag-action{min-width:190px;justify-content:center}
+@media screen and (max-width:640px){.planner-piece-actions{display:grid;gap:12px}.planner-bag-action{width:100%;min-width:0}}

@@ -774,3 +774,6 @@ body{background:var(--cream);color:var(--ink)}
   .catalog-page .catalog-quick-browse { margin-bottom: 8px; }
   .catalog-page #catalog-search { min-width: 0; font-size: 16px; }
 }
+
+.bag-next-steps{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap}
+.bag-next-steps .text-link{min-height:44px;display:inline-flex;align-items:center}
