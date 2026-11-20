@@ -56,12 +56,21 @@ jobs:
           --baseline-url https://cmcnosky.github.io/kiss-it-goodbuy-preview/inventory.json
           --allow-large-change
 
+      - name: Review lighting of new or replaced catalog photographs
+        run: |
+          if ! /usr/bin/python3 -c 'from PIL import Image' >/dev/null 2>&1; then
+            sudo apt-get -qq update
+            sudo apt-get -qq install python3-pil
+          fi
+          /usr/bin/python3 _build-tools/profile-photographs.py --inventory .build/dist/inventory.json --output .build/dist/photo-tones.js
+
       - name: Render static entry points and product pages
         run: node .build/scripts/render-pages.mjs --dist .build/dist
 
       - name: Validate the staged storefront
         run: |
           node --check .build/dist/app.js
+          node --check .build/dist/photo-delivery.js
           node --check .build/dist/catalog-normalize.js
           node --check .build/dist/commerce.js
           node --check .build/dist/checkout-recovery.js
@@ -78,6 +87,7 @@ jobs:
           node .build/scripts/test-interactions.mjs
           node .build/scripts/test-cross-tab.mjs
           node .build/scripts/test-palette.mjs
+          node .build/scripts/test-photo-delivery.mjs
           node .build/scripts/test-planner.mjs
           node .build/scripts/test-checkout-recovery.mjs
           node .build/scripts/test-studio-state.mjs

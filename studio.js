@@ -144,7 +144,7 @@
     const style=`--preview-coral:${d.coral};--preview-sage:${d.celadon};--preview-gold:${d.ochre};--preview-cream:${d.cream};--preview-ink:${d.ink};--preview-frame:${d.frame};--preview-border:${d.borderWidth}px;--preview-scale:${d.textScale};`;
     return `<aside class="studio-live-preview" style="${style}" aria-label="Design preview">
       <div class="studio-preview-copy"><span>LIVE PREVIEW</span><h3>${escape(c.heroTitle)}<br><em>${escape(c.heroAccent)}</em></h3><p>${escape(c.heroIntro).replaceAll('\n','<br>')}</p><span class="studio-preview-button">Explore the finds →</span></div>
-      <div class="studio-preview-products">${products.map(product=>`<figure><img src="${escape(product.imageUrl)}" alt=""><figcaption>${escape(product.title)}</figcaption></figure>`).join('')}</div>
+      <div class="studio-preview-products">${products.map(product=>`<figure>${studioPhoto(product.photo || product.imageUrl, true)}<figcaption>${escape(product.title)}</figcaption></figure>`).join('')}</div>
     </aside>`;
   }
 
@@ -219,15 +219,27 @@
     </section>`;
   }
 
+  function studioPhoto(image, preview = false) {
+    const sizes = preview ? '(max-width: 580px) 90vw, (max-width: 900px) 55vw, 32vw' : '76px';
+    return root.KIGBPhotos.image(image || 'assets/brand-original.png', {
+      alt: '', width: preview ? 480 : 76, height: preview ? 400 : 76,
+      widths: preview ? [320, 480, 640, 960] : [76, 152, 228],
+      sizes, loading: 'lazy', tone: true
+    });
+  }
+
   function effectiveProduct(product,draft){
     const override=draft.products[product.handle]||{};
-    return {title:override.title??product.title,priceCents:override.priceCents??Math.round(product.price*100),available:override.available??product.available,dimensionsRaw:override.dimensionsRaw??product.dimensionsRaw??'',imageUrl:override.imageUrl??product.images?.[0]?.src??'',hidden:override.hidden??false};
+    const original = root.KIGBPhotos.gallery(product)[0];
+    const imageUrl = override.imageUrl ?? original?.src ?? '';
+    const photo = imageUrl === original?.src ? original : imageUrl;
+    return {photo,title:override.title??product.title,priceCents:override.priceCents??Math.round(product.price*100),available:override.available??product.available,dimensionsRaw:override.dimensionsRaw??product.dimensionsRaw??'',imageUrl,hidden:override.hidden??false};
   }
 
   function productEditor(product,draft){
     const item=effectiveProduct(product,draft),overridden=Object.hasOwn(draft.products,product.handle);
     return `<details class="studio-product" data-product-handle="${escape(product.handle)}">
-      <summary><img src="${escape(item.imageUrl||'assets/brand-original.png')}" alt=""><span><strong>${escape(item.title)}</strong><small>${escape(product.itemNumber||product.sourceProductType||'Gallery item')} · ${money(item.priceCents)}${overridden?' · Edited in Studio':''}</small></span><i class="${item.available?'available':'unavailable'}">${item.hidden?'Hidden':item.available?'Available':'Unavailable'}</i></summary>
+      <summary>${studioPhoto(item.photo || item.imageUrl)}<span><strong>${escape(item.title)}</strong><small>${escape(product.itemNumber||product.sourceProductType||'Gallery item')} · ${money(item.priceCents)}${overridden?' · Edited in Studio':''}</small></span><i class="${item.available?'available':'unavailable'}">${item.hidden?'Hidden':item.available?'Available':'Unavailable'}</i></summary>
       <form data-product-form="${escape(product.handle)}" class="studio-product-form">
         <label class="studio-field studio-field-full"><span>Display title</span><input name="title" value="${escape(item.title)}" maxlength="160" required></label>
         <label class="studio-field"><span>Practice price</span><input name="price" type="number" min="0" max="10000000" step="0.01" value="${(item.priceCents/100).toFixed(2)}" required></label>
@@ -241,7 +253,7 @@
   }
 
   function customProductMarkup(product){
-    return `<article class="studio-custom-product"><img src="${escape(product.imageUrl||'assets/brand-original.png')}" alt=""><div><strong>${escape(product.title)}</strong><span>${money(product.priceCents)} · ${escape(product.category||'Studio piece')}</span></div><button class="text-link" type="button" data-delete-custom="${escape(product.handle)}">Remove</button></article>`;
+    return `<article class="studio-custom-product">${studioPhoto(product.imageUrl)}<div><strong>${escape(product.title)}</strong><span>${money(product.priceCents)} · ${escape(product.category||'Studio piece')}</span></div><button class="text-link" type="button" data-delete-custom="${escape(product.handle)}">Remove</button></article>`;
   }
 
   function inventoryPanel(state){

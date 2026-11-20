@@ -7,7 +7,7 @@ const inventory=JSON.parse(fs.readFileSync(path.join(dist,'inventory.json'),'utf
 const app=fs.readFileSync(path.join(dist,'app.js'),'utf8').split('// BROWSER START')[0];
 const context={location:new URL('https://example.test/collection.html'),URL,URLSearchParams,Intl,Date,KIGB_INVENTORY:inventory,localStorage:{getItem:()=>null}};context.window=context;
 vm.createContext(context);
-vm.runInContext(fs.readFileSync(path.join(dist,'catalog-normalize.js'),'utf8')+'\n'+fs.readFileSync(path.join(dist,'catalog.js'),'utf8')+'\n'+fs.readFileSync(path.join(dist,'commerce.js'),'utf8')+'\n'+app,context);
+vm.runInContext(fs.readFileSync(path.join(dist,'photo-tones.js'),'utf8')+'\n'+fs.readFileSync(path.join(dist,'photo-delivery.js'),'utf8')+'\n'+fs.readFileSync(path.join(dist,'catalog-normalize.js'),'utf8')+'\n'+fs.readFileSync(path.join(dist,'catalog.js'),'utf8')+'\n'+fs.readFileSync(path.join(dist,'commerce.js'),'utf8')+'\n'+app,context);
 const run=code=>vm.runInContext(code,context);
 let fixtureSequence=0;
 function fixtureProduct({

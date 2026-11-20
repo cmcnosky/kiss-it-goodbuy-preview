@@ -279,6 +279,74 @@ test('layout audit detects representative broken CSS, image, and markup', async 
   expect(issues.some(issue => issue.startsWith('broken local images'))).toBeTruthy();
 });
 
+test('catalog photographs use responsive native-size renditions and keep an exact original view', async ({ page }) => {
+  const product = inventory.products.find(entry => entry.handle && entry.itemNumber && entry.images?.length > 1 && entry.images[0].width > 500);
+  expect(product).toBeTruthy();
+  await page.goto(`/products/${product.handle}/`, { waitUntil: 'load' });
+
+  const main = page.locator('#main-product-image');
+  await expect(main).toHaveAttribute('srcset', /\s\d+w(?:,|$)/);
+  await expect(main).toHaveAttribute('sizes', /94vw/);
+  const candidates = (await main.getAttribute('srcset')).split(',').map(candidate => Number(candidate.trim().match(/(\d+)w$/)?.[1]));
+  expect(Math.max(...candidates)).toBeLessThanOrEqual(product.images[0].width);
+
+  const original = page.getByRole('button', { name: 'View original ↗', exact: true });
+  await expect(original).toBeVisible();
+  await original.click();
+  const dialog = page.locator('#photo-dialog');
+  await expect(dialog).toBeVisible();
+  const zoom = page.locator('#zoom-image');
+  await expect(zoom).toHaveAttribute('src', product.images[0].src);
+  await expect(zoom).not.toHaveAttribute('srcset', /./);
+  await expect(zoom).not.toHaveAttribute('data-photo-tone', /./);
+  await dialog.getByRole('button', { name: 'Close original photograph' }).click();
+
+  await page.locator('[data-photo="1"]').click();
+  await expect(main).toHaveAttribute('alt', /\S/);
+  await original.click();
+  await expect(zoom).toHaveAttribute('src', product.images[1].src);
+
+  const singlePhotoProduct = inventory.products.find(entry => entry.handle && entry.images?.length === 1);
+  expect(singlePhotoProduct, 'fixture needs a single-photo listing').toBeTruthy();
+  await page.goto(`/products/${singlePhotoProduct.handle}/`, { waitUntil: 'load' });
+  const singleOriginal = page.getByRole('button', { name: 'View original ↗', exact: true });
+  await expect(singleOriginal).toBeVisible();
+  await singleOriginal.click();
+  await expect(page.locator('#zoom-image')).toHaveAttribute('src', singlePhotoProduct.images[0].src);
+
+  await page.goto('/collection.html', { waitUntil: 'load' });
+  const catalogPhoto = page.locator('.product-photo img[srcset]').first();
+  await expect(catalogPhoto).toBeVisible();
+  await expect(catalogPhoto).toHaveAttribute('sizes', /vw|px/);
+
+  await page.goto(`/shortlist.html?items=${encodeURIComponent(product.itemNumber)}`, { waitUntil: 'load' });
+  await expect(page.locator('.compare-table img')).toHaveAttribute('srcset', /\s\d+w(?:,|$)/);
+
+  await page.goto(`/planner.html?items=${encodeURIComponent(product.itemNumber)}`, { waitUntil: 'load' });
+  await expect(page.locator('.planner-piece-photo img')).toHaveAttribute('srcset', /\s\d+w(?:,|$)/);
+
+  const cartProduct = inventory.products.find(entry => entry.handle && entry.images?.length && entry.available && entry.variants?.some(variant => variant.available));
+  expect(cartProduct, 'fixture needs an available photographed product').toBeTruthy();
+  const cartVariant = cartProduct.variants.find(variant => variant.available);
+  await page.evaluate(({ selectedProduct, selectedVariant }) => {
+    localStorage.setItem('kigb-cart-v1', JSON.stringify([{
+      variantId: `gid://shopify/ProductVariant/${selectedVariant.id}`,
+      quantity: 1,
+      productHandle: selectedProduct.handle,
+      productTitle: selectedProduct.title,
+      variantTitle: selectedVariant.title === 'Default Title' ? '' : selectedVariant.title,
+      priceCents: selectedVariant.priceCents,
+      compareAtPriceCents: selectedVariant.compareAtPriceCents,
+      currencyCode: 'USD',
+      imageUrl: selectedProduct.images[0].src,
+      onlineStoreUrl: selectedProduct.productUrl,
+      available: true
+    }]));
+  }, { selectedProduct: cartProduct, selectedVariant: cartVariant });
+  await page.goto('/cart.html', { waitUntil: 'load' });
+  await expect(page.locator('.cart-line img')).toHaveAttribute('srcset', /\s\d+w(?:,|$)/);
+});
+
 test('saved catalog remains usable when the live inventory read is unavailable', async ({ page }) => {
   await page.unroute('https://kissitgoodbuy.net/products.json**');
   await page.route('https://kissitgoodbuy.net/products.json**', route => route.fulfill({

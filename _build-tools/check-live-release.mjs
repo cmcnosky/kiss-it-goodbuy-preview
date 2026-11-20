@@ -175,6 +175,9 @@ async function runChecks(options) {
   }
   for (const required of [
     'app.js',
+    'photo-delivery.js',
+    'photo-tones.js',
+    'photo-tones.css',
     'commerce.js',
     'checkout-recovery.js',
     'planner.js',

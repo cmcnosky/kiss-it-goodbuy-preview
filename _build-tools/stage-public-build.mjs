@@ -25,6 +25,9 @@ const HTML_FILES = [
 const PUBLIC_DIRECTORIES = ['assets', 'products', 'licenses'];
 const REQUIRED_ROOT_FILES = [
   'inventory.json',
+  'photo-tones.js',
+  'photo-tones.css',
+  'photo-delivery.js',
   'app.js',
   'catalog-normalize.js',
   'catalog.js',
@@ -53,6 +56,7 @@ const REQUIRED_TOOLS = [
   'test-interactions.mjs',
   'test-cross-tab.mjs',
   'test-palette.mjs',
+  'test-photo-delivery.mjs',
   'test-planner.mjs',
   'test-studio-state.mjs',
   'test-studio-runtime.mjs',

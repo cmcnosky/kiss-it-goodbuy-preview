@@ -206,7 +206,7 @@
       const confirmed=confirmedByProduct[product.handle]||normalizeConfirmed(),result=evaluateRoute(product,plan,confirmed);
       const photoLabel=product.images.length?`View ${context.esc(product.displayTitle)}`:`View details for ${context.esc(product.displayTitle)}; photograph not supplied`;
       return `<article class="planner-piece">
-        <a class="planner-piece-photo" href="${context.productHref(product)}" aria-label="${photoLabel}"><img src="${context.thumb(product.image,500)}" alt="${product.images.length?context.esc(product.displayTitle):''}" width="280" height="280"></a>
+        <a class="planner-piece-photo" href="${context.productHref(product)}" aria-label="${photoLabel}">${product.images.length?context.photo(product.images[0],{alt:product.displayTitle,width:280,height:280,widths:[280,420,560,840],sizes:'(max-width: 640px) 100vw, 320px',loading:'lazy'}):''}</a>
         <div class="planner-piece-copy">
           <p class="eyebrow">0${index+1} / ${product.itemNumber?'ITEM '+context.esc(product.itemNumber):'GALLERY FIND'}</p>
           <h2><a href="${context.productHref(product)}">${context.esc(product.displayTitle)}</a></h2>

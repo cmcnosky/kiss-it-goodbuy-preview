@@ -650,6 +650,8 @@ body{background:var(--cream);color:var(--ink)}
  font-size:12px;
 }
 .product-photo-nav>div{display:flex;gap:6px}
+.product-photo-nav>span{flex:0 0 auto;white-space:nowrap}
+.product-photo-nav .original-photo-button{display:inline-flex;align-items:center;min-height:42px;padding:7px 10px;white-space:nowrap}
 .product-photo-nav .icon-button{
  width:42px;
  min-width:42px;
@@ -686,6 +688,12 @@ body{background:var(--cream);color:var(--ink)}
  .product-thumbnails button{scroll-snap-align:center}
  .piece-question{grid-template-columns:1fr;gap:17px;padding:22px 20px}
  .piece-question .button{width:100%}
+}
+@media(max-width:380px){
+ .product-photo-nav{gap:8px}
+ .product-photo-nav>div{gap:4px}
+ .product-photo-nav .original-photo-button{padding-inline:4px}
+ .product-photo-nav .icon-button{width:44px;min-width:44px;height:44px}
 }
 
 /* The archive print and its separate catalog label stay legible at every width. */

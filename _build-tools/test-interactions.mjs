@@ -9,6 +9,8 @@ const app = fs.readFileSync(path.join(dist, 'app.js'), 'utf8');
 const inventory = JSON.parse(fs.readFileSync(path.join(dist, 'inventory.json'), 'utf8'));
 const catalogNormalize = fs.readFileSync(path.join(dist, 'catalog-normalize.js'), 'utf8');
 const commerce = fs.readFileSync(path.join(dist, 'commerce.js'), 'utf8');
+const photoDelivery = fs.readFileSync(path.join(dist, 'photo-delivery.js'), 'utf8');
+const photoTones = fs.readFileSync(path.join(dist, 'photo-tones.js'), 'utf8');
 const renderer = fs.readFileSync(path.join(root, 'scripts', 'render-pages.mjs'), 'utf8');
 const prefix = app.slice(0, app.indexOf('// BROWSER START'));
 const product = inventory.products.find((entry) => entry.available && entry.variants.some((variant) => variant.available));
@@ -45,7 +47,7 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
   };
   context.window = context;
   vm.createContext(context);
-  vm.runInContext(`${catalogNormalize}\n${commerce}\n${prefix}`, context);
+  vm.runInContext(`${photoTones}\n${photoDelivery}\n${catalogNormalize}\n${commerce}\n${prefix}`, context);
   return (code) => vm.runInContext(code, context);
 }
 
@@ -147,11 +149,13 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
   const htmlStart = renderer.indexOf('function html(');
   const htmlEnd = renderer.indexOf('const pages=', htmlStart);
   assert.ok(htmlStart > 0 && htmlEnd > htmlStart, 'renderer HTML helper is available for skip-link regression tests');
-  const assetNames = ['style.css', 'storefront.css', 'integration.css', 'catalog-normalize.js', 'inventory.js', 'catalog.js', 'commerce.js', 'storefront-data.js', 'app.js'];
+  const assetNames = ['style.css', 'storefront.css', 'integration.css', 'planner.css', 'studio.css', 'studio-runtime.css', 'photo-tones.css', 'photo-tones.js', 'photo-delivery.js', 'catalog-normalize.js', 'inventory.js', 'catalog.js', 'commerce.js', 'checkout-recovery.js', 'storefront-data.js', 'planner.js', 'studio-state.js', 'studio-runtime.js', 'studio.js', 'app.js'];
   const context = {
     URL,
     siteUrl: 'https://cmcnosky.github.io/kiss-it-goodbuy-preview/',
     previewPath: 'assets/preview.png',
+    photoLight: '',
+    catalogContext: { KIGBPhotos: { gallery(product) { return product?.images || []; } } },
     assetUrls: Object.fromEntries(assetNames.map((name) => [name, name])),
     escape(value) { return String(value); },
     encode: JSON.stringify
