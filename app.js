@@ -163,12 +163,12 @@ function visualDepartments() {
 }
 
 const galleryPhotographs = {
-  chandelier: ['murano-overview', 384, 640, 640, 'Two-tier Murano glass chandelier with fluted cups and curling arms'],
-  cup: ['murano-fluted-cup', 320, 640, 640, 'Close view of the fluted candle cup and ribbed glass leaf'],
-  branches: ['murano-glass-branches', 320, 640, 640, 'Glass leaves and spiral arms seen from beneath the chandelier'],
-  drummer: ['smiroldo-drummer', 480, 789, 789, 'A drummer leaning over a red and gold kit, with loose strokes of blue and green'],
-  chest: ['lane-park-chest', 480, 798, 798, 'Front view of the Bernhardt Lane Park chest with its geometric wood panels'],
-  showroom: ['gallery-showroom', 768, 1135, 596, 'Furniture, art, and accessories arranged in the Kiss It Good Buy showroom']
+  chandelier: ['murano-overview-v2', 384, 1280, 1280, 'Two-tier Murano glass chandelier with fluted cups and curling arms', 640],
+  cup: ['murano-fluted-cup-v2', 320, 640, 640, 'Close view of the fluted candle cup and ribbed glass leaf'],
+  branches: ['murano-glass-branches-v2', 320, 640, 640, 'Glass leaves and spiral arms seen from beneath the chandelier'],
+  drummer: ['smiroldo-drummer-v2', 480, 789, 789, 'A drummer leaning over a red and gold kit, with loose strokes of blue and green'],
+  chest: ['lane-park-chest-v2', 480, 798, 798, 'Front view of the Bernhardt Lane Park chest with its geometric wood panels'],
+  showroom: ['gallery-showroom-v2', 768, 1135, 596, 'Furniture, art, and accessories arranged in the Kiss It Good Buy showroom']
 };
 
 function archivePhotoLink(image, file, alt) {
@@ -176,9 +176,10 @@ function archivePhotoLink(image, file, alt) {
 }
 
 function galleryPhoto(key, sizes, eager = false) {
-  const [name, small, width, height, alt] = galleryPhotographs[key];
+  const [name, small, width, height, alt, middle] = galleryPhotographs[key];
   const file = w => `assets/editorial/${name}-${w}.webp`;
-  const image = `<img src="${file(width)}" srcset="${file(small)} ${small}w, ${file(width)} ${width}w" sizes="${sizes}" width="${width}" height="${height}" alt="${alt}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
+  const sources = [small, middle, width].filter(Boolean).map(w => `${file(w)} ${w}w`).join(', ');
+  const image = `<img src="${file(width)}" srcset="${sources}" sizes="${sizes}" width="${width}" height="${height}" alt="${alt}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
   return archivePhotoLink(image, file(width), alt);
 }
 
@@ -195,7 +196,7 @@ function home(){
  <section class="room-entrance affection-hero" aria-labelledby="welcome-title">
    <div class="room-welcome affection-hero-copy"><div><p class="eyebrow">Furniture · Art · The unexpected</p><h1 id="welcome-title">${esc(studioContent('heroTitle','Objects of'))}<br><em>${esc(studioContent('heroAccent','affection.'))}</em></h1></div><div class="welcome-action"><p>${esc(studioContent('heroIntro','A sculptural chair. A little sparkle.\nA piece you keep thinking about.')).replace(/\n/g,'<br> ')}</p><a class="button red" href="collection.html">Find your next piece ${icon('arrow')}</a><a class="text-link" href="visit.html">Visit the gallery ↗</a></div></div>
    <figure class="room-photograph affection-hero-photograph gallery-print">
-     <div class="gallery-print-image">${archivePhotoLink(`<img src="assets/editorial/crystal-chandelier-hero-enhanced-v2-960.webp" srcset="assets/editorial/crystal-chandelier-hero-enhanced-v2-640.webp 640w, assets/editorial/crystal-chandelier-hero-enhanced-v2-960.webp 960w, assets/editorial/crystal-chandelier-hero-enhanced-v2.webp 1448w" sizes="(max-width: 720px) 100vw, 58vw" width="1448" height="1086" alt="Restored close-up of clear chandelier prisms lit in amber, from the gallery archive" fetchpriority="high">`, 'assets/editorial/crystal-chandelier-hero-enhanced-v2.webp', 'Clear crystal chandelier prisms')}<span>Restored gallery archive · Crystal lighting</span></div>
+     <div class="gallery-print-image">${archivePhotoLink(`<img src="assets/editorial/crystal-chandelier-hero-enhanced-v3-960.webp" srcset="assets/editorial/crystal-chandelier-hero-enhanced-v3-640.webp 640w, assets/editorial/crystal-chandelier-hero-enhanced-v3-960.webp 960w, assets/editorial/crystal-chandelier-hero-enhanced-v3.webp 1448w" sizes="(max-width: 720px) 100vw, 58vw" width="1448" height="1086" alt="Restored close-up of clear chandelier prisms lit in amber, from the gallery archive" fetchpriority="high">`, 'assets/editorial/crystal-chandelier-hero-enhanced-v3.webp', 'Clear crystal chandelier prisms')}<span>Restored gallery archive · Crystal lighting</span></div>
      <figcaption>${relatedLightingCard(relatedLight)}</figcaption>
    </figure>
  </section>
@@ -228,7 +229,7 @@ function home(){
 
  <section class="gallery-chapter color-chapter" aria-labelledby="color-title"><div class="chapter-shop"><p class="eyebrow">03 / COLOR · Follow the unexpected</p><h2 id="color-title">The piece that<br><em>starts a conversation.</em></h2><p>A bold brushstroke. An unusual object. Something you’ve never quite seen before.</p><a href="collection.html?category=Art%20%26%20Objects" class="text-link">Explore art & objects ${icon('arrow')}</a>${chapterPieces(colors,'No available art or objects are shown online right now.','collection.html?category=Art%20%26%20Objects','Browse art & objects')}</div><figure class="chapter-photograph drummer-study"><div class="drummer-print">${galleryPhoto('drummer', '(max-width: 700px) 88vw, (max-width: 1200px) 42vw, 550px')}<figcaption>Jazz Musician<span>Michael Smiroldo · Gallery archive</span></figcaption></div></figure></section>
 
- <section class="gallery-note affection-editorial" aria-labelledby="affection-editorial-title"><div class="affection-editorial-copy"><p class="eyebrow">The pleasure of the unexpected</p><h2 id="affection-editorial-title">Unexpected company.<br><em>Unmistakably yours.</em></h2><p>Different eras. A little personality. The kind of character that makes a room feel like yours.</p><a href="story.html" class="text-link">Get to know the gallery ${icon('arrow')}</a></div><div class="affection-editorial-pictures"><figure>${archivePhotoLink(`<img src="assets/editorial/eames-orange-chairs-enhanced-v2-960.webp" srcset="assets/editorial/eames-orange-chairs-enhanced-v2-640.webp 640w, assets/editorial/eames-orange-chairs-enhanced-v2-960.webp 960w, assets/editorial/eames-orange-chairs-enhanced-v2.webp 1254w" sizes="(max-width: 700px) 44vw, 22vw" width="1254" height="1254" alt="Restored archive photograph of orange chairs with the gallery cat beside them" loading="lazy">`, 'assets/editorial/eames-orange-chairs-enhanced-v2.webp', 'Orange chairs and the gallery cat')}<figcaption><strong>A little personality.</strong><span>Restored archive photograph · Availability changes.</span></figcaption></figure><figure>${galleryPhoto('chest', '(max-width: 700px) 88vw, 31vw')}<figcaption><strong>Worth a second look.</strong><span>Archive photograph · Availability changes.</span></figcaption></figure></div></section>
+ <section class="gallery-note affection-editorial" aria-labelledby="affection-editorial-title"><div class="affection-editorial-copy"><p class="eyebrow">The pleasure of the unexpected</p><h2 id="affection-editorial-title">Unexpected company.<br><em>Unmistakably yours.</em></h2><p>Different eras. A little personality. The kind of character that makes a room feel like yours.</p><a href="story.html" class="text-link">Get to know the gallery ${icon('arrow')}</a></div><div class="affection-editorial-pictures"><figure>${archivePhotoLink(`<img src="assets/editorial/eames-orange-chairs-enhanced-v3-960.webp" srcset="assets/editorial/eames-orange-chairs-enhanced-v3-640.webp 640w, assets/editorial/eames-orange-chairs-enhanced-v3-960.webp 960w, assets/editorial/eames-orange-chairs-enhanced-v3.webp 1254w" sizes="(max-width: 700px) 44vw, 22vw" width="1254" height="1254" alt="Restored archive photograph of orange chairs with the gallery cat beside them" loading="lazy">`, 'assets/editorial/eames-orange-chairs-enhanced-v3.webp', 'Orange chairs and the gallery cat')}<figcaption><strong>A little personality.</strong><span>Restored archive photograph · Availability changes.</span></figcaption></figure><figure>${galleryPhoto('chest', '(max-width: 700px) 88vw, 31vw')}<figcaption><strong>Worth a second look.</strong><span>Archive photograph · Availability changes.</span></figcaption></figure></div></section>
 
  <section class="gallery-doors" aria-label="Visit or consign"><div class="visit-door"><p class="eyebrow">The door is on Franklin Street</p><h2>Come look<br><em>around.</em></h2><p class="door-address">201 East Franklin Street<br>Historic Downtown Grapevine, Texas</p>${hours()}<div class="door-actions"><a class="button" href="${urls.maps}" target="_blank" rel="noopener">Get directions ↗</a><a class="text-link" href="visit.html">Plan your visit</a></div><p class="door-note">Purchases are for local pickup. Plan transport for larger pieces.</p></div><div class="consign-door"><p class="eyebrow">Your piece. Its next chapter.</p><h2>Good things<br><em>go on.</em></h2><p>Ready to make room? Start with photos, dimensions, the maker, and an honest look at condition.</p><ol><li><span>01</span>Send photographs and details.</li><li><span>02</span>Wait for the gallery’s approval.</li><li><span>03</span>Arrange an approved drop-off.</li></ol><div class="door-actions"><a class="button red" href="consign.html">Offer a piece ${icon('arrow')}</a><a class="text-link" href="${urls.portal}">Consignor account ↗</a></div></div></section>
  </main>`;
@@ -357,17 +358,29 @@ function openProductPhoto(mode,opener){
  dialog._photoOpener=opener;
  dialog.showModal();
 }
-function togglePhotoDialogSize(control){
- const stage=$('.photo-dialog-stage');
- if(!stage)return;
- const actual=!stage.classList.contains('is-actual-size');
- stage.classList.toggle('is-actual-size',actual);
- control.setAttribute('aria-pressed',String(actual));
- control.textContent=actual?'Fit to window':'View at 100%';
- if(actual){
-  requestAnimationFrame(()=>{stage.scrollLeft=Math.max(0,(stage.scrollWidth-stage.clientWidth)/2);stage.scrollTop=Math.max(0,(stage.scrollHeight-stage.clientHeight)/2);});
- }else{stage.scrollLeft=0;stage.scrollTop=0;}
+function showNativePhotoPixels(stage) {
+ const image = stage.querySelector('img');
+ if (!image || !stage.classList.contains('is-actual-size')) return;
+ const position = () => {
+  if (!stage.isConnected || !stage.classList.contains('is-actual-size') || !image.naturalWidth) return;
+  const density = window.devicePixelRatio || 1;
+  stage.style.setProperty('--inspection-width', (image.naturalWidth / density) + 'px');
+  stage.scrollLeft = Math.max(0, (stage.scrollWidth - stage.clientWidth) / 2);
+  stage.scrollTop = Math.max(0, (stage.scrollHeight - stage.clientHeight) / 2);
+ };
+ if (image.complete) position();
+ else image.addEventListener('load', position, {once:true});
 }
+function togglePhotoDialogSize(control){
+ const stage = control.closest('dialog')?.querySelector('.photo-dialog-stage');
+ if (!stage) return;
+ const actual = stage.classList.toggle('is-actual-size');
+ control.setAttribute('aria-pressed', String(actual));
+ control.textContent = actual ? 'Fit to window' : 'View at 100%';
+ if (actual) showNativePhotoPixels(stage);
+ else {stage.scrollLeft = 0;stage.scrollTop = 0;}
+}
+
 function selectProductPhoto(index){
  const product=PRODUCTS.find(item=>item.handle===productHandle),photoIndex=Number(index),image=product?.images[photoIndex];
  if(!image)return;
@@ -386,6 +399,10 @@ function refreshProductMain(){const dialog=$('#photo-dialog');if(dialog?.open){p
 function refreshHomeMain(){const main=$('#main'),focus=captureFocusState(main),query=$('#home-search')?.value,railPosition=$('#arrival-track')?.scrollLeft;main.outerHTML=home();refreshQuickAddConfirmations($('#main'));if(query!==undefined&&$('#home-search'))$('#home-search').value=query;if(railPosition!==undefined&&$('#arrival-track'))$('#arrival-track').scrollLeft=railPosition;restoreFocusState(focus,$('#main'));}
 function refreshCatalogResults(){const box=$('#catalog-results'),focus=captureFocusState(box);box.innerHTML=catalogResults(filterState());refreshQuickAddConfirmations(box);restoreFocusState(focus,box);}
 // INTERACTION STATE END
+window.addEventListener('resize', () => {
+ const stage = document.querySelector('.photo-dialog[open] .is-actual-size');
+ if (stage) showNativePhotoPixels(stage);
+});
 if(page==='product.html'&&productHandle){recent=[productHandle,...recent.filter(h=>h!==productHandle)].slice(0,12);try{localStorage.setItem(recentStorageKey,JSON.stringify(recent));}catch{}}
 function toast(message){const t=$('#toast');t.textContent=message;t.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.hidden=true,4500);}
 function updateCartCount(){$$('.cart-count').forEach(el=>el.textContent=cartLines.reduce((n,l)=>n+l.quantity,0));}

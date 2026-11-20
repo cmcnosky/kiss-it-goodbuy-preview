@@ -959,16 +959,19 @@ img.main-product-image {
 }
 
 .photo-dialog-stage.is-actual-size {
-  display: block;
+  grid-template-columns: max-content;
+  grid-template-rows: max-content;
+  justify-content: safe center;
+  align-content: safe center;
 }
 
 .photo-dialog-stage.is-actual-size > img {
-  width: auto;
+  width: var(--inspection-width, auto);
   height: auto;
   max-width: none;
   max-height: none;
   margin: 0;
-  object-fit: none;
+  object-fit: contain;
 }
 
 .photo-dialog-tools {

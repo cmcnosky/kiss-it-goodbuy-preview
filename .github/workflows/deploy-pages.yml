@@ -58,9 +58,9 @@ jobs:
 
       - name: Review lighting of new or replaced catalog photographs
         run: |
-          if ! /usr/bin/python3 -c 'from PIL import Image, ImageCms' >/dev/null 2>&1; then
+          if ! /usr/bin/python3 -c 'from PIL import Image, ImageCms; import numpy' >/dev/null 2>&1; then
             sudo apt-get -qq update
-            sudo apt-get -qq install python3-pil
+            sudo apt-get -qq install python3-numpy python3-pil
           fi
           /usr/bin/python3 _build-tools/profile-photographs.py --inventory .build/dist/inventory.json --output .build/dist/photo-tones.js
 

@@ -459,6 +459,10 @@ test('all eleven gallery archive photographs open their largest local file and r
       await sizeControl.click();
       await expect(sizeControl).toHaveAttribute('aria-pressed', 'true');
       await expect(dialog.locator('.photo-dialog-stage')).toHaveClass(/is-actual-size/);
+      expect(await image.evaluate(element => Math.abs(
+        element.getBoundingClientRect().width * devicePixelRatio - element.naturalWidth
+      )), '100% maps each source pixel to one display pixel').toBeLessThanOrEqual(1);
+
       if (index % 2 === 0) await page.keyboard.press('Escape');
       else await dialog.locator('[data-close]').click();
       await expect(dialog).toHaveCount(0);
@@ -1141,7 +1145,7 @@ test('Owner Studio resizes a large phone-style photo into a bounded local sample
   await expect(page.locator('.studio-custom-product')).toContainText('Browser QA photo sample');
 
   const customProduct = await page.evaluate(() => window.KIGBStudioState.read().draft.customProducts.at(-1));
-  expect(customProduct.imageUrl.startsWith('data:image/jpeg;base64,')).toBe(true);
+  expect(customProduct.imageUrl).toMatch(/^data:image\/(webp|jpeg);base64,/);
   expect(Buffer.from(customProduct.imageUrl.split(',')[1], 'base64').length).toBeLessThanOrEqual(150 * 1024);
 });
 

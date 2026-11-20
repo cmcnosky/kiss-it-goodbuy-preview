@@ -71,7 +71,9 @@
     const key = photoKey(image.src);
     const entries = root.KIGBPhotoSharpness?.photos;
     const larger = entries?.[key] && entries[largerCopies.get(key)];
-    return larger?.length ? Math.max(image.width || 0, ...larger.map(row => Number(row[0]))) : image.width;
+    if (larger?.length) return Math.max(image.width || 0, ...larger.map(row => Number(row[0])));
+    const registered = entries?.[key] && root.KIGBPhotoSharpness?.registeredWidths?.[key];
+    return registered ? Math.max(Number(registered), image.width || 0) : image.width;
   }
 
   function sharpenedSources(imageValue) {

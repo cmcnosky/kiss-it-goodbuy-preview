@@ -1,0 +1,63 @@
+{
+  "output": {
+    "path": "../murano-registered-master.png",
+    "dimensions": [1280, 1280],
+    "sha256": "76202c5ff2b5218c2077c724f1c413224a4a4b42249ada1bbe4641507c7f3eba"
+  },
+  "sources": [
+    {
+      "role": "composition, color, and low-frequency structure",
+      "path": "merchant-overview-1.jpg",
+      "dimensions": [640, 640],
+      "sha256": "28d97ee4c6dcb629ad0921695f6a69c4b0b588cd75cac2d0f4770469c151dd8e"
+    },
+    {
+      "role": "correlation-validated upper-crown high-frequency detail",
+      "path": "merchant-detail-2.jpg",
+      "dimensions": [640, 640],
+      "sha256": "60380494671b000617d2b8c65074af33b4b716bba7aba4449a077fa77fcd0251"
+    },
+    {
+      "role": "correlation-validated upper-crown high-frequency detail",
+      "path": "merchant-detail-4.jpg",
+      "dimensions": [640, 640],
+      "sha256": "3c94c0f01268ec45e1732bc9e4ffc6e7610748f978a15308d0194bb9d252cb2d"
+    }
+  ],
+  "method": "SIFT and mutual ratio matching; MAGSAC homography; bounded DIS piecewise alignment; independent local high-pass, gradient, intensity, and texture gates; high-frequency luminance fusion only",
+  "accepted_mapping": [
+    {
+      "source": "merchant-detail-2.jpg",
+      "reliable_bbox_in_640_overview_xyxy": [166, 64, 384, 160],
+      "ratio_matches": 373,
+      "magsac_inliers": 254,
+      "median_reprojection_error_overview_pixels": 0.8579362034797668,
+      "p95_reprojection_error_overview_pixels": 2.4752659797668457,
+      "median_sampling_gain": 1.9547967910766602,
+      "median_high_frequency_correlation": 0.8327741026878357,
+      "reliable_pixels_at_640": 7998
+    },
+    {
+      "source": "merchant-detail-4.jpg",
+      "reliable_bbox_in_640_overview_xyxy": [197, 0, 436, 160],
+      "ratio_matches": 168,
+      "magsac_inliers": 147,
+      "median_reprojection_error_overview_pixels": 0.9552063941955566,
+      "p95_reprojection_error_overview_pixels": 2.840898275375366,
+      "median_sampling_gain": 2.0605623722076416,
+      "median_high_frequency_correlation": 0.8169172406196594,
+      "reliable_pixels_at_640": 4028
+    }
+  ],
+  "combined_hard_reliable_fraction_of_1280_master": 0.0220953369140625,
+  "combined_feathered_contribution_fraction_of_1280_master": 0.0257769775390625,
+  "outside_feathered_contribution": {
+    "changed_pixels": 0,
+    "maximum_absolute_channel_difference": 0
+  },
+  "limitations": [
+    "Only upper-crown regions overlap at meaningfully higher sampling in the genuine closer merchant frames.",
+    "The lower tier and surrounding room remain merchant overview photograph 1 enlarged; no absent detail is synthesized.",
+    "Transparent glass and camera parallax prevent reliable whole-frame replacement, so low-correlation pixels are excluded."
+  ]
+}

@@ -452,7 +452,7 @@
       reader.onload=()=>resolve(String(reader.result||''));
       reader.readAsDataURL(blob);
     });
-    const canvasBlob=(canvas,quality)=>new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',quality));
+    const canvasBlob=(canvas,type,quality)=>new Promise(resolve=>canvas.toBlob(resolve,type,quality));
     const decode=async()=>{
       if(typeof root.createImageBitmap==='function')return {source:await root.createImageBitmap(file),revoke(){this.source.close?.();}};
       const url=root.URL.createObjectURL(file),image=new root.Image();
@@ -468,14 +468,25 @@
         const source=decoded.source,sourceWidth=source.width||source.naturalWidth,sourceHeight=source.height||source.naturalHeight;
         if(!sourceWidth||!sourceHeight)throw new Error('The selected file has no readable image dimensions.');
         if(file.size<=stateApi().MAX_IMAGE_BYTES)return {dataUrl:await readDataUrl(file),resized:false,bytes:file.size};
-        for(const longestSide of [1600,1280,1024,800,640,480]){
+        const sourceSide = Math.max(sourceWidth, sourceHeight);
+        const sides = [...new Set([1800,1600,1280,1024,800,640,480,384,320].map(side => Math.min(side,sourceSide)))];
+        let outputType = 'image/webp';
+        for(const longestSide of sides){
           const scale=Math.min(1,longestSide/Math.max(sourceWidth,sourceHeight)),width=Math.max(1,Math.round(sourceWidth*scale)),height=Math.max(1,Math.round(sourceHeight*scale));
           const canvas=root.document.createElement('canvas');canvas.width=width;canvas.height=height;
           const drawing=canvas.getContext('2d',{alpha:false});
           if(!drawing)throw new Error('This browser could not prepare the photo.');
+          drawing.imageSmoothingEnabled = true;
+          drawing.imageSmoothingQuality = 'high';
           drawing.fillStyle='#fff9ed';drawing.fillRect(0,0,width,height);drawing.drawImage(source,0,0,width,height);
-          for(const quality of [.88,.8,.72,.64,.56,.48,.4]){
-            const blob=await canvasBlob(canvas,quality);
+          // Large, heavily compressed copies obscure upholstery and wood grain.
+          // Use a smaller, high-quality rendition if the larger one cannot fit.
+          for(const quality of [.94,.88,.82]){
+            let blob = await canvasBlob(canvas,outputType,quality);
+            if (outputType === 'image/webp' && blob?.type !== outputType) {
+              outputType = 'image/jpeg';
+              blob = await canvasBlob(canvas,outputType,quality);
+            }
             if(blob&&blob.size<=stateApi().MAX_IMAGE_BYTES)return {dataUrl:await readDataUrl(blob),resized:true,bytes:blob.size};
           }
         }

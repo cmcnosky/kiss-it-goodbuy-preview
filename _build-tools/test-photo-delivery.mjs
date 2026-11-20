@@ -184,6 +184,15 @@ delete catalog[largeKey];
 assert.equal(Photos.descriptor(duplicate, {fullSize: true}).src, 'small.jpg');
 assert.equal(Photos.displaySourceWidth(duplicate), 798);
 
+const registeredItem = {src: 'https://cdn.shopify.com/s/files/1/0289/5239/5911/files/registered.jpg?v=9', width: 640, height: 640};
+const registeredKey = Photos.photoKey(registeredItem.src);
+context.KIGBPhotoSharpness.registeredWidths = { [registeredKey]: 1280 };
+catalog[registeredKey] = [[480, 480, 'registered-small.jpg'], [1280, 1280, 'registered-full.jpg']];
+assert.equal(Photos.displaySourceWidth(registeredItem), 1280);
+assert.equal(Photos.descriptor(registeredItem, {fullSize: true}).src, 'registered-full.jpg');
+assert.equal(Photos.descriptor(registeredItem, {original: true}).src, registeredItem.src);
+assert.equal(Photos.displaySourceWidth({ ...registeredItem, src: registeredItem.src.replace('v=9', 'v=10') }), 640);
+
 // A pair can lead with both chairs while the merchant remains in control of the cover.
 const singleChair = {id: '52049330012397'};
 const chairsTogether = {id: '52049330077933'};
