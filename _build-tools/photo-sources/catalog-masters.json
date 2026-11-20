@@ -2,7 +2,10 @@
   "files/16ae096980e9d52296f9a0b68bf120e2_0c61a054-a1c6-4644-b8f5-6eee4bd51129.jpg?1723592030": {
     "originalSha256": "28d97ee4c6dcb629ad0921695f6a69c4b0b588cd75cac2d0f4770469c151dd8e",
     "masterSha256": "76202c5ff2b5218c2077c724f1c413224a4a4b42249ada1bbe4641507c7f3eba",
-    "file": "murano-registered-master.png"
+    "file": "murano-registered-master.png",
+    "alternateOriginalSha256": [
+      "bd136e42c3d26fba6b3ac140d839c337260943dc0f7ab8ad7d41cb57da6db090"
+    ]
   },
   "files/dd8892767c4f586f617d00aa6df113a2.jpg?1786817930": {
     "originalSha256": "0249d1b62b48505e3873d7034f184180fa44bef3512a7831b81d6b4ade84fe32",
@@ -17,12 +20,18 @@
   "files/60a2883e78f2f61cbf7ae493dedc9d6a.jpg?1786122702": {
     "originalSha256": "24de5b8c22cfd63d6e6981603d344ca7e54def49f513fcb543807514e0770ced",
     "masterSha256": "db2250d9551931a6b798bb49dfa76a8ac7370bbf0e2cb0b16553a48b411442bf",
-    "file": "matched-catalog/madrid-lamp.jpg"
+    "file": "matched-catalog/madrid-lamp.jpg",
+    "alternateOriginalSha256": [
+      "119f1fa6e996c32c8372f544b36a629e87025c1317aaca0993f08447b7fb8174"
+    ]
   },
   "products/5f2042f46faf04f4448f700609035c1d.jpg?1671057823": {
     "originalSha256": "454d9b505a8f54ef6ae44f81666173a4ec3281849f1e35630865cf524bde0de8",
     "masterSha256": "ce17dcfb0a85109a88b4d1632d60d7f33cb075f2cd331f6df70e47b39e415403",
-    "file": "matched-catalog/nectar-peppermint.jpg"
+    "file": "matched-catalog/nectar-peppermint.jpg",
+    "alternateOriginalSha256": [
+      "c77c5c7a42998dded828518b931e0aa07fb9f53811abb2e0c84059a615f47c6b"
+    ]
   },
   "products/f064e2986858b02663e2003c7eb38da4.jpg?1671057824": {
     "originalSha256": "62c96bd536d7334e9adbec44d6101267672f64e7b3b894d82594f7f04d813552",
@@ -32,6 +41,9 @@
   "products/db1b9027985d417b6473b75d86d3d062.jpg?1618436340": {
     "originalSha256": "1ba2e9a8d48607d38165eb667c8c818a1e65ead2c617d64cebd67f7d208c1918",
     "masterSha256": "489f1ec4bd6b68e51d29dc34401b1e9a3ce57186d89b90d33f7b8a2959afdb57",
-    "file": "matched-catalog/millie-pendant.webp"
+    "file": "matched-catalog/millie-pendant.webp",
+    "alternateOriginalSha256": [
+      "ad8440d8b7205e44b75510cfdd2d91008a749d788a80961fc29613778dc62ffa"
+    ]
   }
 }

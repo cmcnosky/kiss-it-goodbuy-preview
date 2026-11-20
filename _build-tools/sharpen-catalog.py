@@ -329,7 +329,9 @@ def render_photo(item, output_dir, cache):
     if registration:
         original_hash = hashlib.sha256(blob).hexdigest()
         rendition_key += ":" + original_hash
-        if original_hash == registration["originalSha256"]:
+        # Shopify can negotiate different encodings of the same exact frame.
+        approved_hashes = [registration["originalSha256"], *registration.get("alternateOriginalSha256", [])]
+        if original_hash in approved_hashes:
             master = (PHOTO_SOURCES / registration["file"]).read_bytes()
             master_hash = hashlib.sha256(master).hexdigest()
             if master_hash != registration["masterSha256"]:

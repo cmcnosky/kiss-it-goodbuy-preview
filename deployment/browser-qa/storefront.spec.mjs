@@ -433,6 +433,9 @@ test('all eleven gallery archive photographs open their largest local file and r
       const link = links.nth(index);
       const href = await link.getAttribute('href');
       const expected = new URL(href, page.url()).href;
+      const sourceImage = link.locator('img');
+      const expectedTone = await sourceImage.getAttribute('data-photo-tone');
+      const expectedFilter = await sourceImage.evaluate(element => getComputedStyle(element).filter);
       await link.click();
       const dialog = page.locator('dialog.photo-dialog[open]');
       const image = dialog.locator('.photo-dialog-stage img');
@@ -455,6 +458,8 @@ test('all eleven gallery archive photographs open their largest local file and r
       expect(details.naturalHeight).toBeGreaterThan(0);
       expect(details.renderedWidth).toBeLessThanOrEqual(details.naturalWidth + 1);
       expect(details.renderedHeight).toBeLessThanOrEqual(details.naturalHeight + 1);
+      expect(await image.getAttribute('data-photo-tone')).toBe(expectedTone);
+      expect(await image.evaluate(element => getComputedStyle(element).filter)).toBe(expectedFilter);
       const sizeControl = dialog.locator('[data-photo-size]');
       await sizeControl.click();
       await expect(sizeControl).toHaveAttribute('aria-pressed', 'true');
@@ -462,6 +467,8 @@ test('all eleven gallery archive photographs open their largest local file and r
       expect(await image.evaluate(element => Math.abs(
         element.getBoundingClientRect().width * devicePixelRatio - element.naturalWidth
       )), '100% maps each source pixel to one display pixel').toBeLessThanOrEqual(1);
+      expect(await image.getAttribute('data-photo-tone')).toBe(expectedTone);
+      expect(await image.evaluate(element => getComputedStyle(element).filter)).toBe(expectedFilter);
 
       if (index % 2 === 0) await page.keyboard.press('Escape');
       else await dialog.locator('[data-close]').click();
@@ -480,6 +487,8 @@ test('the Murano study preserves square contained photographs when the neighbori
     const photographs = print.locator(':scope > [data-archive-photo] img, .murano-details [data-archive-photo] img');
     await expect(photographs).toHaveCount(3);
     await photographs.evaluateAll(images => Promise.all(images.map(image => image.decode())));
+    expect(await photographs.evaluateAll(images => images.map(image => image.dataset.photoTone || '')))
+      .toEqual(['', '', 'midtones']);
     const before = await print.boundingBox();
     await page.locator('.light-chapter .chapter-shop').evaluate(element => { element.style.minHeight = '1800px'; });
     await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));

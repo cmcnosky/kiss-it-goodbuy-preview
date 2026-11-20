@@ -170,6 +170,7 @@ const galleryPhotographs = {
   chest: ['lane-park-chest-v2', 480, 798, 798, 'Front view of the Bernhardt Lane Park chest with its geometric wood panels'],
   showroom: ['gallery-showroom-v2', 768, 1135, 596, 'Furniture, art, and accessories arranged in the Kiss It Good Buy showroom']
 };
+const galleryPhotoTones = { branches: 'midtones' };
 
 function archivePhotoLink(image, file, alt) {
   return `<a class="archive-photo-link" href="${file}" data-archive-photo aria-haspopup="dialog" aria-label="Enlarge photograph: ${esc(alt)}">${image}</a>`;
@@ -179,7 +180,8 @@ function galleryPhoto(key, sizes, eager = false) {
   const [name, small, width, height, alt, middle] = galleryPhotographs[key];
   const file = w => `assets/editorial/${name}-${w}.webp`;
   const sources = [small, middle, width].filter(Boolean).map(w => `${file(w)} ${w}w`).join(', ');
-  const image = `<img src="${file(width)}" srcset="${sources}" sizes="${sizes}" width="${width}" height="${height}" alt="${alt}" loading="${eager ? 'eager' : 'lazy'}" decoding="async">`;
+  const tone = galleryPhotoTones[key];
+  const image = `<img src="${file(width)}" srcset="${sources}" sizes="${sizes}" width="${width}" height="${height}" alt="${alt}" loading="${eager ? 'eager' : 'lazy'}" decoding="async"${tone ? ` data-photo-tone="${tone}"` : ''}>`;
   return archivePhotoLink(image, file(width), alt);
 }
 
@@ -472,8 +474,10 @@ document.addEventListener('click', event => {
  dialog.setAttribute('aria-labelledby', 'archive-photo-title');
  dialog.innerHTML = `<div class="dialog-top"><span id="archive-photo-title"></span><button class="icon-button" data-close aria-label="Close photograph">${icon('close')}</button></div><div class="photo-dialog-stage"></div><div class="photo-dialog-tools"><button type="button" class="text-link" data-photo-size aria-pressed="false">View at 100%</button></div>`;
  const image = document.createElement('img');
- image.alt = link.querySelector('img').alt;
+ const sourceImage = link.querySelector('img');
+ image.alt = sourceImage?.alt || '';
  image.src = link.href;
+ if (sourceImage?.dataset.photoTone) image.dataset.photoTone = sourceImage.dataset.photoTone;
  dialog.querySelector('#archive-photo-title').textContent = image.alt;
  dialog.querySelector('.photo-dialog-stage').append(image);
  dialog.addEventListener('close', () => {
