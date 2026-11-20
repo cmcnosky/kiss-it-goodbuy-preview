@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "entries": {
+    "files/dd8892767c4f586f617d00aa6df113a2.jpg?1786817930": {
+      "productId": "9531869823213",
+      "merchantImageId": "50173443309805",
+      "label": "Kuzco Oros room",
+      "sourceUrl": "https://kuzcolighting.com/cdn/shop/files/OROS_CH94829-AN_LIFESTYLE.jpg?v=1741732138",
+      "originalSourceSha256": "cbf198a9b320bed784cdea0d4235a0c87a5e4c4e2327f082b7d880a5d760c2c0",
+      "originalSourceDimensions": [3199, 4140],
+      "relativeMasterPath": "_build-tools/photo-sources/matched-catalog/oros-room.jpg",
+      "masterSha256": "7a1419a0d41aa2b78f6a8bf302d80f43af9f7418887aafba2e24a6e634a03987",
+      "width": 2048,
+      "height": 2048,
+      "recipe": {
+        "type": "similarity-fit-with-white-square-matte",
+        "sourceToMasterAffine": [
+          [0.4852833402588243, -0.00039529579711555416, 246.257839649635],
+          [0.00039529579711555416, 0.4852833402588243, 17.1147199719708]
+        ],
+        "interpolation": "OpenCV INTER_LANCZOS4",
+        "background": "#FFFFFF",
+        "jpegQuality": 97,
+        "jpegChromaSampling": "4:4:4",
+        "note": "Uniform-scale similarity projection retains the merchant portrait framing and white side matte; no scene pixels are synthesized."
+      },
+      "alignmentEvidence": {
+        "magsacInliers": 134,
+        "medianReprojectionErrorAtMerchantPixels": 0.44475680589675903,
+        "p95ReprojectionErrorAtMerchantPixels": 1.3928251266479492
+      }
+    },
+    "files/e3a16141a2d46329b9c644c3aee177a3.jpg?1786817930": {
+      "productId": "9531869823213",
+      "merchantImageId": "50173443342573",
+      "label": "Kuzco Oros detail",
+      "sourceUrl": "https://kuzcolighting.com/cdn/shop/files/OROS_CH94829-AN_CROPLS.jpg?v=1741732138",
+      "originalSourceSha256": "501ec9d4879051c1dfc8be80af92aab29582dd47e929fa1051cadc5fee6b3843",
+      "originalSourceDimensions": [2000, 2000],
+      "relativeMasterPath": "_build-tools/photo-sources/matched-catalog/oros-detail.jpg",
+      "masterSha256": "501ec9d4879051c1dfc8be80af92aab29582dd47e929fa1051cadc5fee6b3843",
+      "width": 2000,
+      "height": 2000,
+      "recipe": {
+        "type": "exact-source-copy",
+        "note": "The official file already matches the merchant crop to subpixel error, so it is retained byte-for-byte."
+      },
+      "alignmentEvidence": {
+        "magsacInliers": 272,
+        "medianReprojectionErrorAtMerchantPixels": 0.34227198362350464,
+        "p95ReprojectionErrorAtMerchantPixels": 1.4876203536987305,
+        "directGrayCorrelation": 0.9931389242920041,
+        "directHighPassCorrelation": 0.9087488128601543
+      }
+    },
+    "files/60a2883e78f2f61cbf7ae493dedc9d6a.jpg?1786122702": {
+      "productId": "9288349253869",
+      "merchantImageId": "50021203607789",
+      "label": "Regina Andrew Madrid lamp",
+      "sourceUrl": "https://www.reginaandrew.com/SSP%20Applications/NetSuite%20Inc.%20-%20SCA%20Mont%20Blanc/Development/assets/img/13-1274_1.jpg",
+      "originalSourceSha256": "db2250d9551931a6b798bb49dfa76a8ac7370bbf0e2cb0b16553a48b411442bf",
+      "originalSourceDimensions": [1600, 1600],
+      "relativeMasterPath": "_build-tools/photo-sources/matched-catalog/madrid-lamp.jpg",
+      "masterSha256": "db2250d9551931a6b798bb49dfa76a8ac7370bbf0e2cb0b16553a48b411442bf",
+      "width": 1600,
+      "height": 1600,
+      "recipe": {
+        "type": "exact-source-copy",
+        "note": "The official file already matches the merchant crop to subpixel error, so it is retained byte-for-byte."
+      },
+      "alignmentEvidence": {
+        "magsacInliers": 138,
+        "medianReprojectionErrorAtMerchantPixels": 0.5452874302864075,
+        "p95ReprojectionErrorAtMerchantPixels": 1.5634889602661133,
+        "directGrayCorrelation": 0.9958574816474344,
+        "directHighPassCorrelation": 0.8596292479862051
+      }
+    }
+  }
+}

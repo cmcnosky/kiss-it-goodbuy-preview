@@ -25,10 +25,9 @@ PIPELINE_DIGEST = hashlib.sha256(
     + b"\0NumPy-"
     + np.__version__.encode()
 ).hexdigest()[:16]
-# Register only the merchant file whose geometry was verified against the two close-ups.
-REGISTERED_KEY = "files/16ae096980e9d52296f9a0b68bf120e2_0c61a054-a1c6-4644-b8f5-6eee4bd51129.jpg?1723592030"
-REGISTERED_SOURCE_HASH = "28d97ee4c6dcb629ad0921695f6a69c4b0b588cd75cac2d0f4770469c151dd8e"
-REGISTERED_MASTER_HASH = "76202c5ff2b5218c2077c724f1c413224a4a4b42249ada1bbe4641507c7f3eba"
+# A versioned merchant key and the original file hash both bind each approved replacement.
+PHOTO_SOURCES = Path(__file__).parent / "photo-sources"
+REGISTERED_MASTERS = json.loads((PHOTO_SOURCES / "catalog-masters.json").read_text())
 TARGET_WIDTHS = (192, 480, 960, 1600)
 MAX_SOURCE_BYTES = 30_000_000
 MAX_PIXELS = 30_000_000
@@ -325,18 +324,25 @@ def render_photo(item, output_dir, cache):
     if declared_height:
         width_cap = min(width_cap, max(1, int(declared_height * image.width / image.height)))
     registered_width = None
-    if key == REGISTERED_KEY and hashlib.sha256(blob).hexdigest() == REGISTERED_SOURCE_HASH:
-        master = (Path(__file__).parent / "photo-sources" / "murano-registered-master.png").read_bytes()
-        if hashlib.sha256(master).hexdigest() != REGISTERED_MASTER_HASH:
-            raise ValueError("Registered overview master does not match its verified source")
-        image, color_handling, source_format = open_rgb(master)
-        registered_width = width_cap = image.width
+    rendition_key = key
+    registration = REGISTERED_MASTERS.get(key)
+    if registration:
+        original_hash = hashlib.sha256(blob).hexdigest()
+        rendition_key += ":" + original_hash
+        if original_hash == registration["originalSha256"]:
+            master = (PHOTO_SOURCES / registration["file"]).read_bytes()
+            master_hash = hashlib.sha256(master).hexdigest()
+            if master_hash != registration["masterSha256"]:
+                raise ValueError(f"Catalog photograph master failed its integrity check: {key}")
+            image, color_handling, source_format = open_rgb(master)
+            registered_width = width_cap = image.width
+            rendition_key += ":" + master_hash
     image, source_processing = prepared_source(image, source_format)
     sources = []
     measures = []
     derivative_cached = 0
     for width in target_widths(width_cap):
-        cached = cache_path(cache, key, width)
+        cached = cache_path(cache, rendition_key, width)
         if cached and cached.exists():
             encoded = cached.read_bytes()
             derivative_cached += 1
@@ -370,6 +376,7 @@ def render_photo(item, output_dir, cache):
         "sourceFormat": source_format,
         "sourceProcessing": source_processing,
         "registeredWidth": registered_width,
+        "renditionKey": rendition_key,
         "jpegQuality": JPEG_QUALITY,
         "sources": sources,
         "measurements": measures,
@@ -465,9 +472,9 @@ def run():
     if args.cache:
         active_sources = {hashlib.sha256(key.encode()).hexdigest() + ".source" for key in photos}
         active_renditions = {
-            cache_path(args.cache, key, source[0]).name
-            for key, sources in photos.items()
-            for source in sources
+            cache_path(args.cache, row["renditionKey"], source[0]).name
+            for row in rows if row["status"] == "sharpened"
+            for source in row["sources"]
         }
         report["prunedCacheFiles"] = (
             prune_files(args.cache / "sources", active_sources, r"[0-9a-f]{64}\.source")

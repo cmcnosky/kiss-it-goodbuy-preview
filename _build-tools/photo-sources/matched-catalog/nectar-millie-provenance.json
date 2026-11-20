@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "purpose": "Exact-photo higher-resolution source masters for small merchant catalog images",
+  "verification": {
+    "method": "Each proposed master was visually compared with the merchant frame, then reduced to the merchant frame with Lanczos resampling. Luma correlation, mean absolute error, and RMS error were measured on the aligned frames.",
+    "condition_photo_rule": "A manufacturer or retailer photograph was accepted only when the photographed object and pixel geometry matched the merchant image. No generic substitute was accepted for an item-specific condition photograph."
+  },
+  "photos": [
+    {
+      "merchant_key": "products/5f2042f46faf04f4448f700609035c1d.jpg?1671057823",
+      "listing": "Nectar Republic Candle Apothecary Jar Collection 16oz",
+      "angle": 4,
+      "subject": "Peppermint Tea Tree candle",
+      "merchant_original": {
+        "url": "https://cdn.shopify.com/s/files/1/0289/5239/5911/products/5f2042f46faf04f4448f700609035c1d.jpg?v=1671057823",
+        "width": 300,
+        "height": 300,
+        "sha256": "c77c5c7a42998dded828518b931e0aa07fb9f53811abb2e0c84059a615f47c6b"
+      },
+      "source": {
+        "page_url": "https://ambientegifts.com/products/peppermint-tea-tree-apothecary-candle-nectar-republic",
+        "image_url": "https://ambientegifts.com/cdn/shop/files/peppermint-tea-tree-apothecary-candle-nectar-republicnectar-republic-ambiente-gifts-decor-design-304823_1200x1200.jpg?v=1717445092",
+        "width": 1000,
+        "height": 1000,
+        "sha256": "ce17dcfb0a85109a88b4d1632d60d7f33cb075f2cd331f6df70e47b39e415403"
+      },
+      "master": {
+        "path": "_build-tools/photo-sources/matched-catalog/nectar-peppermint.jpg",
+        "width": 1000,
+        "height": 1000,
+        "sha256": "ce17dcfb0a85109a88b4d1632d60d7f33cb075f2cd331f6df70e47b39e415403"
+      },
+      "framing_recipe": {
+        "operation": "direct copy",
+        "notes": "The source and merchant image use the same square framing."
+      },
+      "alignment": {
+        "comparison": "1000x1000 master resized to 300x300 merchant frame with Lanczos",
+        "luma_correlation": 0.994015463197,
+        "luma_mean_absolute_error": 1.73168889,
+        "luma_rms_error": 3.27553558
+      }
+    },
+    {
+      "merchant_key": "products/f064e2986858b02663e2003c7eb38da4.jpg?1671057824",
+      "listing": "Nectar Republic Candle Apothecary Jar Collection 16oz",
+      "angle": 6,
+      "subject": "Grapefruit Lemongrass candle",
+      "merchant_original": {
+        "url": "https://cdn.shopify.com/s/files/1/0289/5239/5911/products/f064e2986858b02663e2003c7eb38da4.jpg?v=1671057824",
+        "width": 300,
+        "height": 300,
+        "sha256": "62c96bd536d7334e9adbec44d6101267672f64e7b3b894d82594f7f04d813552"
+      },
+      "source": {
+        "page_url": "https://www.graceiousliving.com/collections/nectar-republic",
+        "image_url": "https://www.graceiousliving.com/cdn/shop/products/grapefruit-candle-nectar-republic.jpg?v=1747153549",
+        "width": 1000,
+        "height": 1000,
+        "sha256": "515a4789192dc7f8cf4687c765dfdc4aee71a33a4d6325a89c7fb4f55be5a0b8"
+      },
+      "master": {
+        "path": "_build-tools/photo-sources/matched-catalog/nectar-grapefruit.jpg",
+        "width": 1000,
+        "height": 1000,
+        "sha256": "515a4789192dc7f8cf4687c765dfdc4aee71a33a4d6325a89c7fb4f55be5a0b8"
+      },
+      "framing_recipe": {
+        "operation": "direct copy",
+        "notes": "The source and merchant image use the same square framing."
+      },
+      "alignment": {
+        "comparison": "1000x1000 master resized to 300x300 merchant frame with Lanczos",
+        "luma_correlation": 0.995078697416,
+        "luma_mean_absolute_error": 1.73763333,
+        "luma_rms_error": 3.03951568
+      }
+    },
+    {
+      "merchant_key": "products/db1b9027985d417b6473b75d86d3d062.jpg?1618436340",
+      "listing": "Uttermost Millie 6 Lt Chrome Pendant Light 23D",
+      "angle": 2,
+      "subject": "Uttermost model 21283 pendant on white",
+      "merchant_original": {
+        "url": "https://cdn.shopify.com/s/files/1/0289/5239/5911/products/db1b9027985d417b6473b75d86d3d062.jpg?v=1618436340",
+        "width": 450,
+        "height": 450,
+        "sha256": "ad8440d8b7205e44b75510cfdd2d91008a749d788a80961fc29613778dc62ffa"
+      },
+      "source": {
+        "page_url": "https://www.yenkur.com/urunler/millie-krom-avize/",
+        "image_url": "https://www.yenkur.com/wp-content/uploads/2026/09/millie-6-acik-krom-avize-ut-21283-01.webp",
+        "width": 1024,
+        "height": 1024,
+        "sha256": "198f556e69c6eac573baf8897b99a7968c63f6a5a90f36f1e2a5764ec4a58a66"
+      },
+      "master": {
+        "path": "_build-tools/photo-sources/matched-catalog/millie-pendant.webp",
+        "width": 905,
+        "height": 905,
+        "sha256": "489f1ec4bd6b68e51d29dc34401b1e9a3ce57186d89b90d33f7b8a2959afdb57"
+      },
+      "framing_recipe": {
+        "operation": "exact crop and white extension",
+        "extract": {
+          "left": 70,
+          "top": 127,
+          "width": 905,
+          "height": 897
+        },
+        "extend": {
+          "top": 0,
+          "right": 0,
+          "bottom": 8,
+          "left": 0,
+          "color": "#ffffff"
+        },
+        "encoding": "lossless WebP",
+        "notes": "This reproduces the merchant's framing without scaling the source pixels."
+      },
+      "alignment": {
+        "comparison": "905x905 framed master resized to 450x450 merchant frame with Lanczos",
+        "luma_correlation": 0.989419442308,
+        "luma_mean_absolute_error": 1.45358519,
+        "luma_rms_error": 4.64201478
+      }
+    }
+  ]
+}
