@@ -486,6 +486,7 @@ test('the Murano study preserves square contained photographs when the neighbori
     const print = study.locator('.murano-print');
     const photographs = print.locator(':scope > [data-archive-photo] img, .murano-details [data-archive-photo] img');
     await expect(photographs).toHaveCount(3);
+    await study.scrollIntoViewIfNeeded();
     await photographs.evaluateAll(images => Promise.all(images.map(image => image.decode())));
     expect(await photographs.evaluateAll(images => images.map(image => image.dataset.photoTone || '')))
       .toEqual(['', '', 'midtones']);
