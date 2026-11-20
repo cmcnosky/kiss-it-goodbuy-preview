@@ -1,0 +1,1 @@
+(function(root){'use strict';root.KIGBPhotoSharpness=Object.freeze({algorithm:'catalog-sharpen-v1',pipelineDigest:'source-stub',photos:Object.freeze({})});})(typeof globalThis!=='undefined'?globalThis:window);

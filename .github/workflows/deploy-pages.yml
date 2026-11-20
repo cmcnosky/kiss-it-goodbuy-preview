@@ -58,11 +58,39 @@ jobs:
 
       - name: Review lighting of new or replaced catalog photographs
         run: |
-          if ! /usr/bin/python3 -c 'from PIL import Image' >/dev/null 2>&1; then
+          if ! /usr/bin/python3 -c 'from PIL import Image, ImageCms' >/dev/null 2>&1; then
             sudo apt-get -qq update
             sudo apt-get -qq install python3-pil
           fi
           /usr/bin/python3 _build-tools/profile-photographs.py --inventory .build/dist/inventory.json --output .build/dist/photo-tones.js
+
+      - name: Identify this set of versioned merchant photographs
+        id: photo-set
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const crypto = require('node:crypto');
+          const { products } = JSON.parse(fs.readFileSync('.build/dist/inventory.json', 'utf8'));
+          const sources = [...new Set(products.flatMap(product => product.images.map(image => image.src)))].sort();
+          const digest = crypto.createHash('sha256').update(JSON.stringify(sources)).digest('hex');
+          fs.appendFileSync(process.env.GITHUB_OUTPUT, 'digest=' + digest + '\n');
+          NODE
+
+      - name: Reuse photograph processing cache
+        uses: actions/cache@v4
+        with:
+          path: .build/photo-cache
+          key: catalog-clarity-${{ runner.os }}-${{ hashFiles('_build-tools/sharpen-catalog.py') }}-${{ steps.photo-set.outputs.digest }}
+          restore-keys: |
+            catalog-clarity-${{ runner.os }}-${{ hashFiles('_build-tools/sharpen-catalog.py') }}-
+
+      - name: Sharpen merchant originals at storefront sizes
+        run: >-
+          /usr/bin/python3 _build-tools/sharpen-catalog.py
+          --inventory .build/dist/inventory.json
+          --output-dir .build/dist/assets/catalog-clarity
+          --manifest .build/dist/photo-sharpness.js
+          --cache .build/photo-cache
 
       - name: Render static entry points and product pages
         run: node .build/scripts/render-pages.mjs --dist .build/dist
@@ -70,6 +98,7 @@ jobs:
       - name: Validate the staged storefront
         run: |
           node --check .build/dist/app.js
+          node --check .build/dist/photo-sharpness.js
           node --check .build/dist/photo-delivery.js
           node --check .build/dist/catalog-normalize.js
           node --check .build/dist/commerce.js
@@ -88,6 +117,7 @@ jobs:
           node .build/scripts/test-cross-tab.mjs
           node .build/scripts/test-palette.mjs
           node .build/scripts/test-photo-delivery.mjs
+          node .build/scripts/check-catalog-clarity.mjs .build/dist
           node .build/scripts/test-planner.mjs
           node .build/scripts/test-checkout-recovery.mjs
           node .build/scripts/test-studio-state.mjs

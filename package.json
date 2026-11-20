@@ -1,0 +1,10 @@
+{
+  "name": "kiss-it-good-buy-site-assets",
+  "private": true,
+  "scripts": {
+    "render:static-photos": "node _build-tools/render-static-photo-sharpness.mjs"
+  },
+  "devDependencies": {
+    "sharp": "0.35.5"
+  }
+}

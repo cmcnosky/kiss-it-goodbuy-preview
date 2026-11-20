@@ -149,7 +149,7 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
   const htmlStart = renderer.indexOf('function html(');
   const htmlEnd = renderer.indexOf('const pages=', htmlStart);
   assert.ok(htmlStart > 0 && htmlEnd > htmlStart, 'renderer HTML helper is available for skip-link regression tests');
-  const assetNames = ['style.css', 'storefront.css', 'integration.css', 'planner.css', 'studio.css', 'studio-runtime.css', 'photo-tones.css', 'photo-tones.js', 'photo-delivery.js', 'catalog-normalize.js', 'inventory.js', 'catalog.js', 'commerce.js', 'checkout-recovery.js', 'storefront-data.js', 'planner.js', 'studio-state.js', 'studio-runtime.js', 'studio.js', 'app.js'];
+  const assetNames = ['style.css', 'storefront.css', 'integration.css', 'planner.css', 'studio.css', 'studio-runtime.css', 'photo-tones.css', 'photo-tones.js', 'photo-sharpness.js', 'photo-delivery.js', 'catalog-normalize.js', 'inventory.js', 'catalog.js', 'commerce.js', 'checkout-recovery.js', 'storefront-data.js', 'planner.js', 'studio-state.js', 'studio-runtime.js', 'studio.js', 'app.js'];
   const context = {
     URL,
     siteUrl: 'https://cmcnosky.github.io/kiss-it-goodbuy-preview/',

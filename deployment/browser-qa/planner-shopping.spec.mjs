@@ -17,7 +17,7 @@ const plannableProduct = inventory.products.find(product =>
 if (!plannableProduct) throw new Error('Browser fixture needs an available, single-variant furniture or decor product with an item number.');
 
 test.beforeEach(async ({ page }) => {
-  const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+XhGbWQAAAABJRU5ErkJggg==', 'base64');
+  const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAXpeqz8AAAAASUVORK5CYII=', 'base64');
   await page.route('https://cdn.shopify.com/**', route => route.fulfill({ status: 200, contentType: 'image/png', body: pixel }));
   await page.route('https://kissitgoodbuy.net/products.json**', route => route.fulfill({
     status: 200,

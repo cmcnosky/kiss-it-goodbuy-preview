@@ -47,6 +47,27 @@
     }
   }
 
+  function photoKey(source) {
+    try {
+      const parsed = new URL(source);
+      const prefix = '/s/files/1/0289/5239/5911/';
+      if (parsed.protocol !== 'https:' || parsed.hostname !== 'cdn.shopify.com' || !parsed.pathname.startsWith(prefix)) return '';
+      return parsed.pathname.slice(prefix.length) + '?' + (parsed.searchParams.get('v') || '');
+    } catch {
+      return '';
+    }
+  }
+
+  function sharpenedSources(imageValue) {
+    const image = normalizedImage(imageValue);
+    const entry = root.KIGBPhotoSharpness?.photos?.[photoKey(image.src)];
+    if (!Array.isArray(entry)) return [];
+    return entry
+      .filter(source => Array.isArray(source) && source.length === 3 && Number(source[0]) > 0 && Number(source[1]) > 0 && typeof source[2] === 'string')
+      .map(source => ({ width: Number(source[0]), height: Number(source[1]), src: source[2] }))
+      .sort((left, right) => left.width - right.width);
+  }
+
   function url(source, requestedWidth, nativeWidth) {
     const src = String(source || '');
     if (!isShopifyImage(src)) return src;
@@ -77,17 +98,45 @@
 
   function descriptor(imageValue, options = {}) {
     const image = normalizedImage(imageValue);
-    if (options.original) return { src: image.src, srcset: '', sizes: '', tone: '' };
+    if (options.original) return { src: image.src, srcset: '', sizes: '', tone: '', originalSrc: '' };
     const widths = Array.isArray(options.widths) && options.widths.length ? options.widths : DEFAULT_WIDTHS;
-    const candidates = srcset(image, widths);
     const desiredWidth = Number(options.sourceWidth || options.width || widths.at(-1) || image.width || 1200);
     const tone = options.tone === false ? '' : root.KIGBPhotoTones?.profile?.(image.src) || '';
+    const sharpened = sharpenedSources(image);
+    if (sharpened.length) {
+      const selected = sharpened.find(source => source.width >= desiredWidth) || sharpened.at(-1);
+      return {
+        src: selected.src,
+        srcset: sharpened.map(source => `${source.src} ${source.width}w`).join(', '),
+        sizes: String(options.sizes || ''),
+        tone,
+        originalSrc: image.src
+      };
+    }
+    const candidates = srcset(image, widths);
     return {
       src: url(image.src, desiredWidth, image.width),
       srcset: candidates,
       sizes: candidates ? String(options.sizes || '') : '',
-      tone
+      tone,
+      originalSrc: ''
     };
+  }
+
+  function share(imageValue) {
+    const image = normalizedImage(imageValue);
+    const sharpened = sharpenedSources(image);
+    if (sharpened.length) {
+      const largest = sharpened.at(-1);
+      return { src: largest.src, width: largest.width, height: largest.height, type: 'image/jpeg' };
+    }
+    let type = '';
+    try {
+      type = ({ jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' })[
+        new URL(image.src).pathname.split('.').pop().toLowerCase()
+      ] || '';
+    } catch {}
+    return { src: image.src, width: image.width, height: image.height, type };
   }
 
   function image(imageValue, options = {}) {
@@ -107,6 +156,7 @@
     if (options.fetchpriority === 'high' || options.fetchpriority === 'low') attributes.push(`fetchpriority="${options.fetchpriority}"`);
     if (options.decoding !== false) attributes.push('decoding="async"');
     if (source.tone) attributes.push(`data-photo-tone="${escape(source.tone)}"`);
+    if (source.originalSrc) attributes.push(`data-photo-original="${escape(source.originalSrc)}"`);
     return `<img ${attributes.join(' ')}>`;
   }
 
@@ -114,16 +164,47 @@
     if (!element) return false;
     const source = descriptor(imageValue, options);
     if (!source.src) return false;
-    element.src = source.src;
+    if (source.originalSrc) element.dataset.photoOriginal = source.originalSrc;
+    else delete element.dataset.photoOriginal;
+    delete element.dataset.photoFallback;
+    if (source.tone) element.dataset.photoTone = source.tone;
+    else delete element.dataset.photoTone;
+    if (options.alt !== undefined) element.alt = String(options.alt);
     if (source.srcset) element.srcset = source.srcset;
     else element.removeAttribute('srcset');
     if (source.sizes) element.sizes = source.sizes;
     else element.removeAttribute('sizes');
-    if (source.tone) element.dataset.photoTone = source.tone;
-    else delete element.dataset.photoTone;
-    if (options.alt !== undefined) element.alt = String(options.alt);
+    // Assign src last so an angle switch has its own original ready even if the
+    // derivative fails immediately from an old page or an interrupted deploy.
+    element.src = source.src;
     return true;
   }
 
-  return { DEFAULT_WIDTHS, gallery, normalizedImage, isShopifyImage, url, candidateWidths, srcset, descriptor, image, apply };
+  function installFallback() {
+    if (typeof root.addEventListener !== 'function' || root.__kigbPhotoFallbackInstalled) return;
+    root.__kigbPhotoFallbackInstalled = true;
+    const restoreOriginal = element => {
+      const original = element?.dataset?.photoOriginal;
+      if (!original || element.dataset.photoFallback === 'true') return false;
+      element.dataset.photoFallback = 'true';
+      element.removeAttribute('srcset');
+      element.removeAttribute('sizes');
+      element.src = original;
+      return true;
+    };
+    root.addEventListener('error', event => restoreOriginal(event?.target), true);
+    const sweepCompletedFailures = () => {
+      root.document?.querySelectorAll?.('img[data-photo-original]').forEach(element => {
+        if (element.complete && element.naturalWidth === 0) restoreOriginal(element);
+      });
+    };
+    if (root.document?.readyState === 'loading') {
+      root.addEventListener('DOMContentLoaded', sweepCompletedFailures, { once: true });
+    } else {
+      sweepCompletedFailures();
+    }
+  }
+
+  installFallback();
+  return { DEFAULT_WIDTHS, gallery, normalizedImage, isShopifyImage, photoKey, sharpenedSources, url, candidateWidths, srcset, descriptor, share, image, apply, installFallback };
 });

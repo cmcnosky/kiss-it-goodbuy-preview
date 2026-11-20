@@ -129,7 +129,7 @@ async function runChecks(options) {
   }
   report.inventory = { sha256: inventoryHash, fetchedAt: inventory.fetchedAt, ageHours, products: inventory.products.length, variants, collections: inventory.collections.length };
 
-  const firstProduct = inventory.products.find(product => product?.handle);
+  const firstProduct = inventory.products.find(product => product?.handle && product.images?.length) || inventory.products.find(product => product?.handle);
   const paths = ['', 'collection.html', 'planner.html', 'studio.html', 'practice-checkout.html', 'visit.html', 'shortlist.html', 'cart.html', `products/${encodeURIComponent(firstProduct.handle)}/`];
   let rootHtml = '';
   const pageHtml = [];
@@ -142,6 +142,18 @@ async function runChecks(options) {
     if (!pagePath) rootHtml = html;
     pageHtml.push({ html, url });
     report.pages.push({ url, bytes: response.bytes.length });
+  }
+
+  if (firstProduct.images?.length) {
+    const productPage = pageHtml.at(-1);
+    const shared = htmlMetadata(productPage.html).ogImage;
+    const catalogPhotoRoot = new URL('assets/catalog-clarity/', options.baseUrl).href;
+    if (!shared.startsWith(catalogPhotoRoot)) throw new Error('The representative product is missing its sharpened public photograph.');
+    const rendition = await fetchBytes(shared, { accept: 'image/jpeg' });
+    if (!rendition.contentType.startsWith('image/jpeg') || rendition.bytes.readUInt16BE(0) !== 0xffd8) {
+      throw new Error('The published catalog photograph is not a readable JPEG.');
+    }
+    report.catalogPhoto = { url: shared, bytes: rendition.bytes.length, sha256: sha256(rendition.bytes) };
   }
 
   const metadata = htmlMetadata(rootHtml);
@@ -176,6 +188,7 @@ async function runChecks(options) {
   for (const required of [
     'app.js',
     'photo-delivery.js',
+    'photo-sharpness.js',
     'photo-tones.js',
     'photo-tones.css',
     'commerce.js',

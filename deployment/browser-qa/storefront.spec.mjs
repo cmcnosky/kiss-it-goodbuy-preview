@@ -31,7 +31,7 @@ const viewports = [
 ];
 
 test.beforeEach(async ({ page }) => {
-  const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+XhGbWQAAAABJRU5ErkJggg==', 'base64');
+  const pixel = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAC0lEQVR4nGNgAAIAAAUAAXpeqz8AAAAASUVORK5CYII=', 'base64');
   await page.route('https://cdn.shopify.com/**', route => route.fulfill({ status: 200, contentType: 'image/png', body: pixel }));
   await page.route('https://kissitgoodbuy.net/products.json**', route => route.fulfill({
     status: 200,
@@ -277,6 +277,24 @@ test('layout audit detects representative broken CSS, image, and markup', async 
   expect(issues.some(issue => issue.startsWith('document overflow'))).toBeTruthy();
   expect(issues.some(issue => issue.startsWith('duplicate IDs'))).toBeTruthy();
   expect(issues.some(issue => issue.startsWith('broken local images'))).toBeTruthy();
+});
+
+test('a missing sharpened angle falls back to its own merchant photograph', async ({ page }) => {
+  const product = inventory.products.find(entry => entry.handle && entry.images?.length >= 2);
+  const root = '/products/' + product.handle + '/';
+  const photo = readFileSync(path.join(buildRoot, 'assets/editorial/facebook-geometric-front-chest.jpg'));
+  await page.route('https://cdn.shopify.com/**', route => route.fulfill({ contentType: 'image/jpeg', body: photo }));
+  await page.route('**/assets/catalog-clarity/**', route => route.abort());
+  await page.goto(root);
+  const main = page.locator('#main-product-image');
+  await expect(main).toHaveAttribute('data-photo-fallback', 'true');
+  const lead = await main.getAttribute('data-photo-original');
+  await expect(main).toHaveAttribute('src', lead);
+  await expect(main).not.toHaveAttribute('srcset', /./);
+  await page.locator('[data-photo="1"]').click();
+  await expect.poll(async () => (await main.getAttribute('src')) !== lead && (await main.getAttribute('src')) === (await main.getAttribute('data-photo-original'))).toBe(true);
+  await expect(main).toHaveAttribute('data-photo-fallback', 'true');
+  await expect.poll(() => main.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
 });
 
 test('catalog photographs use responsive native-size renditions and keep an exact original view', async ({ page }) => {
