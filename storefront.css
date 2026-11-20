@@ -958,6 +958,10 @@ img.main-product-image {
   object-fit: contain;
 }
 
+.photo-dialog-stage:not(.is-actual-size) > img[style] {
+  max-width: min(100%, calc(var(--photo-native-width) / var(--photo-display-density, 1)));
+}
+
 .photo-dialog-stage.is-actual-size {
   grid-template-columns: max-content;
   grid-template-rows: max-content;

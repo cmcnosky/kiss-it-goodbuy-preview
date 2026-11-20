@@ -858,13 +858,13 @@ body{background:var(--cream);color:var(--ink)}
 
 
 /* Keep low-resolution photos at their supplied size when the gallery has a wide frame. */
-.product-gallery #main-product-image {
-  max-width: min(100%, var(--photo-native-width, 100%));
+.product-gallery #main-product-image[style] {
+  max-width: min(100%, calc(var(--photo-native-width) / var(--photo-display-density, 1)));
   margin-inline: auto;
 }
 .product-photo img[style] {
   box-sizing: border-box;
-  padding-inline: max(0px, calc((100% - var(--photo-native-width, 100%)) / 2));
+  padding-inline: max(0px, calc((100% - var(--photo-native-width) / var(--photo-display-density, 1)) / 2));
 }
 
 @media (min-width: 701px) and (max-width: 1000px) {

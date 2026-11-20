@@ -117,37 +117,28 @@
       .join(', ');
   }
 
+  const unavailableRenditions = new Set();
+
   function descriptor(imageValue, options = {}) {
     const image = normalizedImage(imageValue);
-    if (options.original) return { src: image.src, srcset: '', sizes: '', tone: '', originalSrc: '' };
-    const widths = Array.isArray(options.widths) && options.widths.length ? options.widths : DEFAULT_WIDTHS;
-    const desiredWidth = Number(options.sourceWidth || options.width || widths.at(-1) || image.width || 1200);
-    const tone = options.tone === false ? '' : root.KIGBPhotoTones?.profile?.(image.src) || '';
-    const sharpened = sharpenedSources(image);
-    if (sharpened.length) {
-      const selected = options.fullSize ? sharpened.at(-1) : sharpened.find(source => source.width >= desiredWidth) || sharpened.at(-1);
-      return {
-        src: selected.src,
-        srcset: options.fullSize ? '' : sharpened.map(source => `${source.src} ${source.width}w`).join(', '),
-        sizes: options.fullSize ? '' : String(options.sizes || ''),
-        tone,
-        originalSrc: image.src
-      };
+    const source = { src: image.src, srcset: '', sizes: '', tone: '', originalSrc: '' };
+    if (options.original) return source;
+    if (options.tone !== false) source.tone = root.KIGBPhotoTones?.profile?.(image.src) || '';
+
+    // One angle has one display file, from the smallest card to the open viewer.
+    const best = sharpenedSources(image).at(-1);
+    if (best) {
+      source.originalSrc = image.src;
+      if (!unavailableRenditions.has(image.src)) {
+        source.src = best.src;
+        return source;
+      }
+      source.fallback = true;
     }
-    // New inventory and owner-supplied photographs can appear before the next image build.
-    const displayDetail = !/(?:^|\/)(?:brand[-.]|original-logo\.|catalog-clarity\/)|^data:image\/svg|\.svg(?:[?#]|$)/i.test(image.src);
-    if (options.fullSize) {
-      return { src: image.src, srcset: '', sizes: '', tone, originalSrc: '', displayDetail };
-    }
-    const candidates = srcset(image, widths);
-    return {
-      src: url(image.src, desiredWidth, image.width),
-      srcset: candidates,
-      sizes: candidates ? String(options.sizes || '') : '',
-      tone,
-      originalSrc: '',
-      displayDetail
-    };
+
+    // Unsynced inventory, uploads and failed renditions use the supplied file at every size.
+    source.displayDetail = !/(?:^|\/)(?:brand[-.]|original-logo\.|catalog-clarity\/)|^data:image\/svg|\.svg(?:[?#]|$)/i.test(image.src);
+    return source;
   }
 
   function share(imageValue) {
@@ -172,8 +163,6 @@
     const source = descriptor(image, options);
     const attributes = [];
     attributes.push(`src="${escape(source.src)}"`);
-    if (source.srcset) attributes.push(`srcset="${escape(source.srcset)}"`);
-    if (source.sizes) attributes.push(`sizes="${escape(source.sizes)}"`);
     const nativeWidth = displaySourceWidth(image);
     if (nativeWidth) attributes.push(`style="--photo-native-width:${nativeWidth}px"`);
     if (options.id) attributes.push(`id="${escape(options.id)}"`);
@@ -184,6 +173,7 @@
     if (options.loading) attributes.push(`loading="${options.loading === 'eager' ? 'eager' : 'lazy'}"`);
     if (options.fetchpriority === 'high' || options.fetchpriority === 'low') attributes.push(`fetchpriority="${options.fetchpriority}"`);
     if (options.decoding !== false) attributes.push('decoding="async"');
+    if (source.fallback) attributes.push('data-photo-fallback="true"');
     if (source.displayDetail) attributes.push('data-photo-detail="live"');
     if (source.tone) attributes.push(`data-photo-tone="${escape(source.tone)}"`);
     if (source.originalSrc) attributes.push(`data-photo-original="${escape(source.originalSrc)}"`);
@@ -199,16 +189,15 @@
     else element.style?.removeProperty('--photo-native-width');
     if (source.originalSrc) element.dataset.photoOriginal = source.originalSrc;
     else delete element.dataset.photoOriginal;
-    delete element.dataset.photoFallback;
+    if (source.fallback) element.dataset.photoFallback = 'true';
+    else delete element.dataset.photoFallback;
     if (source.displayDetail) element.dataset.photoDetail = 'live';
     else delete element.dataset.photoDetail;
     if (source.tone) element.dataset.photoTone = source.tone;
     else delete element.dataset.photoTone;
     if (options.alt !== undefined) element.alt = String(options.alt);
-    if (source.srcset) element.srcset = source.srcset;
-    else element.removeAttribute('srcset');
-    if (source.sizes) element.sizes = source.sizes;
-    else element.removeAttribute('sizes');
+    element.removeAttribute('srcset');
+    element.removeAttribute('sizes');
     // Assign src last so an angle switch has its own original ready even if the
     // derivative fails immediately from an old page or an interrupted deploy.
     element.src = source.src;
@@ -221,6 +210,7 @@
     const restoreOriginal = element => {
       const original = element?.dataset?.photoOriginal;
       if (!original || element.dataset.photoFallback === 'true') return false;
+      unavailableRenditions.add(original);
       element.dataset.photoFallback = 'true';
       element.dataset.photoDetail = 'live';
       element.removeAttribute('srcset');

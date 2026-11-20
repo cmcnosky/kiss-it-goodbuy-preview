@@ -220,11 +220,9 @@
   }
 
   function studioPhoto(image, preview = false) {
-    const sizes = preview ? '(max-width: 580px) 90vw, (max-width: 900px) 55vw, 32vw' : '76px';
     return root.KIGBPhotos.image(image || 'assets/brand-original.png', {
       alt: '', width: preview ? 480 : 76, height: preview ? 400 : 76,
-      widths: preview ? [320, 480, 640, 960] : [76, 152, 228],
-      sizes, loading: 'lazy', tone: true
+      loading: 'lazy', tone: true
     });
   }
 

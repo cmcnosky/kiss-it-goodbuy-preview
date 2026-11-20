@@ -295,18 +295,38 @@ test('a missing sharpened angle falls back to its own merchant photograph', asyn
   await expect.poll(async () => (await main.getAttribute('src')) !== lead && (await main.getAttribute('src')) === (await main.getAttribute('data-photo-original'))).toBe(true);
   await expect(main).toHaveAttribute('data-photo-fallback', 'true');
   await expect.poll(() => main.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+  const fallback = await main.evaluate(image => image.currentSrc);
+  await page.getByRole('button', { name: 'Enlarge photo', exact: true }).click();
+  const zoom = page.locator('#zoom-image');
+  await expect(zoom).toHaveAttribute('data-photo-fallback', 'true');
+  await zoom.evaluate(image => image.decode());
+  expect(await zoom.evaluate(image => image.currentSrc)).toBe(fallback);
 });
 
-test('catalog photographs use responsive native-size renditions and keep an exact original view', async ({ page }) => {
+test('one photo file follows a shopper from the shelf through the viewer, shortlist, planner and bag', async ({ page }) => {
   const product = inventory.products.find(entry => entry.handle && entry.itemNumber && entry.images?.length > 1 && entry.images[0].width > 500);
   expect(product).toBeTruthy();
   await page.goto(`/products/${product.handle}/`, { waitUntil: 'load' });
 
   const main = page.locator('#main-product-image');
-  await expect(main).toHaveAttribute('srcset', /\s\d+w(?:,|$)/);
-  await expect(main).toHaveAttribute('sizes', /94vw/);
-  const candidates = (await main.getAttribute('srcset')).split(',').map(candidate => Number(candidate.trim().match(/(\d+)w$/)?.[1]));
-  expect(Math.max(...candidates)).toBeLessThanOrEqual(product.images[0].width);
+  async function displayedPhoto(locator) {
+    await expect(locator).toHaveAttribute('data-photo-original', /./);
+    await locator.scrollIntoViewIfNeeded();
+    await locator.evaluate(image => image.decode());
+    const details = await locator.evaluate(image => ({
+      actual: image.currentSrc,
+      expected: new URL(window.KIGBPhotos.sharpenedSources(image.dataset.photoOriginal).at(-1).src, document.baseURI).href,
+      srcset: image.getAttribute('srcset'),
+      sizes: image.getAttribute('sizes'),
+      tone: image.dataset.photoTone || ''
+    }));
+    expect(details.actual).toBe(details.expected);
+    expect(details.srcset).toBeNull();
+    expect(details.sizes).toBeNull();
+    return details;
+  }
+  const lead = await displayedPhoto(page.locator('[data-photo="0"] img'));
+  expect(await displayedPhoto(main)).toEqual(lead);
 
   await page.locator('.main-product-image').click();
   const dialog = page.locator('#photo-dialog');
@@ -317,9 +337,10 @@ test('catalog photographs use responsive native-size renditions and keep an exac
   await expect(zoom).toHaveAttribute('src', /assets\/catalog-clarity\/[a-f0-9]+\.jpg/);
   await expect(zoom).not.toHaveAttribute('srcset', /./);
   await expect(zoom).toHaveAttribute('data-photo-view', 'sharp');
+  expect(await displayedPhoto(zoom)).toEqual(lead);
   expect(await zoom.evaluate(image => {
     const box = image.getBoundingClientRect();
-    return box.width <= image.naturalWidth + 1 && box.height <= image.naturalHeight + 1;
+    return box.width * devicePixelRatio <= image.naturalWidth + 1 && box.height * devicePixelRatio <= image.naturalHeight + 1;
   }), 'the fitted enlargement must never stretch beyond its prepared pixels').toBe(true);
   const sizeControl = page.locator('[data-photo-size]');
   await expect(sizeControl).toHaveAccessibleName('View at 100%');
@@ -327,6 +348,7 @@ test('catalog photographs use responsive native-size renditions and keep an exac
   await expect(sizeControl).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.photo-dialog-stage')).toHaveClass(/is-actual-size/);
   await expect(sizeControl).toHaveText('Fit to window');
+  expect(await displayedPhoto(zoom)).toEqual(lead);
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
   await expect(page.locator('.main-product-image')).toBeFocused();
@@ -351,7 +373,10 @@ test('catalog photographs use responsive native-size renditions and keep an exac
 
   await page.locator('[data-photo="1"]').click();
   await expect(main).toHaveAttribute('alt', /\S/);
+  const second = await displayedPhoto(page.locator('[data-photo="1"] img'));
+  expect(await displayedPhoto(main)).toEqual(second);
   await enlarge.click();
+  expect(await displayedPhoto(zoom)).toEqual(second);
   await dialog.getByRole('button', { name: 'View original photo', exact: true }).click();
   await expect(zoom).toHaveAttribute('src', product.images[1].src);
   await page.keyboard.press('Escape');
@@ -367,15 +392,16 @@ test('catalog photographs use responsive native-size renditions and keep an exac
   await page.keyboard.press('Escape');
 
   await page.goto('/collection.html', { waitUntil: 'load' });
-  const catalogPhoto = page.locator('.product-photo img[srcset]').first();
-  await expect(catalogPhoto).toBeVisible();
-  await expect(catalogPhoto).toHaveAttribute('sizes', /vw|px/);
+  const catalogPhoto = page.locator('.product-photo img[data-photo-original]').first();
+  const card = await displayedPhoto(catalogPhoto);
+  await catalogPhoto.click();
+  expect(await displayedPhoto(page.locator('#main-product-image'))).toEqual(card);
 
   await page.goto(`/shortlist.html?items=${encodeURIComponent(product.itemNumber)}`, { waitUntil: 'load' });
-  await expect(page.locator('.compare-table img')).toHaveAttribute('srcset', /\s\d+w(?:,|$)/);
+  expect(await displayedPhoto(page.locator('.compare-table img'))).toEqual(lead);
 
   await page.goto(`/planner.html?items=${encodeURIComponent(product.itemNumber)}`, { waitUntil: 'load' });
-  await expect(page.locator('.planner-piece-photo img')).toHaveAttribute('srcset', /\s\d+w(?:,|$)/);
+  expect(await displayedPhoto(page.locator('.planner-piece-photo img'))).toEqual(lead);
 
   const cartProduct = inventory.products.find(entry => entry.handle && entry.images?.length && entry.available && entry.variants?.some(variant => variant.available));
   expect(cartProduct, 'fixture needs an available photographed product').toBeTruthy();
@@ -396,7 +422,9 @@ test('catalog photographs use responsive native-size renditions and keep an exac
     }]));
   }, { selectedProduct: cartProduct, selectedVariant: cartVariant });
   await page.goto('/cart.html', { waitUntil: 'load' });
-  await expect(page.locator('.cart-line img')).toHaveAttribute('srcset', /\s\d+w(?:,|$)/);
+  const bag = await displayedPhoto(page.locator('.cart-line img'));
+  await page.goto(`/products/${cartProduct.handle}/`);
+  expect(await displayedPhoto(page.locator('#main-product-image'))).toEqual(bag);
 });
 
 test('small merchant photos keep their native width when shoppers switch angles', async ({ page }) => {
@@ -424,7 +452,50 @@ test('small merchant photos keep their native width when shoppers switch angles'
   expect(dimensions.displayed).toBeLessThanOrEqual(dimensions.frame + 1);
 });
 
-test('all eleven gallery archive photographs open their largest local file and restore focus', async ({ page }) => {
+test.describe('High-density photograph display', () => {
+  test.use({ deviceScaleFactor: 2, viewport: { width: 849, height: 850 } });
+  test('Fit and 100% use the thumbnail file without stretching its pixels', async ({ page }) => {
+    const entry = inventory.products.find(product => product.images?.some(image => image.width > 0 && image.width < 480));
+    test.skip(!entry, 'This catalog has no photograph below 480 supplied pixels.');
+    const small = entry.images.find(image => image.width > 0 && image.width < 480);
+    await page.goto('/products/' + entry.handle + '/');
+    const thumbnail = page.locator('[data-photo] img');
+    const index = await thumbnail.evaluateAll((images, source) =>
+      images.findIndex(image => image.dataset.photoOriginal === source), small.src);
+    expect(index).toBeGreaterThanOrEqual(0);
+    const selected = thumbnail.nth(index);
+    await selected.click();
+    const file = await selected.evaluate(image => image.decode().then(() => image.currentSrc));
+    await page.locator('.main-product-image').click();
+    const zoom = page.locator('#zoom-image');
+    await zoom.evaluate(image => image.decode());
+    const measured = () => zoom.evaluate(image => ({
+      file: image.currentSrc,
+      physicalWidth: image.getBoundingClientRect().width * window.devicePixelRatio,
+      sourceWidth: image.naturalWidth
+    }));
+    const fit = await measured();
+    expect(fit.file).toBe(file);
+    expect(fit.physicalWidth).toBeLessThanOrEqual(fit.sourceWidth + 1);
+    await page.getByRole('button', { name: 'View at 100%' }).click();
+    const actual = await measured();
+    expect(actual.file).toBe(file);
+    expect(Math.abs(actual.physicalWidth - actual.sourceWidth)).toBeLessThanOrEqual(1);
+  });
+});
+
+test('all eleven gallery archive thumbnails and enlargements use the same largest local file', async ({ page }) => {
+  const largestFiles = new Map([
+    ['crystal-chandelier-hero-enhanced-v3.webp', [1448, 1086]],
+    ['murano-overview-v2-1280.webp', [1280, 1280]],
+    ['murano-fluted-cup-v2-640.webp', [640, 639]],
+    ['murano-glass-branches-v2-640.webp', [640, 640]],
+    ['smiroldo-drummer-v2-789.webp', [789, 789]],
+    ['eames-orange-chairs-enhanced-v3.webp', [1254, 1254]],
+    ['lane-park-chest-v2-798.webp', [798, 798]],
+    ['gallery-showroom-v2-1135.webp', [1135, 596]],
+  ]);
+  const seenLargestFiles = new Set();
   for (const [pathname, expectedCount] of [['/index.html', 7], ['/story.html', 4]]) {
     await page.goto(pathname, { waitUntil: 'load' });
     const links = page.locator('[data-archive-photo]');
@@ -433,9 +504,34 @@ test('all eleven gallery archive photographs open their largest local file and r
       const link = links.nth(index);
       const href = await link.getAttribute('href');
       const expected = new URL(href, page.url()).href;
+      const fileName = decodeURIComponent(new URL(expected).pathname.split('/').pop());
+      const expectedDimensions = largestFiles.get(fileName);
+      expect(expectedDimensions, `${fileName} is the reviewed largest archive file`).toBeDefined();
+      seenLargestFiles.add(fileName);
       const sourceImage = link.locator('img');
       const expectedTone = await sourceImage.getAttribute('data-photo-tone');
       const expectedFilter = await sourceImage.evaluate(element => getComputedStyle(element).filter);
+      await link.scrollIntoViewIfNeeded();
+      await sourceImage.evaluate(element => element.decode());
+      const thumbnail = await sourceImage.evaluate(element => {
+        const box = element.getBoundingClientRect();
+        return {
+          src: element.src,
+          currentSrc: element.currentSrc,
+          srcset: element.getAttribute('srcset'),
+          naturalWidth: element.naturalWidth,
+          naturalHeight: element.naturalHeight,
+          renderedWidth: box.width,
+          renderedHeight: box.height,
+          devicePixelRatio,
+        };
+      });
+      expect(thumbnail.src).toBe(expected);
+      expect(thumbnail.currentSrc).toBe(expected);
+      expect(thumbnail.srcset).toBeNull();
+      expect([thumbnail.naturalWidth, thumbnail.naturalHeight]).toEqual(expectedDimensions);
+      expect(thumbnail.naturalWidth).toBeGreaterThanOrEqual(thumbnail.renderedWidth * thumbnail.devicePixelRatio - 1);
+      expect(thumbnail.naturalHeight).toBeGreaterThanOrEqual(thumbnail.renderedHeight * thumbnail.devicePixelRatio - 1);
       await link.click();
       const dialog = page.locator('dialog.photo-dialog[open]');
       const image = dialog.locator('.photo-dialog-stage img');
@@ -445,6 +541,7 @@ test('all eleven gallery archive photographs open their largest local file and r
         const box = element.getBoundingClientRect();
         return {
           src: element.src,
+          currentSrc: element.currentSrc,
           complete: element.complete,
           naturalWidth: element.naturalWidth,
           naturalHeight: element.naturalHeight,
@@ -453,6 +550,7 @@ test('all eleven gallery archive photographs open their largest local file and r
         };
       });
       expect(details.src).toBe(expected);
+      expect(details.currentSrc).toBe(thumbnail.currentSrc);
       expect(details.complete).toBe(true);
       expect(details.naturalWidth).toBeGreaterThan(0);
       expect(details.naturalHeight).toBeGreaterThan(0);
@@ -476,6 +574,7 @@ test('all eleven gallery archive photographs open their largest local file and r
       await expect(link).toBeFocused();
     }
   }
+  expect(seenLargestFiles).toEqual(new Set(largestFiles.keys()));
 });
 
 test('the Murano study preserves square contained photographs when the neighboring chapter grows', async ({ page }) => {

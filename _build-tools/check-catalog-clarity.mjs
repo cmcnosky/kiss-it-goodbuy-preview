@@ -13,7 +13,7 @@ const publicBase = new URL(decodeHtml(canonicalHome));
 const publicAssetRoot = new URL('assets/', publicBase).pathname;
 const context = vm.createContext({ URL });
 context.window = context;
-for (const script of ['photo-sharpness.js', 'photo-delivery.js']) {
+for (const script of ['photo-tones.js', 'photo-sharpness.js', 'photo-delivery.js']) {
   vm.runInContext(fs.readFileSync(path.join(dist, script), 'utf8'), context);
 }
 
@@ -235,18 +235,36 @@ function staticPhotoManifest() {
 
   const outputs = new Map();
   for (const job of STATIC_PHOTO_JOBS) {
+    assert.ok(Array.isArray(job.outputs) && job.outputs.length > 0, `${job.source}: static-photo job has no output`);
     const sourcePath = path.resolve(projectRoot, 'assets', job.source);
     const sourceBytes = fs.readFileSync(sourcePath);
     const native = encodedDimensions(sourceBytes, path.relative(projectRoot, sourcePath));
+    const jobOutputs = [];
+    let previousWidth = 0;
     for (const [output, widthValue] of job.outputs) {
       const width = Number(widthValue);
       assert.ok(width > 0 && width <= native.width, `${output}: renderer job exceeds its ${native.width}px source`);
+      assert.ok(width > previousWidth, `${job.source}: static-photo output widths must be unique and ascending`);
       const publicPath = `assets/${output}`;
       assert.ok(!outputs.has(publicPath), `duplicate static-photo output: ${publicPath}`);
       const rendered = inspectFile(publicPath, `static-photo render manifest ${job.source}`);
       assert.equal(rendered.width, width, `${publicPath}: rendered width differs from the job manifest`);
       assert.equal(rendered.height, Math.round(native.height * width / native.width), `${publicPath}: rendered height differs from the native source ratio`);
-      outputs.set(publicPath, { nativeWidth: native.width, nativeHeight: native.height, source: job.source, width, height: rendered.height });
+      jobOutputs.push({ publicPath, width, height: rendered.height });
+      previousWidth = width;
+    }
+    const best = jobOutputs.at(-1);
+    for (const output of jobOutputs) {
+      outputs.set(output.publicPath, {
+        nativeWidth: native.width,
+        nativeHeight: native.height,
+        source: job.source,
+        width: output.width,
+        height: output.height,
+        bestSource: best.publicPath,
+        bestWidth: best.width,
+        bestHeight: best.height
+      });
     }
   }
   return outputs;
@@ -267,6 +285,7 @@ for (const product of inventory.products) {
   }
 }
 
+const preparedBestByKey = new Map();
 for (const [key, sources] of Object.entries(manifest)) {
   assert.ok(inventoryPhotoKeys.has(key), `photo-sharpness manifest contains an unlisted inventory key: ${key}`);
   assert.ok(Array.isArray(sources) && sources.length > 0, `${key}: empty sharpness manifest entry`);
@@ -278,11 +297,16 @@ for (const [key, sources] of Object.entries(manifest)) {
     inspectFile(filename, `sharpness manifest ${key}`, { width, height });
     previous = Number(width);
   }
+  const [width, height, filename] = sources.at(-1);
+  preparedBestByKey.set(key, { src: filename, width: Number(width), height: Number(height) });
 }
 assert.deepEqual(new Set(Object.keys(manifest)), inventoryPhotoKeys, 'the sharpness manifest must cover every and only current inventory photo');
+const preparedBestFiles = new Map([...preparedBestByKey.values()].map(best => [best.src, best]));
 
 const distinctInventoryPhotos = new Set();
+const deliveredBestByOriginal = new Map();
 let verifiedLargerSources = 0;
+const preparedPhotoSamples = [];
 for (const product of inventory.products) {
   for (const photo of product.images) {
     if (distinctInventoryPhotos.has(photo.src)) continue;
@@ -290,23 +314,30 @@ for (const product of inventory.products) {
     const sharpened = photos.sharpenedSources(photo);
     assert.ok(sharpened.length > 0, `${photo.src}: no prepared photograph exists`);
     for (const source of sharpened) inspectFile(source.src, `prepared inventory photo ${photo.src}`, source);
+    const largest = sharpened.at(-1);
+    assert.deepEqual({ ...preparedBestFiles.get(largest.src) }, { src: largest.src, width: largest.width, height: largest.height },
+      `${photo.src}: delivery helper selected a file that is not a manifest-best source`);
+    deliveredBestByOriginal.set(photo.src, { src: largest.src, width: largest.width, height: largest.height });
+    if (preparedPhotoSamples.length === 0 || (
+      preparedPhotoSamples.length === 1 &&
+      (photos.descriptor(preparedPhotoSamples[0]).tone || '') !== (photos.descriptor(photo).tone || '')
+    )) preparedPhotoSamples.push(photo);
 
     const display = photos.descriptor(photo, { width: 800, sizes: '100vw' });
-    inspectFile(display.src, `inventory display ${photo.src}`);
-    assert.ok(display.srcset, `${photo.src}: empty responsive sizes`);
-    const candidates = parseSrcset(display.srcset, `inventory display ${photo.src}`);
-    for (const candidate of candidates) inspectFile(candidate.source, `inventory srcset ${photo.src}`, { width: candidate.width });
+    inspectFile(display.src, `inventory display ${photo.src}`, largest);
+    assert.equal(display.src, largest.src, `${photo.src}: ordinary display does not use the exact best prepared file`);
+    assert.equal(display.srcset, '', `${photo.src}: ordinary display can negotiate down from the best prepared file`);
+    assert.equal(display.sizes, '', `${photo.src}: ordinary display advertises a responsive slot despite fixed best-file delivery`);
     const displayWidth = Number(photos.displaySourceWidth?.(photo) ?? photo.width);
     assert.ok(Number.isFinite(displayWidth) && displayWidth > 0, `${photo.src}: display source width is unavailable`);
     assert.ok(Number(photo.width) > 0 && displayWidth >= Number(photo.width), `${photo.src}: verified display width is smaller than the listed source`);
-    assert.ok(candidates.at(-1).width <= displayWidth, `${photo.src}: responsive source exceeds its verified display-source width`);
+    assert.equal(largest.width, displayWidth, `${photo.src}: enlargement sizing does not match the exact best file`);
     if (displayWidth > Number(photo.width)) {
       verifiedLargerSources++;
-      assert.ok(candidates.at(-1).width > Number(photo.width), `${photo.src}: larger verified source is not represented in the responsive set`);
+      assert.ok(largest.width > Number(photo.width), `${photo.src}: larger verified source is not selected as the best file`);
     }
 
     const fullSize = photos.descriptor(photo, { fullSize: true });
-    const largest = sharpened.at(-1);
     assert.equal(fullSize.src, largest.src, `${photo.src}: full viewer does not select the largest prepared photograph`);
     assert.equal(fullSize.srcset, '', `${photo.src}: full viewer must not negotiate down to a smaller candidate`);
     const fullDetail = inspectFile(fullSize.src, `full viewer ${photo.src}`);
@@ -321,6 +352,56 @@ for (const product of inventory.products) {
     assert.equal(share.src, largest.src, `${photo.src}: share image is not the largest prepared photograph`);
     inspectFile(share.src, `share image ${photo.src}`, { width: share.width, height: share.height });
     assert.equal(share.type, 'image/jpeg', `${photo.src}: inventory share image must be a JPEG`);
+  }
+}
+
+assert.equal(preparedPhotoSamples.length, 2, 'the catalog needs two photographs for stale-source transition checks');
+{
+  const attributes = new Map([['srcset', 'stale-small.jpg 320w'], ['sizes', '25vw'], ['src', 'stale.jpg']]);
+  const assignments = [];
+  const styleValues = new Map();
+  const element = {
+    dataset: { photoTone: 'stale', photoOriginal: 'stale-original.jpg', photoFallback: 'true' },
+    style: {
+      setProperty(name, value) { styleValues.set(name, value); },
+      removeProperty(name) { styleValues.delete(name); }
+    },
+    set src(value) { attributes.set('src', value); assignments.push(['src', value]); },
+    set srcset(value) { attributes.set('srcset', value); assignments.push(['srcset', value]); },
+    set sizes(value) { attributes.set('sizes', value); assignments.push(['sizes', value]); },
+    set alt(value) { attributes.set('alt', value); assignments.push(['alt', value]); },
+    removeAttribute(name) { attributes.delete(name); assignments.push(['remove', name]); }
+  };
+  for (const photo of preparedPhotoSamples) {
+    assignments.length = 0;
+    assert.equal(photos.apply(element, photo, { alt: 'Selected catalog angle' }), true, `${photo.src}: angle application failed`);
+    const best = deliveredBestByOriginal.get(photo.src);
+    assert.equal(attributes.get('src'), best.src, `${photo.src}: angle application retained a stale source`);
+    assert.equal(attributes.has('srcset'), false, `${photo.src}: angle application retained a stale responsive set`);
+    assert.equal(attributes.has('sizes'), false, `${photo.src}: angle application retained a stale slot size`);
+    assert.equal(element.dataset.photoOriginal, photo.src, `${photo.src}: angle application retained the prior merchant fallback`);
+    assert.equal(element.dataset.photoFallback, undefined, `${photo.src}: angle application retained a prior failure marker`);
+    assert.equal(element.dataset.photoTone || '', photos.descriptor(photo).tone || '', `${photo.src}: angle application retained stale tone metadata`);
+    assert.equal(styleValues.get('--photo-native-width'), `${best.width}px`, `${photo.src}: angle application retained stale enlargement sizing`);
+    assert.deepEqual(assignments.at(-1), ['src', best.src], `${photo.src}: the new best file must be assigned after stale metadata is cleared`);
+  }
+}
+
+// A newly published merchant photograph can precede derivative generation. In
+// that bounded case every shopper surface must use the exact unmodified URL;
+// width-query variants would create unequal clarity and defeat byte identity.
+{
+  const unprepared = {
+    src: 'https://cdn.shopify.com/s/files/1/0289/5239/5911/files/unpublished-clarity-check.jpg?v=1',
+    width: 1373,
+    height: 941
+  };
+  assert.ok(!preparedBestByKey.has(photos.photoKey(unprepared.src)), 'synthetic unpublished-photo key unexpectedly exists');
+  for (const options of [{}, { width: 240, sizes: '240px' }, { fullSize: true }]) {
+    const delivered = photos.descriptor(unprepared, options);
+    assert.equal(delivered.src, unprepared.src, 'unpublished photograph must retain its exact merchant URL');
+    assert.equal(delivered.srcset, '', 'unpublished photograph must not create width-query variants');
+    assert.equal(delivered.sizes, '', 'unpublished photograph must not advertise responsive variants');
   }
 }
 
@@ -339,6 +420,9 @@ let srcsetCandidates = 0;
 let originalReferences = 0;
 let shareReferences = 0;
 let archiveViewerReferences = 0;
+let exactBestCatalogReferences = 0;
+let exactBestStaticReferences = 0;
+let pairedViewerSources = 0;
 const renderedStaticPhotos = new Set();
 
 for (const filename of htmlFiles) {
@@ -377,20 +461,37 @@ for (const filename of htmlFiles) {
       }
     }
 
+    if (source.category === 'catalog') {
+      const listed = inventoryPhotos.get(original)?.[0]?.photo;
+      const best = deliveredBestByOriginal.get(original);
+      assert.ok(listed && best, `${route}: catalog image cannot resolve its listed best file: ${original}`);
+      assert.equal(source.source, best.src, `${route}: catalog representation is not the exact best prepared file`);
+      assert.equal(candidates.length, 0, `${route}: catalog representation can negotiate down from the exact best file`);
+      assert.ok(!attributes.has('sizes'), `${route}: catalog representation advertises a responsive slot`);
+      const expected = photos.descriptor(listed);
+      assert.equal(attributes.get('data-photo-tone') || '', expected.tone || '', `${route}: catalog representation has stale or inconsistent tone metadata`);
+      assert.equal(attributes.get('data-photo-detail') || '', '', `${route}: prepared catalog image received fallback-only detail treatment`);
+      assert.match(attributes.get('style') || '', new RegExp(`(?:^|;)\\s*--photo-native-width\\s*:\\s*${best.width}px(?:;|$)`),
+        `${route}: catalog enlargement sizing differs from its exact best file`);
+      exactBestCatalogReferences++;
+    }
+
     if (source.category === 'staticPhotograph') {
       renderedStaticPhotos.add(source.source);
+      const job = staticPhotoOutputs.get(source.source);
+      assert.ok(job, `${route}: static photograph bypasses its render manifest: ${source.source}`);
+      assert.equal(source.source, job.bestSource, `${route}: static photograph does not use its exact best rendered file`);
+      assert.equal(candidates.length, 0, `${route}: static photograph can negotiate down from its exact best rendered file`);
+      assert.ok(!attributes.has('sizes'), `${route}: static photograph advertises a responsive slot despite fixed best-file delivery`);
       const intrinsicWidth = Number(attributes.get('width'));
       const intrinsicHeight = Number(attributes.get('height'));
       assert.ok(intrinsicWidth > 0 && intrinsicHeight > 0, `${route}: static photograph lacks explicit layout dimensions: ${source.source}`);
-      assert.ok(candidates.length >= 2, `${route}: static photograph has no prepared responsive source set: ${source.source}`);
-      const available = [source, ...candidates.map(candidate => inspectFile(candidate.source, `${route} static srcset`, { width: candidate.width }))];
-      for (const candidate of available) renderedStaticPhotos.add(candidate.source);
-      const largest = available.sort((left, right) => left.width - right.width).at(-1);
-      assert.equal(largest.width, intrinsicWidth, `${route}: static photograph layout width differs from its largest encoded source: ${source.source}`);
+      assert.equal(source.width, intrinsicWidth, `${route}: static photograph layout width differs from its best encoded source: ${source.source}`);
       const declaredRatio = intrinsicWidth / intrinsicHeight;
-      const encodedRatio = largest.width / largest.height;
+      const encodedRatio = source.width / source.height;
       assert.ok(Math.abs(declaredRatio - encodedRatio) / encodedRatio < 0.015,
         `${route}: static photograph layout ratio does not match its encoded pixels: ${source.source}`);
+      exactBestStaticReferences++;
     }
   }
 
@@ -415,14 +516,10 @@ for (const filename of htmlFiles) {
     const imageTag = match[3].match(/<img\b[^>]*>/i)?.[0];
     assert.ok(imageTag, `${route}: archive viewer link does not contain a photograph`);
     const imageAttributes = parseAttributes(imageTag);
-    const available = [inspectFile(imageAttributes.get('src'), `${route} archive viewer image`)];
-    if (imageAttributes.get('srcset')) {
-      for (const candidate of parseSrcset(imageAttributes.get('srcset'), `${route} archive viewer srcset`)) {
-        available.push(inspectFile(candidate.source, `${route} archive viewer srcset`, { width: candidate.width }));
-      }
-    }
-    const largest = available.sort((left, right) => left.width - right.width).at(-1);
-    assert.equal(full.source, largest.source, `${route}: archive viewer does not open the largest prepared photograph`);
+    const shown = inspectFile(imageAttributes.get('src'), `${route} archive viewer image`);
+    assert.ok(!imageAttributes.has('srcset'), `${route}: archive thumbnail can negotiate down from its exact best file`);
+    assert.equal(full.source, shown.source, `${route}: archive viewer source differs from the exact file already shown`);
+    pairedViewerSources++;
   }
 
   if (!routeMatch) continue;
@@ -446,7 +543,9 @@ for (const filename of htmlFiles) {
     sizes: '(max-width: 760px) 94vw, 58vw'
   });
   assert.equal(mainAttributes.get('src'), expectedMain.src, `${route}: main product photograph bypasses prepared delivery`);
-  assert.equal(mainAttributes.get('srcset'), expectedMain.srcset, `${route}: main product responsive candidates differ from the delivery manifest`);
+  assert.equal(expectedMain.src, deliveredBestByOriginal.get(lead.src).src, `${route}: delivery helper did not choose the exact best lead file`);
+  assert.ok(!mainAttributes.has('srcset') && !mainAttributes.has('sizes'), `${route}: main product photograph can negotiate down from the exact best file`);
+  assert.equal(expectedMain.srcset, '', `${route}: main delivery descriptor exposes responsive candidates`);
 
   const zoomTag = html.match(/<img\b[^>]*\bid="zoom-image"[^>]*>/i)?.[0];
   assert.ok(zoomTag, `${route}: missing full-size viewer image`);
@@ -455,6 +554,8 @@ for (const filename of htmlFiles) {
   assert.equal(zoomAttributes.get('src'), expectedZoom.src, `${route}: full-size viewer does not start with the largest prepared image`);
   assert.ok(!zoomAttributes.has('srcset'), `${route}: full-size viewer can be silently replaced by a smaller candidate`);
   assert.equal(zoomAttributes.get('data-photo-original'), lead.src, `${route}: full-size viewer lacks the selected-angle original fallback`);
+  assert.equal(zoomAttributes.get('src'), mainAttributes.get('src'), `${route}: viewer opens a different prepared file and can flash stale or softer pixels`);
+  pairedViewerSources++;
   assert.match(html, /data-photo-open="sharp"[^>]*aria-controls="photo-dialog"/, `${route}: main image is not wired to the prepared viewer`);
   assert.doesNotMatch(html, /data-photo-open="original"/, `${route}: original merchant file is promoted outside the comparison viewer`);
   assert.match(html, /data-photo-version="original"[^>]*>View original photo<\/button>/, `${route}: viewer cannot switch explicitly to the merchant file`);
@@ -462,6 +563,20 @@ for (const filename of htmlFiles) {
   const thumbnailBlock = html.match(/<div class="product-thumbnails"[^>]*>([\s\S]*?)<\/div>/i)?.[1] || '';
   const thumbnailOriginals = [...thumbnailBlock.matchAll(/data-photo-original="([^"]+)"/g)].map(match => decodeHtml(match[1]));
   assert.deepEqual(thumbnailOriginals, Array.from(gallery, image => image.src), `${route}: thumbnail angles do not map one-for-one to current inventory originals`);
+  const thumbnailButtons = [...thumbnailBlock.matchAll(/<button\b([^>]*)>([\s\S]*?)<\/button>/gi)];
+  assert.equal(thumbnailButtons.length, gallery.length, `${route}: thumbnail controls do not map one-for-one to gallery angles`);
+  for (const [position, match] of thumbnailButtons.entries()) {
+    const buttonAttributes = parseAttributes(`<button ${match[1]}>`);
+    assert.equal(Number(buttonAttributes.get('data-photo')), position, `${route}: thumbnail click index does not match its gallery angle`);
+    const imageTag = match[2].match(/<img\b[^>]*>/i)?.[0];
+    assert.ok(imageTag, `${route}: thumbnail ${position + 1} has no image`);
+    const imageAttributes = parseAttributes(imageTag);
+    const photo = gallery[position];
+    const best = deliveredBestByOriginal.get(photo.src);
+    assert.equal(imageAttributes.get('src'), best.src, `${route}: thumbnail ${position + 1} is not the exact best prepared file`);
+    assert.equal(imageAttributes.get('data-photo-original'), photo.src, `${route}: thumbnail ${position + 1} has a stale merchant fallback`);
+    assert.ok(!imageAttributes.has('srcset') && !imageAttributes.has('sizes'), `${route}: thumbnail ${position + 1} can negotiate down from the exact best file`);
+  }
 
   const shared = photos.share(lead);
   const shareTag = html.match(/<meta property="og:image" content="([^"]+)"/)?.[1];
@@ -481,7 +596,7 @@ for (const filename of walk(dist).filter(file => /\.(?:css|js)$/i.test(file))) {
   if (filename.endsWith('.js')) {
     for (const tag of source.matchAll(/<img\b[^>]*>/gi)) {
       if (/\bsrc\s*=\s*["']\$\{/i.test(tag[0])) {
-        assert.match(tag[0], /\bsrcset\s*=/i, `${route}: dynamic static photograph has no responsive source set`);
+        assert.doesNotMatch(tag[0], /\bsrcset\s*=/i, `${route}: dynamic static photograph can negotiate down from its exact best file`);
       }
       assert.doesNotMatch(tag[0], /\bsrc\s*=\s*["']https?:/i, `${route}: template hard-codes an external image`);
       const attributes = parseAttributes(tag[0]);
@@ -498,7 +613,9 @@ for (const filename of walk(dist).filter(file => /\.(?:css|js)$/i.test(file))) {
 }
 
 assert.ok(htmlFiles.length > inventory.products.length, 'expected product routes plus storefront entry routes');
-assert.ok(imageTags > 0 && srcsetCandidates > 0 && originalReferences > 0 && shareReferences > 0 && archiveViewerReferences > 0);
+assert.ok(imageTags > 0 && originalReferences > 0 && shareReferences > 0 && archiveViewerReferences > 0);
+assert.ok(exactBestCatalogReferences > 0 && exactBestStaticReferences > 0 && pairedViewerSources > 0,
+  'exact-best shopper image and click-pair coverage is incomplete');
 assert.ok(categories.catalog.size > 0 && categories.staticPhotograph.size > 0 && categories.brandArt.size > 0);
 for (const source of renderedStaticPhotos) {
   assert.ok(staticPhotoOutputs.has(source), `rendered static photograph bypasses the no-enlargement render manifest: ${source}`);
@@ -518,6 +635,9 @@ console.log(JSON.stringify({
   otherArt: categories.otherArt.size,
   imageTags,
   srcsetCandidates,
+  exactBestCatalogReferences,
+  exactBestStaticReferences,
+  pairedViewerSources,
   exactOriginalReferences: originalReferences,
   archiveViewerReferences,
   socialImageReferences: shareReferences,

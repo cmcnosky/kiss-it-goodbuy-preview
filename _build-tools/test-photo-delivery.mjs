@@ -66,8 +66,7 @@ const markup = Photos.image(shopify, {
   loading: 'lazy'
 });
 assert.match(markup, /src="assets\/catalog-clarity\/example-1000\.jpg"/);
-assert.match(markup, /srcset="assets\/catalog-clarity\/example-360\.jpg 360w, assets\/catalog-clarity\/example-1000\.jpg 1000w"/);
-assert.match(markup, /sizes="\(max-width: 600px\) 90vw, 420px"/);
+assert.doesNotMatch(markup, /srcset=|sizes=/);
 assert.match(markup, /alt="Chair &amp; ottoman"/);
 assert.match(markup, /data-photo-tone="lift"/);
 assert.match(markup, /data-photo-original="https:\/\/cdn\.shopify\.com\/s\/files\/1\/0289\/5239\/5911\/files\/dark-photo\.jpg\?v=123"/);
@@ -86,7 +85,7 @@ assert.match(local, /width="400"/, 'layout dimensions remain present for local a
 const data = 'data:image/jpeg;base64,AAAA';
 assert.equal(Photos.url(data, 1000), data, 'browser-local sample photographs remain untouched');
 
-const attributes = new Map();
+const attributes = new Map([['srcset', 'small.jpg 320w'], ['sizes', '50vw']]);
 const element = {
   dataset: {},
   set src(value) { attributes.set('src', value); },
@@ -96,8 +95,9 @@ const element = {
   removeAttribute(name) { attributes.delete(name); }
 };
 assert.equal(Photos.apply(element, shopify, { alt: 'Closer view', widths: [500, 1500], sizes: '95vw', tone: false }), true);
-assert.match(attributes.get('srcset'), /360w.*1000w/);
-assert.equal(attributes.get('sizes'), '95vw');
+assert.equal(attributes.get('src'), fullSize.src);
+assert.equal(attributes.has('srcset'), false);
+assert.equal(attributes.has('sizes'), false);
 assert.equal(attributes.get('alt'), 'Closer view');
 assert.equal(element.dataset.photoTone, undefined, 'the enlarged original view is never visually toned');
 const original = Photos.image(shopify, { alt: 'Original', original: true, tone: false });
@@ -165,7 +165,11 @@ if (renderedPath) {
 assert.equal(completedFailure.dataset.photoDetail, 'live');
 assert.match(Photos.image(data), /data-photo-detail="live"/);
 assert.doesNotMatch(Photos.image('assets/brand-original.png'), /data-photo-detail/);
-assert.doesNotMatch(Photos.image(shopify), /data-photo-detail/);
+for (const options of [{width: 76}, {width: 480}, {fullSize: true}]) {
+  assert.equal(Photos.descriptor(shopify, options).src, shopify.src, 'each view reuses the working fallback');
+  assert.match(Photos.image(shopify, options), /data-photo-fallback="true"/);
+  assert.equal(Photos.descriptor(data, options).src, data);
+}
 Photos.apply(element, data);
 assert.equal(element.dataset.photoDetail, 'live');
 Photos.apply(element, data, {original: true});
@@ -205,4 +209,4 @@ assert.equal(Photos.gallery(merchantUpdate), merchantUpdate.images);
 const missingAngle = { ...pair, images: [singleChair] };
 assert.equal(Photos.gallery(missingAngle), missingAngle.images);
 
-console.log('photo delivery: native-size caps, responsive candidates, embedded grading filters, safe markup, and unfiltered zoom checks passed');
+console.log('photo delivery: same-file delivery across sizes, fallback reuse, safe markup, and original comparison passed');
