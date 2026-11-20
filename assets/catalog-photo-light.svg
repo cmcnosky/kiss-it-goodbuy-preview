@@ -23,5 +23,8 @@
         <feFuncB type="table" tableValues="0 .10 .22 .36 .50 .64 .78 .90 1"/>
       </feComponentTransfer>
     </filter>
+    <filter id="kigb-live-photo-detail" color-interpolation-filters="sRGB" x="0" y="0" width="100%" height="100%">
+      <feConvolveMatrix order="3" kernelMatrix="0 -.12 0 -.12 1.48 -.12 0 -.12 0" divisor="1" edgeMode="duplicate" preserveAlpha="true"/>
+    </filter>
   </defs>
 </svg>

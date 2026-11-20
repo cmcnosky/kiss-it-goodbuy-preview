@@ -72,6 +72,12 @@ assert.match(markup, /alt="Chair &amp; ottoman"/);
 assert.match(markup, /data-photo-tone="lift"/);
 assert.match(markup, /data-photo-original="https:\/\/cdn\.shopify\.com\/s\/files\/1\/0289\/5239\/5911\/files\/dark-photo\.jpg\?v=123"/);
 
+const fullSize = Photos.descriptor(shopify, { fullSize: true });
+assert.equal(fullSize.src, 'assets/catalog-clarity/example-1000.jpg', 'the enlargement uses the largest prepared rendition');
+assert.equal(fullSize.srcset, '', 'the full-size enlargement cannot be replaced by a smaller responsive candidate');
+assert.equal(fullSize.sizes, '', 'the full-size enlargement does not advertise a smaller layout slot');
+assert.equal(fullSize.originalSrc, shopify.src, 'the prepared enlargement retains its merchant-file fallback');
+
 const local = Photos.image('assets/products/chair.jpg', { alt: 'Chair', width: 400, height: 400 });
 assert.match(local, /src="assets\/products\/chair\.jpg"/);
 assert.doesNotMatch(local, /srcset=/, 'local artwork is delivered directly without invented renditions');
@@ -155,6 +161,28 @@ if (renderedPath) {
     'the renderer embeds the scoped photograph filters when a built page is not available'
   );
 }
+
+assert.equal(completedFailure.dataset.photoDetail, 'live');
+assert.match(Photos.image(data), /data-photo-detail="live"/);
+assert.doesNotMatch(Photos.image('assets/brand-original.png'), /data-photo-detail/);
+assert.doesNotMatch(Photos.image(shopify), /data-photo-detail/);
+Photos.apply(element, data);
+assert.equal(element.dataset.photoDetail, 'live');
+Photos.apply(element, data, {original: true});
+assert.equal(element.dataset.photoDetail, undefined);
+
+const smallKey = 'files/6544188d231520de57114d688d217643_688a28b0-f5b8-49f4-8917-e92ad31b35b3.jpg?1792599755';
+const largeKey = 'files/1d9f5949d4bde93d087fe8befc2c6e6e.jpg?1792599755';
+const duplicate = {src: 'https://cdn.shopify.com/s/files/1/0289/5239/5911/' + smallKey.replace('?', '?v='), width: 798};
+const catalog = context.KIGBPhotoSharpness.photos;
+catalog[smallKey] = [[798, 798, 'small.jpg']];
+catalog[largeKey] = [[2048, 2048, 'large.jpg']];
+assert.equal(Photos.descriptor(duplicate, {fullSize: true}).src, 'large.jpg');
+assert.equal(Photos.displaySourceWidth(duplicate), 2048);
+assert.equal(Photos.descriptor(duplicate, {original: true}).src, duplicate.src);
+delete catalog[largeKey];
+assert.equal(Photos.descriptor(duplicate, {fullSize: true}).src, 'small.jpg');
+assert.equal(Photos.displaySourceWidth(duplicate), 798);
 
 // A pair can lead with both chairs while the merchant remains in control of the cover.
 const singleChair = {id: '52049330012397'};

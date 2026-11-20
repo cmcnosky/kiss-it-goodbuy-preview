@@ -83,6 +83,7 @@ jobs:
           key: catalog-clarity-${{ runner.os }}-${{ hashFiles('_build-tools/sharpen-catalog.py') }}-${{ steps.photo-set.outputs.digest }}
           restore-keys: |
             catalog-clarity-${{ runner.os }}-${{ hashFiles('_build-tools/sharpen-catalog.py') }}-
+            catalog-clarity-${{ runner.os }}-
 
       - name: Sharpen merchant originals at storefront sizes
         run: >-

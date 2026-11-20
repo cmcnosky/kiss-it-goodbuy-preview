@@ -31,7 +31,7 @@ def photo_key(url):
 
 
 def target_widths(native_width):
-    native_width = min(int(native_width), TARGET_WIDTHS[-1])
+    native_width = int(native_width)
     widths = [width for width in TARGET_WIDTHS if width < native_width]
     # An almost-identical intermediate only adds bytes and cannot improve selection.
     if widths and widths[-1] / native_width > 0.82:

@@ -217,8 +217,16 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
 {
   const run = bootStorage({}, new Set(), product.handle);
   const markup = run('productWithPlanner()');
-  assert.match(markup, /data-zoom[^>]+aria-haspopup="dialog" aria-controls="photo-dialog"/,
-    'the photograph disclosure identifies the enlargement dialog');
+  assert.match(markup, /data-photo-open="sharp"[^>]+aria-haspopup="dialog" aria-controls="photo-dialog"/,
+    'the main photograph identifies the sharpened enlargement dialog');
+  assert.match(markup, /data-photo-open="sharp"[^>]+aria-haspopup="dialog" aria-controls="photo-dialog"[^>]*>Enlarge photo</,
+    'the text enlargement control opens the same sharpened view as the main photograph');
+  assert.doesNotMatch(markup, /data-photo-open="original"/,
+    'the untouched merchant file is not the default enlargement path');
+  assert.match(markup, /data-photo-version="original">View original photo<\/button>/,
+    'the viewer retains a clearly labelled optional original-photo comparison');
+  assert.match(markup, /data-photo-size[^>]+aria-pressed="false"[^>]*>View at 100%/,
+    'the enlargement offers a true-size inspection control');
   const escapedTitle = run(`esc(PRODUCTS.find(p=>p.handle===${JSON.stringify(product.handle)}).displayTitle)`);
   assert.ok(markup.includes(`data-save="${product.handle}" aria-pressed="false" aria-label="Save ${escapedTitle}"`),
     'the product-page shortlist control keeps its item-specific accessible name after a rerender');
@@ -245,7 +253,7 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
     'owner-edited titles propagate to catalog card text');
   assert.match(detail, /<h1>Owner-edited gallery title<\/h1>/,
     'owner-edited titles propagate to the product heading');
-  assert.match(detail, /aria-label="Enlarge photograph of Owner-edited gallery title"/,
+  assert.match(detail, /aria-label="Enlarge sharpened photograph of Owner-edited gallery title"/,
     'owner-edited titles propagate to product-gallery controls');
   assert.match(detail, /id="main-product-image"[^>]+alt="Owner-edited gallery title"/,
     'owner-edited titles replace title-like source alternatives on the product image');

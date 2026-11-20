@@ -49,6 +49,7 @@ const REQUIRED_ROOT_FILES = [
 ];
 const REQUIRED_TOOLS = [
   'render-pages.mjs',
+  'static-photo-jobs.mjs',
   'stage-public-build.mjs',
   'sync-catalog.mjs',
   'test-commerce.mjs',

@@ -58,9 +58,28 @@
     }
   }
 
+  // The shop published these same shots twice. Use the larger original only
+  // while both exact revisions are present in the current catalog.
+  const largerCopies = new Map([
+    ['files/6544188d231520de57114d688d217643_688a28b0-f5b8-49f4-8917-e92ad31b35b3.jpg?1792599755', 'files/1d9f5949d4bde93d087fe8befc2c6e6e.jpg?1792599755'],
+    ['files/f521d1eff28d54c6ab113aa4a442b9e1.jpg?1782584478', 'files/f12390acff16743087a0196dfcfd65d9.jpg?1782584152'],
+    ['products/6da3026b4600f3e838c25ca78df5a9f3.jpg?1645564410', 'products/2aa07fb421b8901123d09266449a4edc.jpg?1645564465']
+  ]);
+
+  function displaySourceWidth(imageValue) {
+    const image = normalizedImage(imageValue);
+    const key = photoKey(image.src);
+    const entries = root.KIGBPhotoSharpness?.photos;
+    const larger = entries?.[key] && entries[largerCopies.get(key)];
+    return larger?.length ? Math.max(image.width || 0, ...larger.map(row => Number(row[0]))) : image.width;
+  }
+
   function sharpenedSources(imageValue) {
     const image = normalizedImage(imageValue);
-    const entry = root.KIGBPhotoSharpness?.photos?.[photoKey(image.src)];
+    const key = photoKey(image.src);
+    const entries = root.KIGBPhotoSharpness?.photos;
+    const own = entries?.[key];
+    const entry = own && (entries[largerCopies.get(key)] || own);
     if (!Array.isArray(entry)) return [];
     return entry
       .filter(source => Array.isArray(source) && source.length === 3 && Number(source[0]) > 0 && Number(source[1]) > 0 && typeof source[2] === 'string')
@@ -104,14 +123,19 @@
     const tone = options.tone === false ? '' : root.KIGBPhotoTones?.profile?.(image.src) || '';
     const sharpened = sharpenedSources(image);
     if (sharpened.length) {
-      const selected = sharpened.find(source => source.width >= desiredWidth) || sharpened.at(-1);
+      const selected = options.fullSize ? sharpened.at(-1) : sharpened.find(source => source.width >= desiredWidth) || sharpened.at(-1);
       return {
         src: selected.src,
-        srcset: sharpened.map(source => `${source.src} ${source.width}w`).join(', '),
-        sizes: String(options.sizes || ''),
+        srcset: options.fullSize ? '' : sharpened.map(source => `${source.src} ${source.width}w`).join(', '),
+        sizes: options.fullSize ? '' : String(options.sizes || ''),
         tone,
         originalSrc: image.src
       };
+    }
+    // New inventory and owner-supplied photographs can appear before the next image build.
+    const displayDetail = !/(?:^|\/)(?:brand[-.]|original-logo\.|catalog-clarity\/)|^data:image\/svg|\.svg(?:[?#]|$)/i.test(image.src);
+    if (options.fullSize) {
+      return { src: image.src, srcset: '', sizes: '', tone, originalSrc: '', displayDetail };
     }
     const candidates = srcset(image, widths);
     return {
@@ -119,7 +143,8 @@
       srcset: candidates,
       sizes: candidates ? String(options.sizes || '') : '',
       tone,
-      originalSrc: ''
+      originalSrc: '',
+      displayDetail
     };
   }
 
@@ -147,6 +172,8 @@
     attributes.push(`src="${escape(source.src)}"`);
     if (source.srcset) attributes.push(`srcset="${escape(source.srcset)}"`);
     if (source.sizes) attributes.push(`sizes="${escape(source.sizes)}"`);
+    const nativeWidth = displaySourceWidth(image);
+    if (nativeWidth) attributes.push(`style="--photo-native-width:${nativeWidth}px"`);
     if (options.id) attributes.push(`id="${escape(options.id)}"`);
     if (options.className) attributes.push(`class="${escape(options.className)}"`);
     attributes.push(`alt="${escape(options.alt || '')}"`);
@@ -155,6 +182,7 @@
     if (options.loading) attributes.push(`loading="${options.loading === 'eager' ? 'eager' : 'lazy'}"`);
     if (options.fetchpriority === 'high' || options.fetchpriority === 'low') attributes.push(`fetchpriority="${options.fetchpriority}"`);
     if (options.decoding !== false) attributes.push('decoding="async"');
+    if (source.displayDetail) attributes.push('data-photo-detail="live"');
     if (source.tone) attributes.push(`data-photo-tone="${escape(source.tone)}"`);
     if (source.originalSrc) attributes.push(`data-photo-original="${escape(source.originalSrc)}"`);
     return `<img ${attributes.join(' ')}>`;
@@ -164,9 +192,14 @@
     if (!element) return false;
     const source = descriptor(imageValue, options);
     if (!source.src) return false;
+    const nativeWidth = displaySourceWidth(imageValue);
+    if (nativeWidth) element.style?.setProperty('--photo-native-width', nativeWidth + 'px');
+    else element.style?.removeProperty('--photo-native-width');
     if (source.originalSrc) element.dataset.photoOriginal = source.originalSrc;
     else delete element.dataset.photoOriginal;
     delete element.dataset.photoFallback;
+    if (source.displayDetail) element.dataset.photoDetail = 'live';
+    else delete element.dataset.photoDetail;
     if (source.tone) element.dataset.photoTone = source.tone;
     else delete element.dataset.photoTone;
     if (options.alt !== undefined) element.alt = String(options.alt);
@@ -187,6 +220,7 @@
       const original = element?.dataset?.photoOriginal;
       if (!original || element.dataset.photoFallback === 'true') return false;
       element.dataset.photoFallback = 'true';
+      element.dataset.photoDetail = 'live';
       element.removeAttribute('srcset');
       element.removeAttribute('sizes');
       element.src = original;
@@ -206,5 +240,5 @@
   }
 
   installFallback();
-  return { DEFAULT_WIDTHS, gallery, normalizedImage, isShopifyImage, photoKey, sharpenedSources, url, candidateWidths, srcset, descriptor, share, image, apply, installFallback };
+  return { DEFAULT_WIDTHS, gallery, normalizedImage, isShopifyImage, photoKey, sharpenedSources, displaySourceWidth, url, candidateWidths, srcset, descriptor, share, image, apply, installFallback };
 });

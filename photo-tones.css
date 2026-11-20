@@ -2,3 +2,9 @@ img[data-photo-tone="shadow"] { filter: url("#kigb-photo-shadow"); }
 img[data-photo-tone="midtones"] { filter: url("#kigb-photo-midtones"); }
 img[data-photo-tone="highlights"] { filter: url("#kigb-photo-highlights"); }
 img[data-photo-tone="contrast"] { filter: url("#kigb-photo-contrast"); }
+
+img[data-photo-detail="live"] { filter: url("#kigb-live-photo-detail"); }
+img[data-photo-detail="live"][data-photo-tone="shadow"] { filter: url("#kigb-photo-shadow") url("#kigb-live-photo-detail"); }
+img[data-photo-detail="live"][data-photo-tone="midtones"] { filter: url("#kigb-photo-midtones") url("#kigb-live-photo-detail"); }
+img[data-photo-detail="live"][data-photo-tone="highlights"] { filter: url("#kigb-photo-highlights") url("#kigb-live-photo-detail"); }
+img[data-photo-detail="live"][data-photo-tone="contrast"] { filter: url("#kigb-photo-contrast") url("#kigb-live-photo-detail"); }

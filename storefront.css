@@ -926,3 +926,84 @@ img.main-product-image {
   .collection-chips,
   .product-thumbnails { scroll-behavior: auto; }
 }
+
+/* The product enlargement keeps the prepared detail image crisp while making
+   the untouched merchant file available as an explicit comparison. */
+.photo-dialog[open] {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: min(1180px, calc(100vw - 28px));
+  max-width: none;
+  max-height: calc(100dvh - 28px);
+}
+
+.photo-dialog-stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: min(76dvh, 900px);
+  min-height: 260px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: var(--soft);
+}
+
+.photo-dialog-stage > img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.photo-dialog-stage.is-actual-size {
+  display: block;
+}
+
+.photo-dialog-stage.is-actual-size > img {
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  object-fit: none;
+}
+
+.photo-dialog-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 58px;
+  padding: 9px 20px;
+  border-top: var(--border-width) solid var(--line);
+  background: var(--paper);
+}
+
+.photo-dialog-tools .text-link {
+  min-height: 40px;
+}
+
+@media (max-width: 640px) {
+  .photo-dialog[open] {
+    width: calc(100vw - 14px);
+    max-height: calc(100dvh - 14px);
+  }
+
+  .photo-dialog-stage {
+    height: 68dvh;
+    min-height: 230px;
+  }
+
+  .photo-dialog-tools {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+
+  .photo-dialog-tools .text-link {
+    padding-inline: 4px;
+    font-size: 11px;
+  }
+}

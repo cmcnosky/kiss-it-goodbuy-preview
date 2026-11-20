@@ -26,7 +26,7 @@ const setup=['photo-tones.js','photo-sharpness.js','photo-delivery.js','catalog-
 function render(url,product){const context={location:new URL(url,'https://cmcnosky.github.io'),URL,URLSearchParams,Intl,Date,localStorage:{getItem:()=>null},KIGB_INVENTORY:inventory,KIGB_PRODUCT_HANDLE:product?.handle};context.window=context;const result=vm.runInNewContext(setup+'\n'+prefix+'\npageHtml()',context);assert.equal((result.match(/<h1[\s>]/g)||[]).length,1,'Exactly one H1 on '+url);return result;}
 const siteUrl='https://cmcnosky.github.io/kiss-it-goodbuy-preview/';
 // Give preview artwork an immutable content-based URL without changing the shared page URL.
-const previewBytes=fs.readFileSync(path.join(dist,'assets/social-preview-kiss-it-good-buy-v17.png'));
+const previewBytes=fs.readFileSync(path.join(dist,'assets/social-preview-kiss-it-good-buy-v18.png'));
 const previewHash=createHash('sha256').update(previewBytes).digest('hex').slice(0,16);
 const previewPath='assets/kiss-it-good-buy-gallery-'+previewHash+'.png';
 writeRenderedFile(path.join(dist,previewPath),previewBytes);
@@ -49,7 +49,7 @@ const photo=catalogContext.KIGBPhotos.gallery(product)[0];
 const sharedPhoto=photo?.src?catalogContext.KIGBPhotos.share(photo):null;
 const image=new URL(sharedPhoto?.src||previewPath,siteUrl).href;
 const suppliedImageAlt=String(photo?.alt||'').trim();
-const imageAlt=photo?.src?(!suppliedImageAlt||suppliedImageAlt===product.title?productTitle(product):suppliedImageAlt):'Kiss It Good Buy Furniture Consignment, with its original red lipstick kiss between restored gallery photographs of orange chairs with a black cat and a crystal chandelier.';
+const imageAlt=photo?.src?(!suppliedImageAlt||suppliedImageAlt===product.title?productTitle(product):suppliedImageAlt):'Kiss It Good Buy Furniture Consignment, with its original red lipstick kiss between a gallery photograph of orange chairs with the gallery cat and a genuine close-up of an Italian Murano glass chandelier.';
 const width=sharedPhoto?sharedPhoto.width:1200;
 const height=sharedPhoto?sharedPhoto.height:630;
 const imageType=sharedPhoto?sharedPhoto.type:'image/png';
