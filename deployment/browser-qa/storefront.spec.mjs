@@ -762,13 +762,20 @@ test('all eleven gallery archive thumbnails and enlargements use the same larges
     ['murano-fluted-cup-v2-640.webp', [640, 639]],
     ['murano-glass-branches-v2-640.webp', [640, 640]],
     ['smiroldo-drummer-v2-789.webp', [789, 789]],
-    ['orange-chairs-and-gallery-cat.webp', [1254, 1254]],
+    ['cat-meets-eames.webp', [900, 900]],
     ['lane-park-chest-v2-798.webp', [798, 798]],
     ['gallery-showroom-v2-1135.webp', [1135, 596]],
   ]);
   const seenLargestFiles = new Set();
   for (const [pathname, expectedCount] of [['/index.html', 7], ['/story.html', 4]]) {
     await page.goto(pathname, { waitUntil: 'load' });
+    if (pathname === '/index.html') {
+      const portrait = page.locator('.affection-hero [data-archive-photo] img');
+      await expect(portrait).toHaveAttribute('src', 'assets/editorial/cat-meets-eames.webp');
+      await expect(portrait).toHaveAttribute('fetchpriority', 'high');
+      await expect(page.locator('.affection-hero').getByRole('link', { name: 'Shop seating' }))
+        .toHaveAttribute('href', 'collection.html?collection=seating');
+    }
     const links = page.locator('[data-archive-photo]');
     await expect(links).toHaveCount(expectedCount);
     for (let index = 0; index < expectedCount; index += 1) {

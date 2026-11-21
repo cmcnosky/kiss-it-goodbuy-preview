@@ -16,6 +16,11 @@ export const STATIC_PHOTO_JOBS = Object.freeze([
     ]
   },
   {
+    source: '../_build-tools/photo-sources/chairs-and-cat-archive-master.png',
+    crop: { left: 16, top: 185, width: 900, height: 900 },
+    outputs: [['editorial/cat-meets-eames.webp', 900]]
+  },
+  {
     source: '../_build-tools/photo-sources/murano-registered-master.png',
     outputs: [
       ['editorial/murano-overview-v2-384.webp', 384],
@@ -60,5 +65,6 @@ export const STATIC_PHOTO_JOBS = Object.freeze([
   }
 ].map(job => Object.freeze({
   source: job.source,
+  crop: job.crop && Object.freeze(job.crop),
   outputs: Object.freeze(job.outputs.map(output => Object.freeze(output)))
 })));

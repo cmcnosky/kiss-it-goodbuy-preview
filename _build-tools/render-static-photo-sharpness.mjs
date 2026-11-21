@@ -11,9 +11,10 @@ const asset = relative => path.join(root, 'assets', relative);
 
 // Use the recorded luminance at two scales. Strong boundaries can take more
 // detail recovery than a smooth wall, glass highlight, or compressed shadow.
-async function restorePhoto(source, width) {
-  const { data: rgb, info } = await sharp(source, { failOn: 'warning' })
-    .rotate().resize({ width, withoutEnlargement: true, kernel: sharp.kernel.lanczos3 })
+async function restorePhoto(source, width, crop) {
+  const input = sharp(source, { failOn: 'warning' }).rotate();
+  if (crop) input.extract(crop);
+  const { data: rgb, info } = await input.resize({ width, withoutEnlargement: true, kernel: sharp.kernel.lanczos3 })
     .flatten({ background: '#fff' }).toColourspace('srgb').removeAlpha()
     .raw().toBuffer({ resolveWithObject: true });
   const luma = Buffer.alloc(info.width * info.height);
@@ -43,28 +44,29 @@ async function restorePhoto(source, width) {
   return sharp(rgb, { raw: { width: info.width, height: info.height, channels: 3 } });
 }
 
-async function render(source, destination, width) {
+async function render(source, destination, width, crop) {
   await access(source);
   const metadata = await sharp(source).metadata();
   assert.ok(metadata.width && metadata.height, `Could not read dimensions for ${source}`);
-  assert.ok(width <= metadata.width, `Refusing to upscale ${source} from ${metadata.width}px to ${width}px`);
+  const frame = crop || metadata;
+  assert.ok(width <= frame.width, `Refusing to upscale ${source} from ${frame.width}px to ${width}px`);
 
   const temporary = `${destination}.render-tmp`;
   await mkdir(path.dirname(destination), { recursive: true });
-  const photograph = await restorePhoto(source, width);
+  const photograph = await restorePhoto(source, width, crop);
   await photograph.webp({ quality: 97, effort: 6, smartSubsample: true })
     .toFile(temporary);
 
   const rendered = await sharp(temporary).metadata();
   assert.equal(rendered.width, width, `Unexpected width for ${destination}`);
-  assert.equal(rendered.height, Math.round(metadata.height * width / metadata.width), `Unexpected height for ${destination}`);
+  assert.equal(rendered.height, Math.round(frame.height * width / frame.width), `Unexpected height for ${destination}`);
   await rename(temporary, destination);
 }
 
 try {
   for (const job of STATIC_PHOTO_JOBS) {
     for (const [output, width] of job.outputs) {
-      await render(asset(job.source), asset(output), width);
+      await render(asset(job.source), asset(output), width, job.crop);
       process.stdout.write(`Rendered ${output} from ${job.source}\n`);
     }
   }

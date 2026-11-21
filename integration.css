@@ -696,7 +696,7 @@ body{background:var(--cream);color:var(--ink)}
  .product-photo-nav .icon-button{width:44px;min-width:44px;height:44px}
 }
 
-/* The archive print and its separate catalog label stay legible at every width. */
+/* Frame the gallery portrait separately from its caption. */
 .affection-hero .gallery-print {
   display: flex;
   flex-direction: column;
@@ -715,19 +715,22 @@ body{background:var(--cream);color:var(--ink)}
 .gallery-print-image > .archive-photo-link { position: absolute; inset: 0 }
 .gallery-print-image > .archive-photo-link img {
   width: 100%; height: 100%;
-  object-fit: cover; object-position: 48% 45%;
-}
-.gallery-print-image > span {
-  pointer-events: none;
-  position: absolute; bottom: 0; left: 0;
-  background: #302c28; color: #fff8ed;
-  padding: 7px 12px; font: 600 12px/1.35 Grotesk, Arial, sans-serif;
+  object-fit: cover; object-position: 50% 50%;
 }
 .affection-hero .gallery-print figcaption {
   position: static;
   background: var(--cream); color: var(--ink);
   margin: 0; padding: 0;
   border-bottom: var(--border-width) solid var(--frame);
+}
+.affection-hero .gallery-print .gallery-cat-caption {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  width: 100%; gap: 0 10px; padding: 4px clamp(10px, 1.5vw, 24px);
+}
+.gallery-cat-caption strong { font: 400 clamp(21px, 2vw, 29px)/1.2 Georgia, serif; }
+.gallery-cat-caption .text-link { display: inline-flex; align-items: center; min-height: 44px; margin: 0; }
+.light-chapter .chapter-shop > :is(.lighting-pick, .lighting-directory-link) {
+  margin-top: 24px; background: var(--cream); border-top: 1px solid var(--line);
 }
 .lighting-pick {
   display: grid; grid-template-columns: 64px minmax(0, 1fr) auto;
@@ -760,13 +763,25 @@ body{background:var(--cream);color:var(--ink)}
 .department-portraits a:nth-child(4) span { background: var(--soft); }
 .department-portraits .icon { width: 18px; flex: none; }
 .department-portraits a:hover span,.department-portraits a:focus-visible span { text-decoration: underline; text-underline-offset: 4px; }
+@media (min-width: 701px) {
+  .affection-hero .gallery-print { grid-column: 2; grid-row: 1; }
+  .affection-hero .room-welcome { grid-column: 1; grid-row: 1; }
+}
+@media (min-width: 1001px) {
+  .affection-hero .gallery-print > :is(.gallery-print-image, .gallery-cat-caption) {
+    align-self: center; width: 100%; max-width: min(900px, max(280px, calc(100svh - 160px)));
+  }
+}
+@media (max-width: 360px) {
+  .gallery-cat-caption .text-link .icon { display: none; }
+}
 @media (max-width: 700px) {
   .affection-hero .room-welcome { padding-block: 28px; }
   .affection-hero .room-welcome h1 { margin: 13px 0 16px; }
   .affection-hero .welcome-action { gap: 10px 16px; }
   .affection-hero .welcome-action > p { margin-bottom: 3px; }
   .affection-hero .gallery-print { height: auto; min-height: 0; padding: 14px; }
-  .gallery-print-image { flex: none; aspect-ratio: 1.64; min-height: 0; }
+  .gallery-print-image { flex: none; aspect-ratio: 1.5; min-height: 0; }
   .lighting-pick { grid-template-columns: 52px minmax(0,1fr) auto; padding: 10px; gap: 9px; }
   .lighting-pick > img { width: 52px; height: 52px; }
   .lighting-pick-price { flex-direction: column; gap: 2px; }

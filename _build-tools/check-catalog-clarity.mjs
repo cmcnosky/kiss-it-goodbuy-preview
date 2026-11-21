@@ -244,7 +244,13 @@ function staticPhotoManifest() {
     assert.ok(Array.isArray(job.outputs) && job.outputs.length > 0, `${job.source}: static-photo job has no output`);
     const sourcePath = path.resolve(projectRoot, 'assets', job.source);
     const sourceBytes = fs.readFileSync(sourcePath);
-    const native = encodedDimensions(sourceBytes, path.relative(projectRoot, sourcePath));
+    const sourceSize = encodedDimensions(sourceBytes, path.relative(projectRoot, sourcePath));
+    const native = job.crop || sourceSize;
+    if (job.crop) {
+      assert.ok(native.left >= 0 && native.top >= 0 && native.width > 0 && native.height > 0 &&
+        native.left + native.width <= sourceSize.width && native.top + native.height <= sourceSize.height,
+        `${job.source}: crop must fit within the supplied photograph`);
+    }
     const jobOutputs = [];
     let previousWidth = 0;
     for (const [output, widthValue] of job.outputs) {
