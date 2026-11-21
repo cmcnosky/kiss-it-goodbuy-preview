@@ -81,6 +81,10 @@ function productQuestionPanel(product,isGift){
  return `<aside class="piece-question"><div><span class="eyebrow">${isGift?'Before you send it':'Before you make the trip'}</span><strong>${heading}</strong><p>${explanation}</p></div><a class="button outline" href="${productQuestionUrl(product,isGift)}">Ask the gallery ↗</a></aside>`;
 }
 
+function photoSizeControls() {
+ return `<button type="button" class="text-link" data-photo-zoom aria-pressed="false" aria-keyshortcuts="+ = - 0">Zoom in</button><button type="button" class="text-link" data-photo-size aria-pressed="false">View at 100%</button>`;
+}
+
 function productPage(){
  const product=PRODUCTS.find(item=>item.handle===productHandle);
  if(!product){
@@ -103,7 +107,7 @@ function productPage(){
  const conditionFact=isGift?'':condition
   ? `<div><dt>Listed condition</dt><dd class="listed-condition"><strong>${esc(condition)}</strong><small class="measurement-note">Condition wording from the listing. Ask about specific wear and repairs.</small></dd></div>`
   : '<div><dt>Condition check</dt><dd>Ask the gallery about wear, repairs, marks, and close-up photographs.</dd></div>';
- return `<main id="main" class="product-page"><div class="breadcrumb"><a href="index.html">Home</a> / <a href="collection.html">Shop the finds</a> / ${esc(product.sourceProductType||'Gift card')}</div><div class="product-layout"><div class="product-gallery">${gallery}</div><div class="product-purchase"><p class="eyebrow">${esc(product.vendor||product.sourceProductType||'From the gallery')} · ${isGift?'Digital gift card':'Item '+esc(product.itemNumber)}</p><h1>${esc(product.displayTitle)}</h1><div id="product-price" class="product-price">${variantPrice(variant)}</div><div class="product-availability"><span id="variant-stock">${stock(variant)}</span><span data-pickup-status>${isGift?'Gift card details in the listing':'Local pickup · Grapevine, Texas'}</span></div><form id="add-to-cart" data-handle="${product.handle}">${variantOptions}<div class="purchase-controls"><label for="product-quantity">Quantity<input type="number" min="1" max="250" step="1" name="quantity" id="product-quantity" value="1" required inputmode="numeric"></label><button type="submit" class="button red" id="add-button" ${variant.available?'':'disabled'}>${addLabel} ${icon('bag')}</button></div><p class="form-note">${studioActive?'This is practice inventory. Adding a piece does not reserve real stock.':'Adding a piece does not reserve it. Stock and totals are confirmed by the store at checkout.'}</p><div id="add-confirmation" class="add-confirmation" role="status" hidden></div></form>${giftPanel}<div class="detail-actions"><button class="button outline" data-save="${product.handle}" aria-pressed="${saved.has(product.handle)}" aria-label="${saved.has(product.handle)?'Unsave ':'Save '}${esc(product.displayTitle)}">${icon('heart')} <span data-save-label>${saved.has(product.handle)?'Saved to shortlist':'Save to shortlist'}</span></button><button class="text-link" data-share-piece="${product.handle}">Share this find ↗</button></div>${snapshot()}<dl class="product-facts"><div><dt>${isGift?'Reference':'Item number'}</dt><dd>${isGift?'Gift card':esc(product.itemNumber)}</dd></div>${measurementFact}${conditionFact}</dl>${productQuestionPanel(product,isGift)}<div class="product-reassurance"><details open><summary>Pickup, transport & returns</summary><p>${isGift?'See the store’s gift card terms and delivery information in the listing.':'Online furniture purchases are for local pickup at 201 E. Franklin Street, Grapevine. Arrange a suitable vehicle or ask the gallery for local mover recommendations.'}</p>${isGift?'':'<p>Ask about returns before buying. The store’s policy requires in-store agreement; refunds are by check, less a 3.3% transaction fee.</p>'}<p><a href="https://kissitgoodbuy.net/policies/shipping-policy">Pickup & transport policy ↗</a> · <a href="https://kissitgoodbuy.net/policies/refund-policy">Return policy ↗</a></p></details><a class="text-link" href="tel:+18174819754">Call 817-481-9754</a><a class="text-link" href="${product.productUrl}">View the store’s original listing ↗</a></div></div><div class="product-description"><h2>About this piece</h2><div class="source-description">${product.sourceHtml||'<p>Ask the gallery for more details about this piece.</p>'}</div></div></div>${relatedProducts(product)}${recentlyViewed()}<dialog id="photo-dialog" class="dialog photo-dialog" aria-labelledby="photo-dialog-label"><div class="dialog-top"><span id="photo-dialog-label">${esc(product.displayTitle)}</span><button class="icon-button" data-close aria-label="Close photograph">${icon('close')}</button></div><div class="photo-dialog-stage">${productPhoto(product,0,{id:'zoom-image',width:2000,height:2000,loading:'lazy',fullSize:true})}</div><div class="photo-dialog-tools" aria-label="Photograph viewing options"><button type="button" class="text-link" data-photo-size aria-pressed="false">View at 100%</button><button type="button" class="text-link" data-photo-version="original">View store photo</button></div></dialog></main>`;
+ return `<main id="main" class="product-page"><div class="breadcrumb"><a href="index.html">Home</a> / <a href="collection.html">Shop the finds</a> / ${esc(product.sourceProductType||'Gift card')}</div><div class="product-layout"><div class="product-gallery">${gallery}</div><div class="product-purchase"><p class="eyebrow">${esc(product.vendor||product.sourceProductType||'From the gallery')} · ${isGift?'Digital gift card':'Item '+esc(product.itemNumber)}</p><h1>${esc(product.displayTitle)}</h1><div id="product-price" class="product-price">${variantPrice(variant)}</div><div class="product-availability"><span id="variant-stock">${stock(variant)}</span><span data-pickup-status>${isGift?'Gift card details in the listing':'Local pickup · Grapevine, Texas'}</span></div><form id="add-to-cart" data-handle="${product.handle}">${variantOptions}<div class="purchase-controls"><label for="product-quantity">Quantity<input type="number" min="1" max="250" step="1" name="quantity" id="product-quantity" value="1" required inputmode="numeric"></label><button type="submit" class="button red" id="add-button" ${variant.available?'':'disabled'}>${addLabel} ${icon('bag')}</button></div><p class="form-note">${studioActive?'This is practice inventory. Adding a piece does not reserve real stock.':'Adding a piece does not reserve it. Stock and totals are confirmed by the store at checkout.'}</p><div id="add-confirmation" class="add-confirmation" role="status" hidden></div></form>${giftPanel}<div class="detail-actions"><button class="button outline" data-save="${product.handle}" aria-pressed="${saved.has(product.handle)}" aria-label="${saved.has(product.handle)?'Unsave ':'Save '}${esc(product.displayTitle)}">${icon('heart')} <span data-save-label>${saved.has(product.handle)?'Saved to shortlist':'Save to shortlist'}</span></button><button class="text-link" data-share-piece="${product.handle}">Share this find ↗</button></div>${snapshot()}<dl class="product-facts"><div><dt>${isGift?'Reference':'Item number'}</dt><dd>${isGift?'Gift card':esc(product.itemNumber)}</dd></div>${measurementFact}${conditionFact}</dl>${productQuestionPanel(product,isGift)}<div class="product-reassurance"><details open><summary>Pickup, transport & returns</summary><p>${isGift?'See the store’s gift card terms and delivery information in the listing.':'Online furniture purchases are for local pickup at 201 E. Franklin Street, Grapevine. Arrange a suitable vehicle or ask the gallery for local mover recommendations.'}</p>${isGift?'':'<p>Ask about returns before buying. The store’s policy requires in-store agreement; refunds are by check, less a 3.3% transaction fee.</p>'}<p><a href="https://kissitgoodbuy.net/policies/shipping-policy">Pickup & transport policy ↗</a> · <a href="https://kissitgoodbuy.net/policies/refund-policy">Return policy ↗</a></p></details><a class="text-link" href="tel:+18174819754">Call 817-481-9754</a><a class="text-link" href="${product.productUrl}">View the store’s original listing ↗</a></div></div><div class="product-description"><h2>About this piece</h2><div class="source-description">${product.sourceHtml||'<p>Ask the gallery for more details about this piece.</p>'}</div></div></div>${relatedProducts(product)}${recentlyViewed()}<dialog id="photo-dialog" class="dialog photo-dialog" aria-labelledby="photo-dialog-label"><div class="dialog-top"><span id="photo-dialog-label">${esc(product.displayTitle)}</span><button class="icon-button" data-close aria-label="Close photograph">${icon('close')}</button></div><div class="photo-dialog-stage" role="region" aria-label="Photograph">${productPhoto(product,0,{id:'zoom-image',width:2000,height:2000,loading:'lazy',fullSize:true})}</div><div class="photo-dialog-tools" aria-label="Photograph viewing options">${photoSizeControls()}<button type="button" class="text-link" data-photo-version="original">View store photo</button></div></dialog></main>`;
 }
 function displaySelection(images,count){
  const candidates=[...images.map(productByImage),...PRODUCTS];
@@ -332,12 +336,6 @@ function restoreFocusState(state,root=document){return focusElement(findFocusTar
 function showQuickAddConfirmation(button){const handle=button.dataset?.quickAdd||button.dataset?.bagFor,link=document.createElement('a');link.className='card-add card-add-confirmation';link.href='cart.html';if(handle){link.dataset.bagFor=handle;recentQuickAdds.add(handle);}link.innerHTML=`Added — view your bag ${icon('arrow')}`;button.replaceWith(link);focusElement(link);return link;}
 function refreshQuickAddConfirmations(root=document){for(const handle of recentQuickAdds){const link=$$('[data-bag-for]',root).find(el=>el.dataset?.bagFor===handle);if(!link)continue;link.classList.add('card-add-confirmation');link.innerHTML=`Added — view your bag ${icon('arrow')}`;}}
 function selectedPhotoIndex(){const selected=$('[data-photo][aria-pressed="true"]');return selected?Number(selected.dataset.photo):0;}
-function resetPhotoDialogSize(){
- const stage=$('.photo-dialog-stage'),control=$('[data-photo-size]');
- stage?.classList.remove('is-actual-size');
- if(stage){stage.scrollLeft=0;stage.scrollTop=0;}
- if(control){control.setAttribute('aria-pressed','false');control.textContent='View at 100%';}
-}
 function setPhotoDialogView(mode='sharp'){
  const product=PRODUCTS.find(item=>item.handle===productHandle),image=product?.images[selectedPhotoIndex()],zoom=$('#zoom-image');
  if(!image||!zoom)return false;
@@ -349,36 +347,64 @@ function setPhotoDialogView(mode='sharp'){
  const dialog=$('#photo-dialog'),version=$('[data-photo-version]');
  if(dialog)dialog.dataset.photoView=zoom.dataset.photoView;
  if(version){version.dataset.photoVersion=original?'sharp':'original';version.textContent=original?'Back to gallery photo':'View store photo';}
- resetPhotoDialogSize();
+ setPhotoScale(dialog, 'fit');
  return true;
 }
 function openProductPhoto(mode,opener){
  const dialog=$('#photo-dialog');
  if(!dialog||!setPhotoDialogView(mode))return;
  dialog._photoOpener=opener;
- dialog.showModal();
+ showPhotoViewer(dialog);
 }
-function showNativePhotoPixels(stage) {
+
+// Size the photograph itself. A portrait can be limited by height even when
+// the dialog still has horizontal room, and vice versa for a panorama.
+function layoutViewerPhoto(stage, point) {
  const image = stage.querySelector('img');
- if (!image || !stage.classList.contains('is-actual-size')) return;
- const position = () => {
-  if (!stage.isConnected || !stage.classList.contains('is-actual-size') || !image.naturalWidth) return;
-  const density = window.devicePixelRatio || 1;
-  stage.style.setProperty('--inspection-width', (image.naturalWidth / density) + 'px');
-  stage.scrollLeft = Math.max(0, (stage.scrollWidth - stage.clientWidth) / 2);
-  stage.scrollTop = Math.max(0, (stage.scrollHeight - stage.clientHeight) / 2);
- };
- if (image.complete) position();
- else image.addEventListener('load', position, {once:true});
+ if (!image?.naturalWidth || !image.naturalHeight || !stage.closest('dialog')?.open) return;
+ const bounds = stage.getBoundingClientRect();
+ if (!bounds.width || !bounds.height) return;
+ const fitWidth = Math.min(bounds.width, bounds.height * image.naturalWidth / image.naturalHeight);
+ const mode = stage.dataset.scale || 'fit';
+ const nativeWidth = image.naturalWidth / (window.devicePixelRatio || 1);
+ let width = fitWidth;
+ if (mode === 'native') width = nativeWidth;
+ if (mode === 'zoom') {
+  const startWidth = stage.hasAttribute('data-zoom-from-native') ? Math.max(fitWidth, nativeWidth) : fitWidth;
+  width = startWidth * 2;
+ }
+ stage.style.setProperty('--viewer-photo-width', width + 'px');
+ stage.classList.toggle('can-pan', mode !== 'fit' && (stage.scrollWidth > stage.clientWidth || stage.scrollHeight > stage.clientHeight));
+ if (point) {
+  stage.scrollLeft = width * point.x - stage.clientWidth / 2;
+  stage.scrollTop = width * image.naturalHeight / image.naturalWidth * point.y - stage.clientHeight / 2;
+ }
 }
-function togglePhotoDialogSize(control){
- const stage = control.closest('dialog')?.querySelector('.photo-dialog-stage');
- if (!stage) return;
- const actual = stage.classList.toggle('is-actual-size');
- control.setAttribute('aria-pressed', String(actual));
- control.textContent = actual ? 'Fit to window' : 'View at 100%';
- if (actual) showNativePhotoPixels(stage);
- else {stage.scrollLeft = 0;stage.scrollTop = 0;}
+
+function setPhotoScale(dialog, mode, point = {x: 0.5, y: 0.5}) {
+ if (!dialog) return;
+ const stage = dialog.querySelector('.photo-dialog-stage');
+ const zoom = dialog.querySelector('[data-photo-zoom]');
+ const native = dialog.querySelector('[data-photo-size]');
+ if (mode !== stage.dataset.scale) {
+  stage.toggleAttribute('data-zoom-from-native', mode === 'zoom' && stage.dataset.scale === 'native');
+ }
+ stage.dataset.scale = mode;
+ stage.classList.toggle('is-actual-size', mode === 'native');
+ stage.tabIndex = mode === 'fit' ? -1 : 0;
+ zoom.setAttribute('aria-pressed', String(mode === 'zoom'));
+ zoom.textContent = mode === 'zoom' ? 'Zoom out' : 'Zoom in';
+ native.setAttribute('aria-pressed', String(mode === 'native'));
+ native.textContent = mode === 'native' ? 'Fit to window' : 'View at 100%';
+ layoutViewerPhoto(stage, point);
+}
+
+function showPhotoViewer(dialog) {
+ dialog.showModal();
+ const stage = dialog.querySelector('.photo-dialog-stage');
+ setPhotoScale(dialog, 'fit');
+ viewerResizeObserver?.observe(stage);
+ dialog.addEventListener('close', () => viewerResizeObserver?.unobserve(stage), {once:true});
 }
 
 function selectProductPhoto(index){
@@ -401,14 +427,19 @@ function refreshCatalogResults(){const box=$('#catalog-results'),focus=captureFo
 // INTERACTION STATE END
 function updatePhotoDisplayScale() {
  document.documentElement.style.setProperty('--photo-display-density', String(window.devicePixelRatio || 1));
- const stage = document.querySelector('.photo-dialog[open] .is-actual-size');
- if (stage) showNativePhotoPixels(stage);
+ const stage = document.querySelector('.photo-dialog[open] .photo-dialog-stage');
+ if (stage) layoutViewerPhoto(stage);
 }
+const viewerResizeObserver = typeof ResizeObserver === 'function'
+ ? new ResizeObserver(entries => entries.forEach(entry => layoutViewerPhoto(entry.target)))
+ : null;
 updatePhotoDisplayScale();
 window.addEventListener('resize', updatePhotoDisplayScale);
 document.addEventListener('load', event => {
  const image = event.target;
- if (image.naturalWidth && image.matches('#main-product-image, .photo-dialog-stage > img')) {
+ if (image.naturalWidth && image.matches('.photo-dialog-stage > img')) {
+  layoutViewerPhoto(image.parentElement, {x: 0.5, y: 0.5});
+ } else if (image.naturalWidth && image.matches('#main-product-image')) {
   image.style.setProperty('--photo-native-width', image.naturalWidth + 'px');
  }
 }, true);
@@ -466,8 +497,54 @@ document.addEventListener('click',event=>{
  if(open){openProductPhoto(open.dataset.photoOpen,open);return;}
  const version=event.target.closest?.('[data-photo-version]');
  if(version){setPhotoDialogView(version.dataset.photoVersion);return;}
- const size=event.target.closest?.('[data-photo-size]');
- if(size)togglePhotoDialogSize(size);
+ const control = event.target.closest?.('[data-photo-size], [data-photo-zoom]');
+ if (control) {
+  const mode = control.hasAttribute('data-photo-zoom') ? 'zoom' : 'native';
+  setPhotoScale(control.closest('dialog'), control.getAttribute('aria-pressed') === 'true' ? 'fit' : mode);
+  return;
+ }
+ const image = event.target.closest?.('.photo-dialog-stage > img');
+ if (image && image.parentElement.dataset.scale === 'fit') {
+  const box = image.getBoundingClientRect();
+  setPhotoScale(image.closest('dialog'), 'zoom', {
+   x: (event.clientX - box.left) / box.width, y: (event.clientY - box.top) / box.height
+  });
+ }
+});
+// Touch uses the browser's native scrolling. Mouse users can also grab the photo.
+document.addEventListener('pointerdown', event => {
+ const stage = event.target.closest?.('.photo-dialog-stage.can-pan');
+ if (!stage || event.pointerType !== 'mouse' || event.button !== 0) return;
+ event.preventDefault();
+ const left = stage.scrollLeft, top = stage.scrollTop;
+ stage.setPointerCapture(event.pointerId);
+ stage.classList.add('is-dragging');
+ const move = pointer => {
+  if (pointer.pointerId !== event.pointerId) return;
+  stage.scrollLeft = left + event.clientX - pointer.clientX;
+  stage.scrollTop = top + event.clientY - pointer.clientY;
+ };
+ stage.addEventListener('pointermove', move);
+ stage.addEventListener('lostpointercapture', () => {
+  stage.removeEventListener('pointermove', move);
+  stage.classList.remove('is-dragging');
+ }, {once:true});
+});
+document.addEventListener('keydown', event => {
+ if (event.ctrlKey || event.metaKey || event.altKey) return;
+ const dialog = event.target.closest?.('.photo-dialog[open]');
+ if (!dialog) return;
+ if (['+', '=', '-', '0'].includes(event.key)) {
+  event.preventDefault();
+  setPhotoScale(dialog, ['+', '='].includes(event.key) ? 'zoom' : 'fit');
+  return;
+ }
+ const stage = dialog.querySelector('.photo-dialog-stage.can-pan');
+ const offset = {ArrowLeft:[-80,0], ArrowRight:[80,0], ArrowUp:[0,-80], ArrowDown:[0,80]}[event.key];
+ if (stage && Array.isArray(offset)) {
+  event.preventDefault();
+  stage.scrollBy(...offset);
+ }
 });
 document.addEventListener('change',e=>{if(e.target.id==='product-variant')updateVariant();if(e.target.id==='catalog-sort')navigateFilters($('#catalog-search-form'));if(e.target.hasAttribute('data-cart-quantity')){try{cartLines=window.KIGBCommerce.updateLine(cartLines,e.target.dataset.cartQuantity,e.target.value);renderCart();}catch(error){toast(error.message);renderCart();}}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#main-nav')?.classList.contains('open')){const b=$('[data-menu]');$('#main-nav').classList.remove('open');b.setAttribute('aria-expanded','false');b.setAttribute('aria-label','Open menu');b.focus();}});
@@ -479,7 +556,7 @@ document.addEventListener('click', event => {
  event.preventDefault();
  dialog.className = 'dialog photo-dialog';
  dialog.setAttribute('aria-labelledby', 'archive-photo-title');
- dialog.innerHTML = `<div class="dialog-top"><span id="archive-photo-title"></span><button class="icon-button" data-close aria-label="Close photograph">${icon('close')}</button></div><div class="photo-dialog-stage"></div><div class="photo-dialog-tools"><button type="button" class="text-link" data-photo-size aria-pressed="false">View at 100%</button></div>`;
+ dialog.innerHTML = `<div class="dialog-top"><span id="archive-photo-title"></span><button class="icon-button" data-close aria-label="Close photograph">${icon('close')}</button></div><div class="photo-dialog-stage" role="region" aria-label="Photograph"></div><div class="photo-dialog-tools">${photoSizeControls()}</div>`;
  const image = document.createElement('img');
  const sourceImage = link.querySelector('img');
  image.alt = sourceImage?.alt || '';
@@ -493,7 +570,7 @@ document.addEventListener('click', event => {
   focusElement(link.isConnected ? link : current);
  }, { once: true });
  document.body.append(dialog);
- dialog.showModal();
+ showPhotoViewer(dialog);
 });
 document.addEventListener('click',event=>{
  const control=event.target.closest('[data-photo-step]');

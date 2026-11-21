@@ -70,6 +70,65 @@ async function auditPage(page) {
   });
 }
 
+async function photoViewerGeometry(image) {
+  await image.evaluate(element => element.decode());
+  return image.evaluate(element => {
+    const stage = element.closest('.photo-dialog-stage');
+    const box = element.getBoundingClientRect();
+    const stageStyle = stage ? getComputedStyle(stage) : null;
+    const elementStyle = getComputedStyle(element);
+    const availableWidth = stage
+      ? stage.clientWidth - parseFloat(stageStyle.paddingLeft) - parseFloat(stageStyle.paddingRight)
+      : box.width;
+    const availableHeight = stage
+      ? stage.clientHeight - parseFloat(stageStyle.paddingTop) - parseFloat(stageStyle.paddingBottom)
+      : box.height;
+    const containScale = element.naturalWidth && element.naturalHeight
+      ? Math.min(box.width / element.naturalWidth, box.height / element.naturalHeight)
+      : 0;
+    const contained = elementStyle.objectFit === 'contain';
+    const drawnWidth = contained ? element.naturalWidth * containScale : box.width;
+    const drawnHeight = contained ? element.naturalHeight * containScale : box.height;
+    return {
+      src: element.currentSrc,
+      tone: element.dataset.photoTone || '',
+      filter: elementStyle.filter,
+      naturalWidth: element.naturalWidth,
+      naturalHeight: element.naturalHeight,
+      boxWidth: box.width,
+      boxHeight: box.height,
+      drawnWidth,
+      drawnHeight,
+      availableWidth,
+      availableHeight,
+      objectFit: elementStyle.objectFit,
+      devicePixelRatio,
+      scrollWidth: stage?.scrollWidth || 0,
+      scrollHeight: stage?.scrollHeight || 0,
+      clientWidth: stage?.clientWidth || 0,
+      clientHeight: stage?.clientHeight || 0
+    };
+  });
+}
+
+function expectFittedPhoto(geometry, context) {
+  expect(geometry.objectFit, `${context} uses contained Fit geometry`).toBe('contain');
+  expect(geometry.naturalWidth, `${context} decoded width`).toBeGreaterThan(0);
+  expect(geometry.naturalHeight, `${context} decoded height`).toBeGreaterThan(0);
+  expect(geometry.boxWidth, `${context} stays inside the available width`).toBeLessThanOrEqual(geometry.availableWidth + 3);
+  expect(geometry.boxHeight, `${context} stays inside the available height`).toBeLessThanOrEqual(geometry.availableHeight + 3);
+  expect(
+    Math.min(Math.abs(geometry.drawnWidth - geometry.availableWidth), Math.abs(geometry.drawnHeight - geometry.availableHeight)),
+    `${context} fitted photograph reaches one canvas edge`
+  ).toBeLessThanOrEqual(3);
+  expect(
+    Math.abs((geometry.drawnWidth / geometry.drawnHeight) - (geometry.naturalWidth / geometry.naturalHeight)),
+    `${context} preserves the photograph aspect ratio`
+  ).toBeLessThanOrEqual(0.01);
+  expect(geometry.scrollWidth, `${context} does not require horizontal scrolling`).toBeLessThanOrEqual(geometry.clientWidth + 1);
+  expect(geometry.scrollHeight, `${context} does not require vertical scrolling`).toBeLessThanOrEqual(geometry.clientHeight + 1);
+}
+
 function watchMerchantDataRequests(page) {
   const requests = [];
   page.on('request', request => {
@@ -339,10 +398,8 @@ test('one photo file follows a shopper from the shelf through the viewer, shortl
   await expect(zoom).not.toHaveAttribute('srcset', /./);
   await expect(zoom).toHaveAttribute('data-photo-view', 'sharp');
   expect(await displayedPhoto(zoom)).toEqual(lead);
-  expect(await zoom.evaluate(image => {
-    const box = image.getBoundingClientRect();
-    return box.width * devicePixelRatio <= image.naturalWidth + 1 && box.height * devicePixelRatio <= image.naturalHeight + 1;
-  }), 'the fitted enlargement must never stretch beyond its prepared pixels').toBe(true);
+  const fitted = await photoViewerGeometry(zoom);
+  expectFittedPhoto(fitted, 'product viewer Fit mode');
   const sizeControl = page.locator('[data-photo-size]');
   await expect(sizeControl).toHaveAccessibleName('View at 100%');
   await sizeControl.click();
@@ -350,6 +407,9 @@ test('one photo file follows a shopper from the shelf through the viewer, shortl
   await expect(page.locator('.photo-dialog-stage')).toHaveClass(/is-actual-size/);
   await expect(sizeControl).toHaveText('Fit to window');
   expect(await displayedPhoto(zoom)).toEqual(lead);
+  const native = await photoViewerGeometry(zoom);
+  expect(Math.abs(native.boxWidth * native.devicePixelRatio - native.naturalWidth),
+    '100% keeps one source pixel per device pixel').toBeLessThanOrEqual(1);
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
   await expect(page.locator('.main-product-image')).toBeFocused();
@@ -441,6 +501,7 @@ test('shopper photo language stays neutral in served copy, alternatives, control
       '[data-photo-version]',
       '[data-archive-photo]',
       '[data-photo-size]',
+      '[data-photo-zoom]',
       '#photo-dialog-label',
       '#archive-photo-title',
       '.gallery-print-image > span',
@@ -528,7 +589,7 @@ test('small merchant photos keep their native width when shoppers switch angles'
 
 test.describe('High-density photograph display', () => {
   test.use({ deviceScaleFactor: 2, viewport: { width: 849, height: 850 } });
-  test('Fit and 100% use the thumbnail file without stretching its pixels', async ({ page }) => {
+  test('Fit fills the viewer while 100% preserves native pixel inspection', async ({ page }) => {
     const entry = inventory.products.find(product => product.images?.some(image => image.width > 0 && image.width < 480));
     test.skip(!entry, 'This catalog has no photograph below 480 supplied pixels.');
     const small = entry.images.find(image => image.width > 0 && image.width < 480);
@@ -543,19 +604,155 @@ test.describe('High-density photograph display', () => {
     await page.locator('.main-product-image').click();
     const zoom = page.locator('#zoom-image');
     await zoom.evaluate(image => image.decode());
-    const measured = () => zoom.evaluate(image => ({
-      file: image.currentSrc,
-      physicalWidth: image.getBoundingClientRect().width * window.devicePixelRatio,
-      sourceWidth: image.naturalWidth
-    }));
-    const fit = await measured();
-    expect(fit.file).toBe(file);
-    expect(fit.physicalWidth).toBeLessThanOrEqual(fit.sourceWidth + 1);
+    const fit = await photoViewerGeometry(zoom);
+    expect(fit.src).toBe(file);
+    expectFittedPhoto(fit, 'high-density small-photo Fit mode');
+    expect(
+      fit.drawnWidth * fit.devicePixelRatio > fit.naturalWidth + 1 ||
+      fit.drawnHeight * fit.devicePixelRatio > fit.naturalHeight + 1,
+      'Fit may use the available canvas even when that enlarges a source-limited photograph'
+    ).toBe(true);
     await page.getByRole('button', { name: 'View at 100%' }).click();
-    const actual = await measured();
-    expect(actual.file).toBe(file);
-    expect(Math.abs(actual.physicalWidth - actual.sourceWidth)).toBeLessThanOrEqual(1);
+    const actual = await photoViewerGeometry(zoom);
+    expect(actual.src).toBe(file);
+    expect(actual.tone).toBe(fit.tone);
+    expect(actual.filter).toBe(fit.filter);
+    expect(Math.abs(actual.boxWidth * actual.devicePixelRatio - actual.naturalWidth)).toBeLessThanOrEqual(1);
+    expect(Math.abs(actual.boxHeight * actual.devicePixelRatio - actual.naturalHeight)).toBeLessThanOrEqual(1);
   });
+});
+
+test('clicked product and archive photographs enlarge at mobile and desktop sizes with reversible inspection modes', async ({ page }) => {
+  const product = inventory.products.find(entry => {
+    const photo = entry.images?.[0];
+    return entry.handle && photo?.width >= 700 && photo?.height >= 700 && photo.height / photo.width > 0.9 && photo.height / photo.width < 1.1;
+  });
+  expect(product, 'fixture needs a nearly square photographed product').toBeTruthy();
+
+  function expectSamePhoto(actual, expected, context) {
+    expect(actual.src, `${context} keeps the exact photograph file`).toBe(expected.src);
+    expect(actual.naturalWidth, `${context} keeps the same encoded width`).toBe(expected.naturalWidth);
+    expect(actual.naturalHeight, `${context} keeps the same encoded height`).toBe(expected.naturalHeight);
+    expect(actual.tone, `${context} keeps the same tone metadata`).toBe(expected.tone);
+    expect(actual.filter, `${context} keeps the same rendered tone`).toBe(expected.filter);
+  }
+
+  async function exerciseViewer({ dialog, image, opener, context }) {
+    const stage = dialog.locator('.photo-dialog-stage');
+    const zoomControl = dialog.locator('[data-photo-zoom]');
+    const sizeControl = dialog.locator('[data-photo-size]');
+    await expect(dialog).toBeVisible();
+    await expect(stage).toHaveAttribute('data-scale', 'fit');
+    await expect(zoomControl).toHaveText('Zoom in');
+    await expect(zoomControl).toHaveAttribute('aria-pressed', 'false');
+    await expect(sizeControl).toHaveText('View at 100%');
+    await expect(sizeControl).toHaveAttribute('aria-pressed', 'false');
+
+    const fit = await photoViewerGeometry(image);
+    expectFittedPhoto(fit, `${context} Fit mode`);
+    expectSamePhoto(fit, opener, `${context} Fit mode`);
+    expect(
+      fit.drawnWidth * fit.drawnHeight,
+      `${context} click produces a materially larger visible photograph`
+    ).toBeGreaterThan(opener.drawnWidth * opener.drawnHeight * 1.05);
+
+    await image.click({ position: { x: Math.max(1, fit.boxWidth / 2), y: Math.max(1, fit.boxHeight / 2) } });
+    await expect(stage).toHaveAttribute('data-scale', 'zoom');
+    await expect(zoomControl).toHaveText('Zoom out');
+    await expect(zoomControl).toHaveAttribute('aria-pressed', 'true');
+    await expect(sizeControl).toHaveAttribute('aria-pressed', 'false');
+    const imageZoom = await photoViewerGeometry(image);
+    expectSamePhoto(imageZoom, fit, `${context} image-click zoom`);
+    expect(Math.abs(imageZoom.boxWidth - fit.boxWidth * 2), `${context} image-click zoom doubles fitted width`).toBeLessThanOrEqual(3);
+    expect(Math.abs(imageZoom.boxHeight - fit.boxHeight * 2), `${context} image-click zoom doubles fitted height`).toBeLessThanOrEqual(3);
+    expect(
+      imageZoom.scrollWidth > imageZoom.clientWidth + 1 || imageZoom.scrollHeight > imageZoom.clientHeight + 1,
+      `${context} 2x view exposes pannable detail`
+    ).toBe(true);
+
+    await zoomControl.click();
+    await expect(stage).toHaveAttribute('data-scale', 'fit');
+    const fitAgain = await photoViewerGeometry(image);
+    expectSamePhoto(fitAgain, fit, `${context} restored Fit mode`);
+    expect(Math.abs(fitAgain.boxWidth - fit.boxWidth), `${context} Zoom out restores fitted width`).toBeLessThanOrEqual(2);
+    expect(Math.abs(fitAgain.boxHeight - fit.boxHeight), `${context} Zoom out restores fitted height`).toBeLessThanOrEqual(2);
+
+    await sizeControl.click();
+    await expect(stage).toHaveAttribute('data-scale', 'native');
+    await expect(stage).toHaveClass(/is-actual-size/);
+    await expect(sizeControl).toHaveText('Fit to window');
+    await expect(sizeControl).toHaveAttribute('aria-pressed', 'true');
+    await expect(zoomControl).toHaveAttribute('aria-pressed', 'false');
+    const native = await photoViewerGeometry(image);
+    expectSamePhoto(native, fit, `${context} 100% mode`);
+    expect(Math.abs(native.boxWidth * native.devicePixelRatio - native.naturalWidth),
+      `${context} 100% maps source pixels horizontally`).toBeLessThanOrEqual(1);
+    expect(Math.abs(native.boxHeight * native.devicePixelRatio - native.naturalHeight),
+      `${context} 100% maps source pixels vertically`).toBeLessThanOrEqual(1);
+
+    await zoomControl.click();
+    await expect(stage).toHaveAttribute('data-scale', 'zoom');
+    await expect(stage).not.toHaveClass(/is-actual-size/);
+    await expect(zoomControl).toHaveAttribute('aria-pressed', 'true');
+    await expect(sizeControl).toHaveAttribute('aria-pressed', 'false');
+    await expect(sizeControl).toHaveText('View at 100%');
+    const zoomFromNative = await photoViewerGeometry(image);
+    expectSamePhoto(zoomFromNative, fit, `${context} Zoom from 100% mode`);
+    expect(Math.abs(zoomFromNative.boxWidth - Math.max(fit.boxWidth, native.boxWidth) * 2),
+      `${context} Zoom from 100% doubles the larger inspection width`).toBeLessThanOrEqual(3);
+    expect(zoomFromNative.boxWidth, `${context} Zoom in never shrinks a 100% view`).toBeGreaterThan(native.boxWidth);
+
+    await page.keyboard.press('-');
+    await expect(stage).toHaveAttribute('data-scale', 'fit');
+    await expect(zoomControl).toHaveText('Zoom in');
+    await page.keyboard.press('Shift+=');
+    await expect(stage).toHaveAttribute('data-scale', 'zoom');
+    await expect(zoomControl).toHaveText('Zoom out');
+    await page.keyboard.press('0');
+    await expect(stage).toHaveAttribute('data-scale', 'fit');
+    await page.keyboard.press('=');
+    await expect(stage).toHaveAttribute('data-scale', 'zoom');
+    const keyboardZoom = await photoViewerGeometry(image);
+    expectSamePhoto(keyboardZoom, fit, `${context} keyboard zoom`);
+    expect(Math.abs(keyboardZoom.boxWidth - fit.boxWidth * 2), `${context} keyboard Zoom uses 2x Fit width`).toBeLessThanOrEqual(3);
+
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
+  }
+
+  for (const [name, viewport] of [['mobile', { width: 390, height: 844 }], ['desktop', { width: 1440, height: 1000 }]]) {
+    await test.step(`${name} product viewer`, async () => {
+      await page.setViewportSize(viewport);
+      await page.goto(`/products/${product.handle}/`, { waitUntil: 'load' });
+      const openerButton = page.locator('.main-product-image');
+      const openerImage = page.locator('#main-product-image');
+      const opener = await photoViewerGeometry(openerImage);
+      await openerButton.click();
+      await exerciseViewer({
+        dialog: page.locator('#photo-dialog'),
+        image: page.locator('#zoom-image'),
+        opener,
+        context: `${name} product viewer`
+      });
+      await expect(openerButton).toBeFocused();
+    });
+
+    await test.step(`${name} archive viewer`, async () => {
+      await page.goto('/index.html', { waitUntil: 'load' });
+      const openerLink = page.locator('[data-archive-photo]').first();
+      await openerLink.scrollIntoViewIfNeeded();
+      const opener = await photoViewerGeometry(openerLink.locator('img'));
+      await openerLink.click();
+      const dialog = page.locator('dialog.photo-dialog[open]');
+      await exerciseViewer({
+        dialog,
+        image: dialog.locator('.photo-dialog-stage img'),
+        opener,
+        context: `${name} archive viewer`
+      });
+      await expect(openerLink).toBeFocused();
+    });
+  }
 });
 
 test('all eleven gallery archive thumbnails and enlargements use the same largest local file', async ({ page }) => {
@@ -610,35 +807,24 @@ test('all eleven gallery archive thumbnails and enlargements use the same larges
       const dialog = page.locator('dialog.photo-dialog[open]');
       const image = dialog.locator('.photo-dialog-stage img');
       await expect(dialog).toBeVisible();
-      await image.evaluate(element => element.decode());
-      const details = await image.evaluate(element => {
-        const box = element.getBoundingClientRect();
-        return {
-          src: element.src,
-          currentSrc: element.currentSrc,
-          complete: element.complete,
-          naturalWidth: element.naturalWidth,
-          naturalHeight: element.naturalHeight,
-          renderedWidth: box.width,
-          renderedHeight: box.height,
-        };
-      });
+      const details = await photoViewerGeometry(image);
       expect(details.src).toBe(expected);
-      expect(details.currentSrc).toBe(thumbnail.currentSrc);
-      expect(details.complete).toBe(true);
-      expect(details.naturalWidth).toBeGreaterThan(0);
-      expect(details.naturalHeight).toBeGreaterThan(0);
-      expect(details.renderedWidth).toBeLessThanOrEqual(details.naturalWidth + 1);
-      expect(details.renderedHeight).toBeLessThanOrEqual(details.naturalHeight + 1);
+      expect(details.src).toBe(thumbnail.currentSrc);
+      expectFittedPhoto(details, `${fileName} archive Fit mode`);
       expect(await image.getAttribute('data-photo-tone')).toBe(expectedTone);
       expect(await image.evaluate(element => getComputedStyle(element).filter)).toBe(expectedFilter);
       const sizeControl = dialog.locator('[data-photo-size]');
       await sizeControl.click();
       await expect(sizeControl).toHaveAttribute('aria-pressed', 'true');
       await expect(dialog.locator('.photo-dialog-stage')).toHaveClass(/is-actual-size/);
-      expect(await image.evaluate(element => Math.abs(
-        element.getBoundingClientRect().width * devicePixelRatio - element.naturalWidth
-      )), '100% maps each source pixel to one display pixel').toBeLessThanOrEqual(1);
+      const native = await photoViewerGeometry(image);
+      expect(Math.abs(native.boxWidth * native.devicePixelRatio - native.naturalWidth),
+        '100% maps each source pixel to one display pixel horizontally').toBeLessThanOrEqual(1);
+      expect(Math.abs(native.boxHeight * native.devicePixelRatio - native.naturalHeight),
+        '100% maps each source pixel to one display pixel vertically').toBeLessThanOrEqual(1);
+      expect(native.src).toBe(details.src);
+      expect(native.tone).toBe(details.tone);
+      expect(native.filter).toBe(details.filter);
       expect(await image.getAttribute('data-photo-tone')).toBe(expectedTone);
       expect(await image.evaluate(element => getComputedStyle(element).filter)).toBe(expectedFilter);
 

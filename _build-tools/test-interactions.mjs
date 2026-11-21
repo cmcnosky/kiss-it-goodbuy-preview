@@ -227,6 +227,8 @@ function bootStorage(values, throwingKeys = new Set(), productHandle = '') {
     'the viewer retains a clearly labelled optional store-photo comparison');
   assert.match(markup, /data-photo-size[^>]+aria-pressed="false"[^>]*>View at 100%/,
     'the enlargement offers a true-size inspection control');
+  assert.match(markup, /data-photo-zoom[^>]+aria-pressed="false"[^>]*>Zoom in/,
+    'the enlargement offers a reversible detail-zoom control');
   const escapedTitle = run(`esc(PRODUCTS.find(p=>p.handle===${JSON.stringify(product.handle)}).displayTitle)`);
   assert.ok(markup.includes(`data-save="${product.handle}" aria-pressed="false" aria-label="Save ${escapedTitle}"`),
     'the product-page shortlist control keeps its item-specific accessible name after a rerender');

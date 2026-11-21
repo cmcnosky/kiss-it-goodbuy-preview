@@ -436,7 +436,7 @@ for (const filename of htmlFiles) {
   const html = fs.readFileSync(filename, 'utf8');
   const routeMatch = route.match(PRODUCT_ROUTE);
 
-  for (const match of html.matchAll(/<(?:img|button|a|span)\b[^>]*(?:data-photo-open|data-photo-version|data-archive-photo|id=["']photo-dialog-label["'])[^>]*>/gi)) {
+  for (const match of html.matchAll(/<(?:img|button|a|span)\b[^>]*(?:data-photo-open|data-photo-version|data-photo-size|data-photo-zoom|data-archive-photo|id=["']photo-dialog-label["'])[^>]*>/gi)) {
     const attributes = parseAttributes(match[0]);
     for (const name of ['alt', 'aria-label', 'title']) {
       if (attributes.has(name)) assertNeutralPhotoCopy(attributes.get(name), `${route} ${name}`);
@@ -578,6 +578,8 @@ for (const filename of htmlFiles) {
   assert.match(html, /data-photo-open="sharp"[^>]*aria-controls="photo-dialog"/, `${route}: main image is not wired to the prepared viewer`);
   assert.doesNotMatch(html, /data-photo-open="original"/, `${route}: original merchant file is promoted outside the comparison viewer`);
   assert.match(html, /data-photo-version="original"[^>]*>View store photo<\/button>/, `${route}: viewer cannot switch explicitly to the store photograph`);
+  assert.match(html, /data-photo-zoom[^>]*aria-pressed="false"[^>]*>Zoom in<\/button>/, `${route}: viewer lacks reversible 2x detail zoom`);
+  assert.match(html, /data-photo-size[^>]*aria-pressed="false"[^>]*>View at 100%<\/button>/, `${route}: viewer lacks native-pixel inspection`);
   const heading = decodeHtml(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || '').replace(/<[^>]*>/g, '').trim();
   const viewerHeading = decodeHtml(html.match(/id="photo-dialog-label"[^>]*>([\s\S]*?)<\/span>/i)?.[1] || '').replace(/<[^>]*>/g, '').trim();
   assert.equal(viewerHeading, heading, `${route}: photo viewer heading must be the item title without process language`);
