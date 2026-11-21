@@ -19,8 +19,7 @@ const pngPath = asset('social-preview-kiss-it-good-buy-v19.png');
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">Kiss It Good Buy Furniture Consignment</title>
-  <desc id="desc">The original red lipstick kiss and Kiss It Good Buy Furniture Consignment name between a gallery photograph of orange chairs with the gallery cat and a genuine close-up of an Italian Murano glass chandelier.</desc>
-  <!-- A full-bleed gallery diptych keeps both authentic store scenes substantial at phone size. -->
+  <desc id="desc">Kiss It Good Buy Furniture Consignment and its red lipstick kiss, flanked by orange chairs with the gallery cat and a close-up of a Murano glass chandelier.</desc>
   <rect width="1200" height="630" fill="#e58a78"/>
   <image href="${catAndChairs}" x="0" y="0" width="650" height="630" preserveAspectRatio="xMinYMid slice"/>
   <!-- Shift the square Murano photograph right so its fluted glass cup remains centered in the visible rail. -->

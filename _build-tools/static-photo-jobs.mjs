@@ -4,7 +4,7 @@ export const STATIC_PHOTO_JOBS = Object.freeze([
     outputs: [
       ['editorial/crystal-chandelier-hero-enhanced-v3-640.webp', 640],
       ['editorial/crystal-chandelier-hero-enhanced-v3-960.webp', 960],
-      ['editorial/crystal-chandelier-hero-enhanced-v3.webp', 1448]
+      ['editorial/crystal-chandelier-prisms.webp', 1448]
     ]
   },
   {
@@ -12,7 +12,7 @@ export const STATIC_PHOTO_JOBS = Object.freeze([
     outputs: [
       ['editorial/eames-orange-chairs-enhanced-v3-640.webp', 640],
       ['editorial/eames-orange-chairs-enhanced-v3-960.webp', 960],
-      ['editorial/eames-orange-chairs-enhanced-v3.webp', 1254]
+      ['editorial/orange-chairs-and-gallery-cat.webp', 1254]
     ]
   },
   {

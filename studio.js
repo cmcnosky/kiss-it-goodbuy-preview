@@ -270,7 +270,7 @@
           <label class="studio-field"><span>Measurements</span><input name="dimensionsRaw" maxlength="240" placeholder="W × D × H"></label>
           <label class="studio-field"><span>Availability</span><select name="available"><option value="true">Available</option><option value="false">Unavailable</option></select></label>
           <label class="studio-field studio-field-full"><span>Photo URL</span><input name="imageUrl" type="text" inputmode="url" placeholder="https://… or assets/photo.jpg"></label>
-          <label class="studio-field studio-field-full"><span>Or upload a photo</span><input name="imageFile" type="file" accept="image/png,image/jpeg,image/webp"><small>PNG, JPEG, or WebP. Larger phone photos are resized into an embedded browser-local copy under 150 KB; the original file is not changed.</small></label>
+          <label class="studio-field studio-field-full"><span>Or upload a photo</span><input name="imageFile" type="file" accept="image/png,image/jpeg,image/webp"><small>PNG, JPEG, or WebP, up to 30 MB. The photo is saved with this draft in your browser.</small></label>
           <button class="button red" type="submit">Add sample piece</button>
         </form>
         <div class="studio-custom-list">${state.draft.customProducts.length?state.draft.customProducts.map(customProductMarkup).join(''):'<p>No sample pieces yet.</p>'}</div>
@@ -441,9 +441,9 @@
   }
 
   function readImage(file){
-    if(!file)return Promise.resolve({dataUrl:'',resized:false});
+    if(!file)return Promise.resolve('');
     if(!['image/png','image/jpeg','image/webp'].includes(file.type))return Promise.reject(new Error('Choose a PNG, JPEG, or WebP image. SVG files are not accepted.'));
-    if(file.size>30*1024*1024)return Promise.reject(new Error('This photo is too large to prepare safely. Choose an image under 30 MB.'));
+    if(file.size>30*1024*1024)return Promise.reject(new Error('Choose a photo that is 30 MB or smaller.'));
     const readDataUrl=blob=>new Promise((resolve,reject)=>{
       const reader=new root.FileReader();
       reader.onerror=()=>reject(new Error('The image could not be read.'));
@@ -465,7 +465,7 @@
         decoded=await decode();
         const source=decoded.source,sourceWidth=source.width||source.naturalWidth,sourceHeight=source.height||source.naturalHeight;
         if(!sourceWidth||!sourceHeight)throw new Error('The selected file has no readable image dimensions.');
-        if(file.size<=stateApi().MAX_IMAGE_BYTES)return {dataUrl:await readDataUrl(file),resized:false,bytes:file.size};
+        if(file.size<=stateApi().MAX_IMAGE_BYTES)return readDataUrl(file);
         const sourceSide = Math.max(sourceWidth, sourceHeight);
         const sides = [...new Set([1800,1600,1280,1024,800,640,480,384,320].map(side => Math.min(side,sourceSide)))];
         let outputType = 'image/webp';
@@ -485,10 +485,10 @@
               outputType = 'image/jpeg';
               blob = await canvasBlob(canvas,outputType,quality);
             }
-            if(blob&&blob.size<=stateApi().MAX_IMAGE_BYTES)return {dataUrl:await readDataUrl(blob),resized:true,bytes:blob.size};
+            if(blob&&blob.size<=stateApi().MAX_IMAGE_BYTES)return readDataUrl(blob);
           }
         }
-        throw new Error('The photo could not be reduced below 150 KB. Choose a simpler or smaller image.');
+        throw new Error('This photo could not be added to the draft. Choose a smaller file or enter a photo URL.');
       }catch(error){
         if(error?.message)throw error;
         throw new Error('The selected file is not a readable photograph.');
@@ -503,18 +503,18 @@
   }
 
   async function submitCustom(form){
-    const data=new root.FormData(form),file=data.get('imageFile'),prepared=root.File&&file instanceof root.File&&file.size?await readImage(file):{dataUrl:'',resized:false};
+    const data=new root.FormData(form),file=data.get('imageFile'),uploadedPhoto=root.File&&file instanceof root.File&&file.size?await readImage(file):'';
     if(!signedIn())throw new Error('Sign in again before adding a sample piece.');
     const title=String(data.get('title')||'').trim(),existing=current().draft.customProducts;
     let now=Date.now();while(existing.some(product=>product.id===String(now)))now++;
     const item={
       id:String(now),handle:`studio-${slug(title)}-${String(now).slice(-6)}`,title,
       priceCents:Math.round(Number(data.get('price'))*100),available:data.get('available')==='true',
-      dimensionsRaw:String(data.get('dimensionsRaw')||'').trim(),imageUrl:prepared.dataUrl||String(data.get('imageUrl')||'').trim(),
+      dimensionsRaw:String(data.get('dimensionsRaw')||'').trim(),imageUrl:uploadedPhoto||String(data.get('imageUrl')||'').trim(),
       category:String(data.get('category')||'').trim()
     };
     const customProducts=[...existing,item];
-    action(()=>stateApi().updateDraft({customProducts}),prepared.resized?'Sample piece added. A resized browser-local copy of the photo was embedded; the original file was not changed.':'Sample piece added to the practice inventory.',{form});
+    action(()=>stateApi().updateDraft({customProducts}),'Sample piece added to the practice inventory.',{form});
   }
 
   function signOut(){

@@ -25,6 +25,7 @@ const CATALOG_PATH = /^assets\/catalog-clarity\/[\w./-]+\.(?:webp|jpe?g)$/i;
 const BRAND_PATH = /^assets\/(?:brand(?:-[\w.-]+)?|original-logo(?:-[\w.-]+)?)\.(?:gif|jpe?g|png|svg|webp)$/i;
 const SHARE_PATH = /^assets\/(?:preview|social-preview)(?:-[\w.-]+)?\.(?:jpe?g|png|webp)$/i;
 const PRODUCT_ROUTE = /^products\/([^/]+)\/index\.html$/;
+const SHOPPER_PHOTO_PROCESS_COPY = /\b(?:sharpened detail|original file|view original photo|view sharpened detail|enlarge sharpened photograph|full-size source|restored (?:archive|gallery|close-up|photo|photograph|image)|(?:photo|photograph|image) (?:was )?(?:sharpened|enhanced|restored))\b/i;
 const EXPECTED_ENTRY_ROUTES = new Set([
   'cart.html', 'collection.html', 'consign.html', 'index.html', 'planner.html', 'practice-checkout.html',
   'product.html', 'shortlist.html', 'story.html', 'studio.html', 'visit.html'
@@ -47,6 +48,11 @@ function decodeHtml(value) {
     .replace(/&#39;|&apos;/g, "'")
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>');
+}
+
+function assertNeutralPhotoCopy(value, use) {
+  const copy = decodeHtml(value).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+  assert.doesNotMatch(copy, SHOPPER_PHOTO_PROCESS_COPY, `${use}: shopper-facing photo copy exposes an internal image process`);
 }
 
 function localPath(value) {
@@ -430,6 +436,19 @@ for (const filename of htmlFiles) {
   const html = fs.readFileSync(filename, 'utf8');
   const routeMatch = route.match(PRODUCT_ROUTE);
 
+  for (const match of html.matchAll(/<(?:img|button|a|span)\b[^>]*(?:data-photo-open|data-photo-version|data-archive-photo|id=["']photo-dialog-label["'])[^>]*>/gi)) {
+    const attributes = parseAttributes(match[0]);
+    for (const name of ['alt', 'aria-label', 'title']) {
+      if (attributes.has(name)) assertNeutralPhotoCopy(attributes.get(name), `${route} ${name}`);
+    }
+  }
+  for (const match of html.matchAll(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/gi)) {
+    assertNeutralPhotoCopy(match[1], `${route} photograph caption`);
+  }
+  for (const match of html.matchAll(/<div\b[^>]*class=["'][^"']*gallery-print-image[^"']*["'][^>]*>([\s\S]*?)<\/div>/gi)) {
+    assertNeutralPhotoCopy(match[1], `${route} gallery photograph caption`);
+  }
+
   for (const tag of html.matchAll(/<img\b[^>]*>/gi)) {
     imageTags++;
     const attributes = parseAttributes(tag[0]);
@@ -558,7 +577,10 @@ for (const filename of htmlFiles) {
   pairedViewerSources++;
   assert.match(html, /data-photo-open="sharp"[^>]*aria-controls="photo-dialog"/, `${route}: main image is not wired to the prepared viewer`);
   assert.doesNotMatch(html, /data-photo-open="original"/, `${route}: original merchant file is promoted outside the comparison viewer`);
-  assert.match(html, /data-photo-version="original"[^>]*>View original photo<\/button>/, `${route}: viewer cannot switch explicitly to the merchant file`);
+  assert.match(html, /data-photo-version="original"[^>]*>View store photo<\/button>/, `${route}: viewer cannot switch explicitly to the store photograph`);
+  const heading = decodeHtml(html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || '').replace(/<[^>]*>/g, '').trim();
+  const viewerHeading = decodeHtml(html.match(/id="photo-dialog-label"[^>]*>([\s\S]*?)<\/span>/i)?.[1] || '').replace(/<[^>]*>/g, '').trim();
+  assert.equal(viewerHeading, heading, `${route}: photo viewer heading must be the item title without process language`);
 
   const thumbnailBlock = html.match(/<div class="product-thumbnails"[^>]*>([\s\S]*?)<\/div>/i)?.[1] || '';
   const thumbnailOriginals = [...thumbnailBlock.matchAll(/data-photo-original="([^"]+)"/g)].map(match => decodeHtml(match[1]));

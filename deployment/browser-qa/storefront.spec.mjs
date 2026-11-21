@@ -279,7 +279,7 @@ test('layout audit detects representative broken CSS, image, and markup', async 
   expect(issues.some(issue => issue.startsWith('broken local images'))).toBeTruthy();
 });
 
-test('a missing sharpened angle falls back to its own merchant photograph', async ({ page }) => {
+test('a missing prepared angle falls back to its own store photograph', async ({ page }) => {
   const product = inventory.products.find(entry => entry.handle && entry.images?.length >= 2);
   const root = '/products/' + product.handle + '/';
   const photo = readFileSync(path.join(buildRoot, 'assets/editorial/facebook-geometric-front-chest.jpg'));
@@ -307,6 +307,7 @@ test('one photo file follows a shopper from the shelf through the viewer, shortl
   const product = inventory.products.find(entry => entry.handle && entry.itemNumber && entry.images?.length > 1 && entry.images[0].width > 500);
   expect(product).toBeTruthy();
   await page.goto(`/products/${product.handle}/`, { waitUntil: 'load' });
+  const productHeading = (await page.locator('h1').innerText()).trim();
 
   const main = page.locator('#main-product-image');
   async function displayedPhoto(locator) {
@@ -333,7 +334,7 @@ test('one photo file follows a shopper from the shelf through the viewer, shortl
   const zoom = page.locator('#zoom-image');
   await expect(dialog).toBeVisible();
   await expect(dialog).toHaveAttribute('data-photo-view', 'sharp');
-  await expect(page.locator('#photo-dialog-label')).toContainText('Sharpened detail');
+  await expect(page.locator('#photo-dialog-label')).toHaveText(productHeading);
   await expect(zoom).toHaveAttribute('src', /assets\/catalog-clarity\/[a-f0-9]+\.jpg/);
   await expect(zoom).not.toHaveAttribute('srcset', /./);
   await expect(zoom).toHaveAttribute('data-photo-view', 'sharp');
@@ -358,15 +359,16 @@ test('one photo file follows a shopper from the shelf through the viewer, shortl
   await enlarge.click();
   await expect(dialog).toBeVisible();
   await expect(dialog).toHaveAttribute('data-photo-view', 'sharp');
-  const original = dialog.getByRole('button', { name: 'View original photo', exact: true });
-  await original.click();
+  const storePhoto = dialog.getByRole('button', { name: 'View store photo', exact: true });
+  await storePhoto.click();
   await expect(dialog).toHaveAttribute('data-photo-view', 'original');
-  await expect(page.locator('#photo-dialog-label')).toContainText('Original file');
+  await expect(page.locator('#photo-dialog-label')).toHaveText(productHeading);
   await expect(zoom).toHaveAttribute('src', product.images[0].src);
   await expect(zoom).not.toHaveAttribute('srcset', /./);
   await expect(zoom).not.toHaveAttribute('data-photo-tone', /./);
-  await dialog.getByRole('button', { name: 'View sharpened detail', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Back to gallery photo', exact: true }).click();
   await expect(dialog).toHaveAttribute('data-photo-view', 'sharp');
+  await expect(page.locator('#photo-dialog-label')).toHaveText(productHeading);
   await expect(zoom).toHaveAttribute('src', /assets\/catalog-clarity\/[a-f0-9]+\.jpg/);
   await dialog.getByRole('button', { name: 'Close photograph' }).click();
   await expect(enlarge).toBeFocused();
@@ -377,7 +379,7 @@ test('one photo file follows a shopper from the shelf through the viewer, shortl
   expect(await displayedPhoto(main)).toEqual(second);
   await enlarge.click();
   expect(await displayedPhoto(zoom)).toEqual(second);
-  await dialog.getByRole('button', { name: 'View original photo', exact: true }).click();
+  await dialog.getByRole('button', { name: 'View store photo', exact: true }).click();
   await expect(zoom).toHaveAttribute('src', product.images[1].src);
   await page.keyboard.press('Escape');
 
@@ -387,7 +389,7 @@ test('one photo file follows a shopper from the shelf through the viewer, shortl
   const singleEnlarge = page.getByRole('button', { name: 'Enlarge photo', exact: true });
   await expect(singleEnlarge).toBeVisible();
   await singleEnlarge.click();
-  await page.getByRole('button', { name: 'View original photo', exact: true }).click();
+  await page.getByRole('button', { name: 'View store photo', exact: true }).click();
   await expect(page.locator('#zoom-image')).toHaveAttribute('src', singlePhotoProduct.images[0].src);
   await page.keyboard.press('Escape');
 
@@ -425,6 +427,78 @@ test('one photo file follows a shopper from the shelf through the viewer, shortl
   const bag = await displayedPhoto(page.locator('.cart-line img'));
   await page.goto(`/products/${cartProduct.handle}/`);
   expect(await displayedPhoto(page.locator('#main-product-image'))).toEqual(bag);
+});
+
+test('shopper photo language stays neutral in served copy, alternatives, controls and both viewer modes', async ({ page }) => {
+  const product = inventory.products.find(entry => entry.handle && entry.images?.length);
+  expect(product, 'fixture needs a photographed product').toBeTruthy();
+  const processCopy = /\b(?:sharpened detail|original file|view original photo|view sharpened detail|enlarge sharpened photograph|full-size source|restored (?:archive|gallery|close-up|photo|photograph|image)|(?:photo|photograph|image) (?:was )?(?:sharpened|enhanced|restored))\b/i;
+
+  async function expectNeutralPhotoLanguage(context) {
+    const values = await page.locator([
+      'img[alt]',
+      '[data-photo-open]',
+      '[data-photo-version]',
+      '[data-archive-photo]',
+      '[data-photo-size]',
+      '#photo-dialog-label',
+      '#archive-photo-title',
+      '.gallery-print-image > span',
+      'figcaption'
+    ].join(',')).evaluateAll(elements => elements.flatMap(element => [
+      ['text', element.textContent],
+      ['alt', element.getAttribute('alt')],
+      ['aria-label', element.getAttribute('aria-label')],
+      ['title', element.getAttribute('title')]
+    ].filter(([, value]) => value && value.trim()).map(([field, value]) => ({
+      field,
+      value: value.replace(/\s+/g, ' ').trim()
+    }))));
+    const offenders = values.filter(entry => processCopy.test(entry.value));
+    expect(offenders, `${context} must not expose internal photograph-processing language`).toEqual([]);
+  }
+
+  for (const pathname of ['/index.html', '/story.html']) {
+    await page.goto(pathname, { waitUntil: 'load' });
+    await expectNeutralPhotoLanguage(pathname);
+  }
+
+  await page.goto('/index.html', { waitUntil: 'load' });
+  const archiveLink = page.locator('[data-archive-photo]').first();
+  const archiveAlt = await archiveLink.locator('img').getAttribute('alt');
+  await archiveLink.click();
+  const archiveDialog = page.locator('dialog.photo-dialog[open]');
+  await expect(archiveDialog).toBeVisible();
+  await expect(archiveDialog.locator('#archive-photo-title')).toHaveText(archiveAlt);
+  await expectNeutralPhotoLanguage('open archive viewer');
+  await archiveDialog.locator('[data-close]').click();
+
+  await page.goto(`/products/${product.handle}/`, { waitUntil: 'load' });
+  const title = (await page.locator('h1').innerText()).trim();
+  const mainOpener = page.locator('.main-product-image');
+  await expect(mainOpener).toHaveAttribute('aria-label', `Enlarge photograph of ${title}`);
+  await expectNeutralPhotoLanguage('product page');
+  await mainOpener.click();
+
+  const dialog = page.locator('#photo-dialog');
+  const heading = dialog.locator('#photo-dialog-label');
+  await expect(dialog).toBeVisible();
+  await expect(heading).toHaveText(title);
+  const viewStorePhoto = dialog.getByRole('button', { name: 'View store photo', exact: true });
+  await expect(viewStorePhoto).toBeVisible();
+  await expectNeutralPhotoLanguage('gallery-photo viewer mode');
+
+  await viewStorePhoto.click();
+  await expect(dialog).toHaveAttribute('data-photo-view', 'original');
+  await expect(heading).toHaveText(title);
+  const backToGalleryPhoto = dialog.getByRole('button', { name: 'Back to gallery photo', exact: true });
+  await expect(backToGalleryPhoto).toBeVisible();
+  await expectNeutralPhotoLanguage('store-photo viewer mode');
+
+  await backToGalleryPhoto.click();
+  await expect(dialog).toHaveAttribute('data-photo-view', 'sharp');
+  await expect(heading).toHaveText(title);
+  await expect(dialog.getByRole('button', { name: 'View store photo', exact: true })).toBeVisible();
 });
 
 test('small merchant photos keep their native width when shoppers switch angles', async ({ page }) => {
@@ -486,12 +560,12 @@ test.describe('High-density photograph display', () => {
 
 test('all eleven gallery archive thumbnails and enlargements use the same largest local file', async ({ page }) => {
   const largestFiles = new Map([
-    ['crystal-chandelier-hero-enhanced-v3.webp', [1448, 1086]],
+    ['crystal-chandelier-prisms.webp', [1448, 1086]],
     ['murano-overview-v2-1280.webp', [1280, 1280]],
     ['murano-fluted-cup-v2-640.webp', [640, 639]],
     ['murano-glass-branches-v2-640.webp', [640, 640]],
     ['smiroldo-drummer-v2-789.webp', [789, 789]],
-    ['eames-orange-chairs-enhanced-v3.webp', [1254, 1254]],
+    ['orange-chairs-and-gallery-cat.webp', [1254, 1254]],
     ['lane-park-chest-v2-798.webp', [798, 798]],
     ['gallery-showroom-v2-1135.webp', [1135, 596]],
   ]);
@@ -1250,7 +1324,7 @@ test('Owner Studio resizes a large phone-style photo into a bounded local sample
     buffer: Buffer.from(generated.base64, 'base64')
   });
   await form.locator('button[type="submit"]').click();
-  await expect(page.locator('.studio-message')).toContainText('resized browser-local copy');
+  await expect(page.locator('.studio-message')).toContainText('Sample piece added to the practice inventory.');
   await expect(page.locator('.studio-custom-product')).toContainText('Browser QA photo sample');
 
   const customProduct = await page.evaluate(() => window.KIGBStudioState.read().draft.customProducts.at(-1));

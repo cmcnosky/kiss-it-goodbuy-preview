@@ -49,7 +49,7 @@ const photo=catalogContext.KIGBPhotos.gallery(product)[0];
 const sharedPhoto=photo?.src?catalogContext.KIGBPhotos.share(photo):null;
 const image=new URL(sharedPhoto?.src||previewPath,siteUrl).href;
 const suppliedImageAlt=String(photo?.alt||'').trim();
-const imageAlt=photo?.src?(!suppliedImageAlt||suppliedImageAlt===product.title?productTitle(product):suppliedImageAlt):'Kiss It Good Buy Furniture Consignment, with its original red lipstick kiss between a gallery photograph of orange chairs with the gallery cat and a genuine close-up of an Italian Murano glass chandelier.';
+const imageAlt=photo?.src?(!suppliedImageAlt||suppliedImageAlt===product.title?productTitle(product):suppliedImageAlt):'Kiss It Good Buy Furniture Consignment and its red lipstick kiss, flanked by orange chairs with the gallery cat and a close-up of a Murano glass chandelier.';
 const width=sharedPhoto?sharedPhoto.width:1200;
 const height=sharedPhoto?sharedPhoto.height:630;
 const imageType=sharedPhoto?sharedPhoto.type:'image/png';
